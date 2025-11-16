@@ -59,7 +59,7 @@ export const Hero = () => {
   currentLocation: "Auckland, New Zealand",
   role: "Student @ The University of Auckland",
   degrees: [
-    "BSc in Software Engineering", 
+    "BE (Hons) in Software Engineering", 
     "BCom in Finance and Management"
   ],
   stack: {
