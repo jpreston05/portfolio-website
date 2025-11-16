@@ -31,7 +31,7 @@ export const Navbar = () => {
 
                 <motion.ul className='nav-links' variants={staggerContainer} initial="initial" animate="animate">
                     <motion.li variants={fadeInUp} whileHover={{scale: 1.1}} whileTap={{scale: 0.95}}>
-                        <a href="#hero">Home</a>
+                        <a href="#home">Home</a>
                     </motion.li>
                     <motion.li variants={fadeInUp} whileHover={{scale: 1.1}} whileTap={{scale: 0.95}}>
                         <a href="#projects">Projects</a>
