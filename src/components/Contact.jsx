@@ -85,17 +85,17 @@ export const Contact = () => {
     }
 
     return (
-        <motion.section id='contact' className="contact" initial={{opacity: 0}} whileInView={{opacity: 1}} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <motion.h2 variants={fadeInUp} initial="initial" whileInView="animate" viewport={{ once: true }}>
+        <motion.section id='contact' className='contact' initial={{opacity: 0}} whileInView={{opacity: 1}} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <motion.h2 variants={fadeInUp} initial='initial' whileInView='animate' viewport={{ once: true }}>
                 Get in Touch
             </motion.h2>
 
-            <motion.div className="contact-content" variants={fadeInUp}>
-                <motion.form className="contact-form" onSubmit={handleSubmit}>
-                    <motion.input type="text" name="name" placeholder="Your Name..." required whileFocus={{ scale: 1.02 }} onChange={handleInputChange} />
-                    <motion.input type="email" name="email" placeholder="Your Email..." required whileFocus={{ scale: 1.02 }} onChange={handleInputChange} />
-                    <motion.textarea name="message" placeholder="Your Message..." required whileFocus={{ scale: 1.02 }} onChange={handleInputChange} />
-                    <motion.button type="submit" className="submit-btn" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} disabled={formStatus.submitting}> {formStatus.submitting ? 'Sending...' : 'Send Message'} </motion.button>
+            <motion.div className='contact-content' variants={fadeInUp}>
+                <motion.form className='contact-form' onSubmit={handleSubmit}>
+                    <motion.input type='text' name='name' placeholder='Your Name...' required whileFocus={{ scale: 1.02 }} onChange={handleInputChange} />
+                    <motion.input type='email' name='email' placeholder='Your Email...' required whileFocus={{ scale: 1.02 }} onChange={handleInputChange} />
+                    <motion.textarea name='message' placeholder='Your Message...' required whileFocus={{ scale: 1.02 }} onChange={handleInputChange} />
+                    <motion.button type='submit' className='submit-btn' whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} disabled={formStatus.submitting}> {formStatus.submitting ? 'Sending...' : 'Send Message'} </motion.button>
                     {formStatus.message && (
                         <motion.div className={ `form-status ${formStatus.success ? 'success' : 'error'}`} initial={{opacity: 0}} animate={{opacity: 1}} transition={{duration: 0.4}}>
                             {formStatus.message}  
