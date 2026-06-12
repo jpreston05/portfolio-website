@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* Old App.css :root palette, exposed as Tailwind v4 theme tokens.
+   Generates utilities like bg-bg, text-ink, text-muted, text-accent, etc. */
+@theme {
+  --color-primary: #4c3aed;
+  --color-primary-dark: #5b21b6;
+  --color-secondary: #279fdb;
+  --color-accent: #72d1f4;
+  --color-ink: #e2e8f0;
+  --color-muted: #94a3b8;
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-card: #1e293b;
+  --color-line: rgba(148, 163, 184, 0.1);
+
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  line-height: 1.6;
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar (from old index.css) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Selection color (from old index.css) */
+::selection {
+  background: var(--color-primary);
+  color: white;
+}
