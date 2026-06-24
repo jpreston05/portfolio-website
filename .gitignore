@@ -37,3 +37,4 @@ next-env.d.ts
 *.sw?
 
 CLAUDE.md
+.claude
