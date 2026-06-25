@@ -1,25 +1,18 @@
 "use client";
 
-import { motion } from "framer-motion";
 import emailjs from "@emailjs/browser";
+import { motion } from "framer-motion";
 import { useState, type ChangeEvent, type FormEvent } from "react";
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 },
-};
+import { FiAlertCircle, FiCheckCircle } from "react-icons/fi";
+import { SectionCard } from "@/components/SectionCard";
+import { c } from "@/components/palette";
 
 const fieldClass =
-  "rounded-lg border-2 border-line bg-card p-4 text-base text-ink shadow-[0_2px_8px_rgba(0,0,0,0.1)] transition-all placeholder:text-muted focus:border-accent focus:shadow-[0_4px_12px_rgba(244,114,182,0.2)] focus:outline-none";
+  "rounded-lg border bg-[#1B1B1F] p-3.5 text-base text-[#ECECEA] transition-colors " +
+  "placeholder:text-[#5C5C5C] focus:border-[#4ADE80] focus:outline-none";
 
 export const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [formStatus, setFormStatus] = useState({
     submitting: false,
     success: false,
@@ -31,21 +24,12 @@ export const Contact = () => {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    setFormStatus({
-      submitting: true,
-      success: false,
-      error: false,
-      message: "",
-    });
+    setFormStatus({ submitting: true, success: false, error: false, message: "" });
 
     try {
       await emailjs.send(
@@ -65,12 +49,7 @@ export const Contact = () => {
         error: false,
         message: "Message sent successfully! I will get back to you soon.",
       });
-
-      setFormData({
-        name: "",
-        email: "",
-        message: "",
-      });
+      setFormData({ name: "", email: "", message: "" });
     } catch {
       setFormStatus({
         submitting: false,
@@ -79,86 +58,75 @@ export const Contact = () => {
         message:
           "An error occurred while sending your message. Please try again.",
       });
-      return;
     }
   };
 
   return (
-    <motion.section
-      id="contact"
-      className="relative bg-surface px-[5%] py-24"
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="absolute left-0 right-0 top-0 h-px [background:linear-gradient(90deg,transparent,#72d1f4,transparent)]" />
-      <motion.h2
-        className="mb-12 text-center text-[2.5rem]"
-        variants={fadeInUp}
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true }}
-      >
-        Get in Touch
-      </motion.h2>
+    <SectionCard id="contact" eyebrow="04" title="Get in Touch">
+      <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Your name…"
+          required
+          value={formData.name}
+          onChange={handleInputChange}
+          className={fieldClass}
+          style={{ borderColor: c.line }}
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Your email…"
+          required
+          value={formData.email}
+          onChange={handleInputChange}
+          className={fieldClass}
+          style={{ borderColor: c.line }}
+        />
+        <textarea
+          name="message"
+          placeholder="Your message…"
+          required
+          value={formData.message}
+          onChange={handleInputChange}
+          className={`${fieldClass} min-h-[140px] resize-y`}
+          style={{ borderColor: c.line }}
+        />
+        <motion.button
+          type="submit"
+          className="rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:opacity-60"
+          style={{ background: c.accent, color: c.bg }}
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          disabled={formStatus.submitting}
+        >
+          {formStatus.submitting ? "Sending…" : "Send Message"}
+        </motion.button>
 
-      <motion.div className="mx-auto max-w-[600px]" variants={fadeInUp}>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <motion.input
-            type="text"
-            name="name"
-            placeholder="Your Name..."
-            required
-            value={formData.name}
-            whileFocus={{ scale: 1.02 }}
-            onChange={handleInputChange}
-            className={fieldClass}
-          />
-          <motion.input
-            type="email"
-            name="email"
-            placeholder="Your Email..."
-            required
-            value={formData.email}
-            whileFocus={{ scale: 1.02 }}
-            onChange={handleInputChange}
-            className={fieldClass}
-          />
-          <motion.textarea
-            name="message"
-            placeholder="Your Message..."
-            required
-            value={formData.message}
-            whileFocus={{ scale: 1.02 }}
-            onChange={handleInputChange}
-            className={`${fieldClass} min-h-[150px] resize-y`}
-          />
-          <motion.button
-            type="submit"
-            className="relative overflow-hidden rounded-lg bg-primary p-4 text-base font-semibold text-white shadow-[0_4px_12px_rgba(124,58,237,0.3)] transition-all disabled:opacity-70 before:absolute before:left-[-100%] before:top-0 before:h-full before:w-full before:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)] before:transition-all before:duration-500 before:content-[''] hover:before:left-[100%]"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            disabled={formStatus.submitting}
+        {formStatus.message && (
+          <motion.div
+            role="status"
+            aria-live="polite"
+            className="mt-1 flex items-center gap-2 rounded-lg border p-3 text-sm font-medium"
+            style={{
+              borderColor: formStatus.success ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)",
+              background: formStatus.success ? "rgba(74,222,128,0.08)" : "rgba(248,113,113,0.08)",
+              color: formStatus.success ? c.accent : "#F87171",
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
           >
-            {formStatus.submitting ? "Sending..." : "Send Message"}
-          </motion.button>
-          {formStatus.message && (
-            <motion.div
-              className={`mt-4 rounded-lg p-4 text-center font-medium ${
-                formStatus.success
-                  ? "border border-[rgba(34,197,94,0.2)] bg-[rgba(34,197,94,0.1)] text-[#4ade80]"
-                  : "border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.2)] text-[#f87171]"
-              }`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-            >
-              {formStatus.message}
-            </motion.div>
-          )}
-        </form>
-      </motion.div>
-    </motion.section>
+            {formStatus.success ? (
+              <FiCheckCircle className="shrink-0 text-base" aria-hidden />
+            ) : (
+              <FiAlertCircle className="shrink-0 text-base" aria-hidden />
+            )}
+            <span>{formStatus.message}</span>
+          </motion.div>
+        )}
+      </form>
+    </SectionCard>
   );
 };
