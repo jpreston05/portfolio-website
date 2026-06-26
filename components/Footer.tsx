@@ -6,8 +6,8 @@ import { c } from "@/components/palette";
 export const Footer = () => {
   return (
     <motion.footer
-      className="rounded-2xl border p-6 text-center text-sm"
-      style={{ borderColor: c.line, background: c.surface, color: c.muted }}
+      className="border-t px-[5%] py-8 text-center text-sm"
+      style={{ borderColor: c.line, background: c.bg, color: c.muted }}
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}

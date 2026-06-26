@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import emailjs from "@emailjs/browser";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Herov2";
+import { useHeroMotion } from "@/components/useHeroMotion";
 import { FeaturedProjects } from "@/components/FeaturedProjects";
 import { TechStack } from "@/components/TechStack";
 import { Timeline } from "@/components/Timeline";
@@ -14,7 +15,11 @@ import { ControlPanel } from "@/components/ControlPanel";
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
-  const reduce = useReducedMotion();
+
+  // Shared collapse motion. contentX is the card's overflow beyond its docked
+  // width, so the content tracks the card's right edge with a constant gap
+  // (never behind it). Vertical hold is done with native sticky (see JSX).
+  const { enabled, contentX, contentOpacity } = useHeroMotion();
 
   useEffect(() => {
     // Own scroll restoration so a refresh always starts at the top.
@@ -27,13 +32,13 @@ export default function Home() {
   }, []);
 
   return (
-    <motion.div
-      className="min-h-screen w-full overflow-x-clip"
-      style={{ background: "#0B0B0C" }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: isLoaded ? 1 : 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-    >
+    <>
+      <motion.div
+        className="relative z-10 min-h-screen w-full overflow-x-clip"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoaded ? 1 : 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
       <Navbar />
 
       <main className="mx-auto grid max-w-[1400px] gap-6 px-4 pb-10 pt-24 sm:px-6 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
@@ -42,20 +47,33 @@ export default function Home() {
           <Hero />
         </div>
 
-        {/* RIGHT COLUMN — scrolling content */}
-        <div className="flex flex-col gap-6 lg:gap-8">
-          {!reduce && (
-            <div aria-hidden className="hidden lg:block lg:h-[180vh]" />
+        {/* RIGHT COLUMN — during the collapse the content is held in place by a
+            native sticky pin (no transform jitter) while it slides in from the
+            right (x) + fades; the trailing spacer gives the sticky its scroll
+            range, after which the content scrolls normally. */}
+        <div className="flex flex-col">
+          <motion.div
+            className="flex flex-col gap-6 lg:sticky lg:top-24 lg:gap-8"
+            style={
+              enabled ? { opacity: contentOpacity, x: contentX } : undefined
+            }
+          >
+            <FeaturedProjects />
+            <TechStack />
+            <Timeline />
+            <Contact />
+          </motion.div>
+          {enabled && (
+            <div aria-hidden className="hidden lg:block lg:h-[50vh]" />
           )}
-          <FeaturedProjects />
-          <TechStack />
-          <Timeline />
-          <Contact />
-          <Footer />
         </div>
       </main>
 
-      <ControlPanel />
-    </motion.div>
+      {/* Full-width footer — spans the page, caps the end normally */}
+      <Footer />
+
+        <ControlPanel />
+      </motion.div>
+    </>
   );
 }

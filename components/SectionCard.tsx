@@ -24,8 +24,8 @@ export const SectionCard = ({
     id={id}
     className={`scroll-mt-24 rounded-2xl border p-6 sm:p-8 ${className}`}
     style={{ borderColor: c.line, background: c.surface }}
-    initial={{ opacity: 0, y: 24 }}
-    whileInView={{ opacity: 1, y: 0 }}
+    initial={{ opacity: 0 }}
+    whileInView={{ opacity: 1 }}
     viewport={{ once: true, margin: "-80px" }}
     transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
   >
