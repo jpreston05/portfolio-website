@@ -15,7 +15,7 @@ export const RAIL_W = 400; // docked card width, matches the grid track max
 // exactly when the sticky pin releases.
 export const COLLAPSE_VH = 0.5;
 export const PORTRAIT_BIG = 560; // portrait width (px) at the big hero state
-export const PORTRAIT_SMALL = 280; // portrait width (px) when docked
+export const PORTRAIT_SMALL = 250; // portrait width (px) when docked
 
 // Horizontal padding outside the max-w container (lg:px-8) — used to size EXTRA.
 const CONTAINER_PAD = 64; // 2 * 2rem

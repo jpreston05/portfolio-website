@@ -8,8 +8,8 @@ import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
 
 const fieldClass =
-  "rounded-lg border bg-[#1B1B1F] p-3.5 text-base text-[#ECECEA] transition-colors " +
-  "placeholder:text-[#5C5C5C] focus:border-[#4ADE80] focus:outline-none";
+  "rounded-lg border bg-[#3A423D] p-3.5 text-base text-[#ECECEA] transition-colors " +
+  "placeholder:text-[#737F77] focus:border-[#DB5461] focus:outline-none";
 
 export const Contact = () => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -112,7 +112,7 @@ export const Contact = () => {
             style={{
               borderColor: formStatus.success ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)",
               background: formStatus.success ? "rgba(74,222,128,0.08)" : "rgba(248,113,113,0.08)",
-              color: formStatus.success ? c.accent : "#F87171",
+              color: formStatus.success ? "#4ade80" : "#F87171",
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

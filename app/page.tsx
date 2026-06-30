@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import emailjs from "@emailjs/browser";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
+import { Preloader } from "@/components/Preloader";
+import { Background, BackgroundProvider } from "@/components/Background";
 import { Hero } from "@/components/Herov2";
 import { useHeroMotion } from "@/components/useHeroMotion";
 import { FeaturedProjects } from "@/components/FeaturedProjects";
@@ -14,7 +16,10 @@ import { Footer } from "@/components/Footer";
 import { ControlPanel } from "@/components/ControlPanel";
 
 export default function Home() {
-  const [isLoaded, setIsLoaded] = useState(false);
+  // Intro loading screen → reveal → hand off the "JP." to the navbar brand.
+  const [intro, setIntro] = useState(true);
+  const [revealContent, setRevealContent] = useState(false);
+  const [navBrandShown, setNavBrandShown] = useState(false);
 
   // Shared collapse motion. contentX is the card's overflow beyond its docked
   // width, so the content tracks the card's right edge with a constant gap
@@ -27,21 +32,21 @@ export default function Home() {
       window.history.scrollRestoration = "manual";
     }
     window.scrollTo(0, 0);
-    setIsLoaded(true);
     emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!);
   }, []);
 
   return (
-    <>
+    <BackgroundProvider>
+      <Background />
       <motion.div
         className="relative z-10 min-h-screen w-full overflow-x-clip"
         initial={{ opacity: 0 }}
-        animate={{ opacity: isLoaded ? 1 : 0 }}
+        animate={{ opacity: revealContent ? 1 : 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-      <Navbar />
+      <Navbar brandVisible={navBrandShown} />
 
-      <main className="mx-auto grid max-w-[1400px] gap-6 px-4 pb-10 pt-24 sm:px-6 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
+      <main id="home" className="mx-auto grid max-w-[1400px] gap-6 px-4 pb-10 pt-24 sm:px-6 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
         {/* LEFT RAIL — collapsing hero, pinned the whole way on desktop */}
         <div className="relative z-10 lg:sticky lg:top-24 lg:flex lg:h-[calc(100vh-7rem)] lg:items-center">
           <Hero />
@@ -63,8 +68,10 @@ export default function Home() {
             <Timeline />
             <Contact />
           </motion.div>
+          {/* collapse range (~50vh) + a dwell so the docked card + content sit
+              still for a stretch before the page scrolls on */}
           {enabled && (
-            <div aria-hidden className="hidden lg:block lg:h-[50vh]" />
+            <div aria-hidden className="hidden lg:block lg:h-[80vh]" />
           )}
         </div>
       </main>
@@ -74,6 +81,18 @@ export default function Home() {
 
         <ControlPanel />
       </motion.div>
-    </>
+
+      <AnimatePresence>
+        {intro && (
+          <Preloader
+            onReveal={() => setRevealContent(true)}
+            onDone={() => {
+              setNavBrandShown(true);
+              setIntro(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </BackgroundProvider>
   );
 }

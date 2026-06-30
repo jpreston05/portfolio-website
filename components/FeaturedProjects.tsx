@@ -40,7 +40,7 @@ export const FeaturedProjects = () => (
         >
           <div className="flex items-start justify-between gap-3">
             <h3
-              className="text-lg font-semibold transition-colors group-hover:text-[#4ADE80]"
+              className="text-lg font-semibold transition-colors group-hover:text-[#DB5461]"
               style={{ color: c.text }}
             >
               {p.title}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiChevronUp, FiMoon, FiZap } from "react-icons/fi";
 import { c } from "@/components/palette";
+import { useBackground } from "@/components/Background";
 
 type ToggleProps = {
   on: boolean;
@@ -44,7 +45,8 @@ const Toggle = ({ on, set, icon, label }: ToggleProps) => (
 export const ControlPanel = () => {
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(true);
-  const [motionOn, setMotionOn] = useState(true);
+  // "Animations" drives the background glow drift (static when off).
+  const { animated, setAnimated } = useBackground();
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
@@ -66,8 +68,8 @@ export const ControlPanel = () => {
             </p>
             <Toggle on={dark} set={setDark} icon={<FiMoon />} label="Dark mode" />
             <Toggle
-              on={motionOn}
-              set={setMotionOn}
+              on={animated}
+              set={setAnimated}
               icon={<FiZap />}
               label="Animations"
             />
