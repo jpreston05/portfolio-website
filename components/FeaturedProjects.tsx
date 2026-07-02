@@ -27,16 +27,17 @@ const projects = [
 ];
 
 export const FeaturedProjects = () => (
-  <SectionCard id="projects" eyebrow="01" title="Featured Projects">
+  <SectionCard id="projects" title="Featured Projects">
     <div className="flex flex-col gap-4">
       {projects.map((p) => (
         <motion.a
           key={p.title}
           href={p.href}
-          className="group flex flex-col gap-3 rounded-xl border p-5 transition-colors"
-          style={{ borderColor: c.line, background: c.surface2 }}
-          whileHover={{ y: -3 }}
-          transition={{ duration: 0.2 }}
+          className="group flex flex-col gap-3 rounded-xl p-5 transition-colors"
+          style={{ background: c.surface2 }}
+          whileHover={{ y: -3, boxShadow: "0 12px 28px rgba(0,0,0,0.28)" }}
+          whileTap={{ scale: 0.985 }}
+          transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         >
           <div className="flex items-start justify-between gap-3">
             <h3
@@ -46,8 +47,7 @@ export const FeaturedProjects = () => (
               {p.title}
             </h3>
             <FiArrowUpRight
-              className="mt-0.5 shrink-0 text-lg transition-colors"
-              style={{ color: c.muted2 }}
+              className="mt-0.5 shrink-0 text-lg text-[#737F77] transition-[transform,color] duration-200 ease-snappy group-hover:translate-x-0.5 group-hover:text-[#DB5461]"
             />
           </div>
           <p className="text-sm leading-relaxed" style={{ color: c.muted }}>
@@ -57,8 +57,8 @@ export const FeaturedProjects = () => (
             {p.stack.map((tech) => (
               <span
                 key={tech}
-                className="rounded-md border px-2 py-0.5 font-mono text-xs"
-                style={{ borderColor: c.line, color: c.muted }}
+                className="rounded-md px-2 py-0.5 font-mono text-xs"
+                style={{ background: c.bg, color: c.muted }}
               >
                 {tech}
               </span>

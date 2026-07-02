@@ -22,7 +22,7 @@ const milestones = [
 ];
 
 export const Timeline = () => (
-  <SectionCard id="timeline" eyebrow="03" title="Timeline">
+  <SectionCard id="timeline" title="Timeline">
     <ol className="flex flex-col">
       {milestones.map((m, i) => (
         <li key={m.when} className="flex gap-4">
@@ -36,8 +36,8 @@ export const Timeline = () => (
               <span className="w-px flex-1" style={{ background: c.line }} />
             )}
           </div>
-          <div className="pb-8">
-            <p className="font-mono text-xs" style={{ color: c.muted2 }}>
+          <div className={i < milestones.length - 1 ? "pb-8" : ""}>
+            <p className="font-mono text-xs" style={{ color: c.muted }}>
               {m.when}
             </p>
             <p className="mt-1 font-semibold" style={{ color: c.text }}>

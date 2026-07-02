@@ -10,13 +10,13 @@ const groups = [
 ];
 
 export const TechStack = () => (
-  <SectionCard id="tech" eyebrow="02" title="Tech Stack">
+  <SectionCard id="tech" title="Tech Stack">
     <div className="flex flex-col gap-6">
       {groups.map((g) => (
         <div key={g.label}>
           <p
             className="mb-2 font-mono text-xs uppercase tracking-wider"
-            style={{ color: c.muted2 }}
+            style={{ color: c.muted }}
           >
             {g.label}
           </p>
@@ -24,8 +24,8 @@ export const TechStack = () => (
             {g.items.map((item) => (
               <span
                 key={item}
-                className="rounded-lg border px-3 py-1.5 text-sm transition-colors hover:text-[#ECECEA]"
-                style={{ borderColor: c.line, background: c.surface2, color: c.muted }}
+                className="rounded-lg px-3 py-1.5 text-sm transition-colors hover:text-[#ECECEA]"
+                style={{ background: c.surface2, color: c.muted }}
               >
                 {item}
               </span>

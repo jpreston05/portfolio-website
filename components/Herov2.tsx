@@ -20,7 +20,7 @@ import {
 
 const PAD = 28; // card inset (matches the absolute children's top/left/bottom)
 const NAVBAR = 112; // 7rem — the rail height is calc(100vh - 7rem)
-const BIG_CARD_RATIO = 0.75; // big card height as a fraction of the docked (full) height
+const BIG_CARD_RATIO = 0.62; // big card height as a fraction of the docked (full) height
 const BIG_BTN_W = 590; // cap on the big-state row: fits 4 buttons (basis-8em) in one tidy line
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -42,20 +42,19 @@ const CurrentlyLine = () => {
     return () => clearInterval(id);
   }, [reduce]);
 
+  // Crossfade + slight blur (no vertical travel — nothing to clip, and the
+  // text keeps its natural inline baseline next to "Currently").
   return (
-    <span
-      className="relative inline-flex h-[1.4em] overflow-hidden align-bottom"
-      aria-live="polite"
-    >
+    <span aria-live="polite">
       <AnimatePresence mode="wait">
         <motion.span
           key={i}
-          className="whitespace-nowrap"
-          style={{ color: c.text }}
-          initial={reduce ? false : { y: "100%", opacity: 0 }}
-          animate={{ y: "0%", opacity: 1 }}
-          exit={reduce ? undefined : { y: "-100%", opacity: 0 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="inline-block whitespace-nowrap"
+          style={{ color: "var(--hero-ink)" }}
+          initial={reduce ? false : { opacity: 0, filter: "blur(3px)" }}
+          animate={{ opacity: 1, filter: "blur(0px)" }}
+          exit={reduce ? undefined : { opacity: 0, filter: "blur(3px)" }}
+          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
         >
           {CURRENTLY[i]}
         </motion.span>
@@ -73,24 +72,26 @@ const Action = ({ href, label, icon }: ActionProps) => (
     rel="noreferrer"
     whileHover={{ y: -2 }}
     whileTap={{ scale: 0.97 }}
-    className="group flex flex-1 basis-[8em] items-center justify-center gap-[0.5em] rounded-lg border px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
-    style={{ borderColor: c.line, color: c.muted, background: c.surface2 }}
+    className="group flex flex-1 basis-[8em] items-center justify-center gap-[0.5em] rounded-lg px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
+    style={{ color: c.muted, background: c.bg }}
   >
-    <span className="text-[1.1em] transition-colors group-hover:text-[#DB5461]">
+    <span className="text-[1.1em] transition-colors duration-200 group-hover:text-[#ECECEA]">
       {icon}
     </span>
-    <span className="transition-colors group-hover:text-[#ECECEA]">{label}</span>
+    <span className="transition-colors duration-200 group-hover:text-[#ECECEA]">
+      {label}
+    </span>
   </motion.a>
 );
 
-/* Portrait art — a red SQUARE pinned to the bottom of the box, with the cutout
-   sitting on it so the head/hair pokes out above the square on the dark bg.
-   object-cover fills the frame (no invisible gap above the hair). */
+/* Portrait art — a carbon SQUARE pinned to the bottom of the box, with the
+   cutout sitting on it so the head/hair pokes out above the square on the pink
+   card. object-cover fills the frame (no invisible gap above the hair). */
 const PortraitArt = () => (
   <>
     <div
-      className="absolute inset-x-0 bottom-0 aspect-square rounded-xl border"
-      style={{ borderColor: c.line, background: "#DB5461" }}
+      className="absolute inset-x-0 bottom-0 aspect-square rounded-xl"
+      style={{ background: "var(--hero-square)" }}
     />
     <Image
       src="/portrait.png"
@@ -107,23 +108,29 @@ const Headline = () => (
   <>
     <p
       className="mb-[0.4em] font-mono text-[0.72em] tracking-wide"
-      style={{ color: c.muted }}
+      style={{ color: "var(--hero-sub)" }}
     >
       Hello, I&apos;m
     </p>
     <h1
       className="text-[4.2em] font-bold leading-[0.9] tracking-tight"
-      style={{ color: c.text }}
+      style={{ color: "var(--hero-ink)" }}
     >
       <span className="block whitespace-nowrap">Jack</span>
       <span className="block whitespace-nowrap">
-        Preston<span style={{ color: c.accent }}>.</span>
+        Preston<span style={{ color: "var(--hero-dot)" }}>.</span>
       </span>
     </h1>
-    <p className="mt-[0.8em] text-[0.95em] leading-relaxed" style={{ color: c.muted }}>
+    <p
+      className="mt-[0.8em] text-[0.95em] leading-relaxed"
+      style={{ color: "var(--hero-sub)" }}
+    >
       Third-year BE(Hons) &amp; BCom student at the University of Auckland.
     </p>
-    <p className="mt-[0.3em] text-[0.95em] leading-relaxed" style={{ color: c.muted }}>
+    <p
+      className="mt-[0.3em] text-[0.95em] leading-relaxed"
+      style={{ color: "var(--hero-sub)" }}
+    >
       Currently <CurrentlyLine />
     </p>
   </>
@@ -148,7 +155,21 @@ const ButtonRow = () => (
 );
 
 export const Hero = () => {
-  const { enabled, dock, vh, cardWidth } = useHeroMotion();
+  const { enabled, dock, vh, cardWidth, bigCardW } = useHeroMotion();
+
+  // Dye-on-dock: at the top the card is DARK with the pink held in the portrait
+  // square + the full stop (the original accent discipline); scrolling dyes the
+  // card pink while the square inverts to carbon — a figure-ground inversion
+  // that "creates" the docked brand mark. The card/square dye gets a long ramp
+  // (the visible story); the text swaps steeply at the crossover so the
+  // mid-tone low-contrast window is a transient blink. Children consume these
+  // as CSS vars so no color needs prop-drilling into Headline/PortraitArt.
+  const cardBg = useTransform(dock, [0.2, 0.8], [c.surface, c.accent]);
+  const squareBg = useTransform(dock, [0.2, 0.8], [c.accent, c.bg]);
+  const inkColor = useTransform(dock, [0.42, 0.58], [c.text, c.heroInk]);
+  const subColor = useTransform(dock, [0.42, 0.58], [c.muted, c.heroMuted]);
+  const dotColor = useTransform(dock, [0.42, 0.58], [c.accent, c.heroMuted]);
+  const focusColor = useTransform(dock, [0.42, 0.58], [c.accent, c.heroInk]);
 
   // Card content-box height GROWS from a shorter big card to the full rail
   // height as it docks; the geometry below reads hcAt(d), not a fixed Hc.
@@ -156,9 +177,14 @@ export const Hero = () => {
   const dockedHc = (vh || 800) - NAVBAR - 2 * PAD; // full rail content height
   const bigHc = dockedHc * BIG_CARD_RATIO; // shorter big card
   const hcAt = (d: number) => lerp(bigHc, dockedHc, d);
-  // Big portrait sized so the CENTRED red square + its hair overhang (~0.167·w
-  // above, from the 6/7 frame) still clears the top of the big card.
-  const pwBig = Math.min(PORTRAIT_BIG, (bigHc / 2 - 10) / 0.667);
+  // Big portrait sized so (a) the CENTRED square + its hair overhang (~0.167·w
+  // above, from the 6/7 frame) still clears the top of the big card, and (b) it
+  // clears the one-row button cap horizontally (16px gap) — no chip overlap.
+  const pwBig = Math.min(
+    PORTRAIT_BIG,
+    (bigHc / 2 - 10) / 0.667,
+    bigCardW - 2 * PAD - BIG_BTN_W - 16
+  );
 
   const phase = (d: number, a: number, b: number) =>
     Math.max(0, Math.min(1, (d - a) / (b - a)));
@@ -223,15 +249,35 @@ export const Hero = () => {
 
   return (
     <motion.div
+      data-on-accent
       className={
         enabled
-          ? "relative shrink-0 overflow-hidden rounded-2xl border"
-          : "w-full max-w-md rounded-2xl border p-6"
+          ? "relative shrink-0 overflow-hidden rounded-2xl"
+          : "w-full max-w-md rounded-2xl p-6"
       }
       style={{
-        borderColor: c.line,
-        background: c.surface,
-        ...(enabled ? { width: cardWidth, height: cardHeight } : {}),
+        background: "var(--hero-card)",
+        boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
+        ...(enabled
+          ? {
+              width: cardWidth,
+              height: cardHeight,
+              "--hero-card": cardBg,
+              "--hero-square": squareBg,
+              "--hero-ink": inkColor,
+              "--hero-sub": subColor,
+              "--hero-dot": dotColor,
+              "--hero-focus": focusColor,
+            }
+          : {
+              // Static variant (mobile / reduced-motion): the docked look.
+              "--hero-card": c.accent,
+              "--hero-square": c.bg,
+              "--hero-ink": c.heroInk,
+              "--hero-sub": c.heroMuted,
+              "--hero-dot": c.heroMuted,
+              "--hero-focus": c.heroInk,
+            }),
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}

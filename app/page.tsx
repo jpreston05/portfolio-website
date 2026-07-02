@@ -5,7 +5,7 @@ import emailjs from "@emailjs/browser";
 import { AnimatePresence, motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Preloader } from "@/components/Preloader";
-import { Background, BackgroundProvider } from "@/components/Background";
+import { Background } from "@/components/Background";
 import { Hero } from "@/components/Herov2";
 import { useHeroMotion } from "@/components/useHeroMotion";
 import { FeaturedProjects } from "@/components/FeaturedProjects";
@@ -13,7 +13,6 @@ import { TechStack } from "@/components/TechStack";
 import { Timeline } from "@/components/Timeline";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
-import { ControlPanel } from "@/components/ControlPanel";
 
 export default function Home() {
   // Intro loading screen → reveal → hand off the "JP." to the navbar brand.
@@ -36,7 +35,7 @@ export default function Home() {
   }, []);
 
   return (
-    <BackgroundProvider>
+    <>
       <Background />
       <motion.div
         className="relative z-10 min-h-screen w-full overflow-x-clip"
@@ -78,8 +77,6 @@ export default function Home() {
 
       {/* Full-width footer — spans the page, caps the end normally */}
       <Footer />
-
-        <ControlPanel />
       </motion.div>
 
       <AnimatePresence>
@@ -93,6 +90,6 @@ export default function Home() {
           />
         )}
       </AnimatePresence>
-    </BackgroundProvider>
+    </>
   );
 }

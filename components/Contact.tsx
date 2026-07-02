@@ -8,8 +8,8 @@ import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
 
 const fieldClass =
-  "rounded-lg border bg-[#3A423D] p-3.5 text-base text-[#ECECEA] transition-colors " +
-  "placeholder:text-[#737F77] focus:border-[#DB5461] focus:outline-none";
+  "rounded-lg bg-[#3A423D] p-3.5 text-base text-[#ECECEA] transition-shadow " +
+  "placeholder:text-[#A6B0A8] focus:outline-none focus:ring-2 focus:ring-[#DB5461]";
 
 export const Contact = () => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -62,7 +62,7 @@ export const Contact = () => {
   };
 
   return (
-    <SectionCard id="contact" eyebrow="04" title="Get in Touch">
+    <SectionCard id="contact" title="Get in Touch">
       <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
         <input
           type="text"
@@ -72,7 +72,6 @@ export const Contact = () => {
           value={formData.name}
           onChange={handleInputChange}
           className={fieldClass}
-          style={{ borderColor: c.line }}
         />
         <input
           type="email"
@@ -82,7 +81,6 @@ export const Contact = () => {
           value={formData.email}
           onChange={handleInputChange}
           className={fieldClass}
-          style={{ borderColor: c.line }}
         />
         <textarea
           name="message"
@@ -91,32 +89,32 @@ export const Contact = () => {
           value={formData.message}
           onChange={handleInputChange}
           className={`${fieldClass} min-h-[140px] resize-y`}
-          style={{ borderColor: c.line }}
         />
         <motion.button
           type="submit"
-          className="rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:opacity-60"
+          className="rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           style={{ background: c.accent, color: c.bg }}
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={formStatus.submitting ? undefined : { y: -2 }}
+          whileTap={formStatus.submitting ? undefined : { scale: 0.98 }}
           disabled={formStatus.submitting}
+          aria-busy={formStatus.submitting}
         >
           {formStatus.submitting ? "Sending…" : "Send Message"}
         </motion.button>
 
         {formStatus.message && (
           <motion.div
-            role="status"
-            aria-live="polite"
+            role={formStatus.success ? "status" : "alert"}
+            aria-live={formStatus.success ? "polite" : "assertive"}
             className="mt-1 flex items-center gap-2 rounded-lg border p-3 text-sm font-medium"
             style={{
               borderColor: formStatus.success ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)",
               background: formStatus.success ? "rgba(74,222,128,0.08)" : "rgba(248,113,113,0.08)",
               color: formStatus.success ? "#4ade80" : "#F87171",
             }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
           >
             {formStatus.success ? (
               <FiCheckCircle className="shrink-0 text-base" aria-hidden />

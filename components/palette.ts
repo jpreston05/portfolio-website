@@ -7,7 +7,9 @@ export const c = {
   surface2: "#3A423D", // nested cards / inputs / badges
   line: "#4A524C", // hairline borders
   text: "#ECECEA",
-  muted: "#9BA89F", // Grey Olive, nudged lighter for AA on cards
-  muted2: "#737F77", // dim labels / eyebrows
-  accent: "#DB5461", // Lobster Pink — all interactive/accent states
+  muted: "#A6B0A8", // Grey Olive, nudged lighter for AA on both surface + surface2 (≥4.6:1)
+  muted2: "#737F77", // dim, DECORATIVE only (icons) — fails AA as body text, never use for copy
+  accent: "#DB5461", // Lobster Pink — interactive states + the hero card surface
+  heroInk: "#10120F", // near-black text ON the pink hero card (4.89:1 AA)
+  heroMuted: "#2A1013", // secondary text ON pink — deep maroon, same hue, never grey (4.61:1 AA)
 } as const;

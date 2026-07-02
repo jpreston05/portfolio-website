@@ -54,10 +54,13 @@ export function useHeroMotion() {
   const extra = Math.max(0, Math.min(iw || 1280, 1400) - RAIL_W - CONTAINER_PAD);
   const cardWidth = useTransform(dock, [0, 1], [RAIL_W + extra, RAIL_W]);
   const contentX = useTransform(dock, [0, 1], [extra, 0]);
+  // Numeric big-state card width — the hero sizes its big portrait off this so
+  // the portrait and the one-row button cap never collide.
+  const bigCardW = RAIL_W + extra;
 
   // Fade in over the collapse range. (Vertical hold is native sticky in page.tsx,
   // not a transform — transforms lag native scroll and visibly jitter.)
   const contentOpacity = useTransform(scrollY, [0, intro], [0, 1], { clamp: true });
 
-  return { enabled, dock, vh, cardWidth, contentX, contentOpacity };
+  return { enabled, dock, vh, cardWidth, bigCardW, contentX, contentOpacity };
 }

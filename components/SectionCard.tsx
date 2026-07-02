@@ -1,11 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { c } from "@/components/palette";
 
 type SectionCardProps = {
   id?: string;
-  eyebrow?: string;
   title: string;
   children: React.ReactNode;
   className?: string;
@@ -15,29 +14,22 @@ type SectionCardProps = {
    Shared shell so every scrolling section matches the hero card aesthetic. */
 export const SectionCard = ({
   id,
-  eyebrow,
   title,
   children,
   className = "",
-}: SectionCardProps) => (
+}: SectionCardProps) => {
+  const reduce = useReducedMotion();
+  return (
   <motion.section
     id={id}
-    className={`scroll-mt-24 rounded-2xl border p-6 sm:p-8 ${className}`}
-    style={{ borderColor: c.line, background: c.surface }}
-    initial={{ opacity: 0 }}
-    whileInView={{ opacity: 1 }}
+    className={`scroll-mt-24 rounded-2xl p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)] sm:p-8 ${className}`}
+    style={{ background: c.surface }}
+    initial={{ opacity: 0, y: reduce ? 0 : 8 }}
+    whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: "-80px" }}
-    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
   >
     <header className="mb-6">
-      {eyebrow && (
-        <p
-          className="mb-1 font-mono text-xs uppercase tracking-wider"
-          style={{ color: c.muted2 }}
-        >
-          {eyebrow}
-        </p>
-      )}
       <h2
         className="text-2xl font-bold tracking-tight sm:text-3xl"
         style={{ color: c.text }}
@@ -47,4 +39,5 @@ export const SectionCard = ({
     </header>
     {children}
   </motion.section>
-);
+  );
+};
