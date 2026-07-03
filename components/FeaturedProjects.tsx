@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FiArrowUpRight } from "react-icons/fi";
+import { FiArrowRight, FiArrowUpRight } from "react-icons/fi";
 import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
 import { featuredProjects } from "@/lib/projects";
@@ -54,14 +54,16 @@ export const FeaturedProjects = () => (
       ))}
     </div>
 
-    <div className="mt-5 text-right">
-      <Link
+    <div className="mt-5 flex justify-end">
+      {/* Colour lives in classes (not inline style) so the hover actually wins. */}
+      <MotionLink
         href="/projects"
-        className="text-sm font-medium transition-colors hover:text-[#DB5461]"
-        style={{ color: c.muted }}
+        whileTap={{ scale: 0.97 }}
+        className="group inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-[#A6B0A8] transition-colors hover:text-[#DB5461]"
       >
-        All projects &rarr;
-      </Link>
+        All projects
+        <FiArrowRight className="transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
+      </MotionLink>
     </div>
   </SectionCard>
 );

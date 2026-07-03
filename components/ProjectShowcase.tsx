@@ -5,7 +5,12 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FiChevronDown, FiExternalLink, FiGithub } from "react-icons/fi";
 import { Carousel } from "@/components/Carousel";
 import { c } from "@/components/palette";
-import { projects, type Project } from "@/lib/projects";
+import {
+  CATEGORY_LABELS,
+  projects,
+  type Project,
+  type ProjectCategory,
+} from "@/lib/projects";
 import { EASE_SNAPPY } from "@/lib/motion";
 
 /* The /projects accordion — big cards, exactly one expanded at a time.
@@ -47,12 +52,13 @@ const ProjectCard = ({
   return (
     <motion.article
       id={project.slug}
+      layout="position"
       className="scroll-mt-26 rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)]"
       style={{ background: c.surface }}
       initial={{ opacity: 0, y: reduce ? 0 : 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, ease: EASE_SNAPPY }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={reduce ? { opacity: 0 } : { opacity: 0, y: -8 }}
+      transition={{ duration: 0.4, ease: EASE_SNAPPY }}
     >
       {/* Collapsed header — the whole row toggles. */}
       <button
@@ -160,9 +166,24 @@ const ProjectCard = ({
   );
 };
 
+type Filter = "all" | ProjectCategory;
+
+const FILTERS: { id: Filter; label: string }[] = [
+  { id: "all", label: "All" },
+  ...(Object.keys(CATEGORY_LABELS) as ProjectCategory[]).map((id) => ({
+    id,
+    label: CATEGORY_LABELS[id],
+  })),
+];
+
+const countFor = (id: Filter) =>
+  id === "all" ? projects.length : projects.filter((p) => p.category === id).length;
+
 export const ProjectShowcase = ({ initialOpen }: { initialOpen?: string }) => {
   const validInitial = projects.some((p) => p.slug === initialOpen) ? initialOpen : undefined;
   const [openSlug, setOpenSlug] = useState<string | undefined>(validInitial);
+  // A deep-linked card opens on "all" (default), so it's always visible.
+  const [filter, setFilter] = useState<Filter>("all");
 
   // Deep link: land with the card expanded and in view. validInitial never
   // changes after mount in practice (the ?open param arrives with the page),
@@ -172,16 +193,64 @@ export const ProjectShowcase = ({ initialOpen }: { initialOpen?: string }) => {
     document.getElementById(validInitial)?.scrollIntoView({ block: "start" });
   }, [validInitial]);
 
+  const shown =
+    filter === "all" ? projects : projects.filter((p) => p.category === filter);
+
   return (
-    <div className="flex flex-col gap-6">
-      {projects.map((p) => (
-        <ProjectCard
-          key={p.slug}
-          project={p}
-          open={openSlug === p.slug}
-          onToggle={() => setOpenSlug(openSlug === p.slug ? undefined : p.slug)}
-        />
-      ))}
+    <div>
+      {/* Filter control — solid track, sliding active pill (matches the nav). */}
+      <div
+        className="mb-8 inline-flex flex-wrap gap-1 rounded-full p-1.5"
+        style={{ background: c.surface }}
+      >
+        {FILTERS.map(({ id, label }) => {
+          const isActive = filter === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={isActive}
+              onClick={() => setFilter(id)}
+              className={`relative rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                isActive ? "" : "hover:text-[#ECECEA]"
+              }`}
+              style={{ color: isActive ? c.text : c.muted }}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="project-filter-pill"
+                  className="absolute inset-0 rounded-full"
+                  style={{ background: c.surface2 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                />
+              )}
+              <span className="relative">
+                {label}
+                <span className="ml-1.5 text-xs opacity-50">{countFor(id)}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <motion.div layout className="flex flex-col gap-6">
+        <AnimatePresence mode="popLayout" initial={false}>
+          {shown.map((p) => (
+            <ProjectCard
+              key={p.slug}
+              project={p}
+              open={openSlug === p.slug}
+              onToggle={() => setOpenSlug(openSlug === p.slug ? undefined : p.slug)}
+            />
+          ))}
+        </AnimatePresence>
+
+        {shown.length === 0 && (
+          <p className="text-sm" style={{ color: c.muted }}>
+            No projects in this category yet.
+          </p>
+        )}
+      </motion.div>
     </div>
   );
 };

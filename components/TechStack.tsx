@@ -5,7 +5,7 @@ import { c } from "@/components/palette";
 
 const groups = [
   { label: "Languages", items: ["Java", "Python", "C++", "C", "JavaScript", "SQL"] },
-  { label: "Web", items: ["React", "Next.js", "HTML", "CSS", "Tailwind"] },
+  { label: "Web", items: ["React", "Next.js", "HTML", "CSS"] },
   { label: "Tools", items: ["Git", "Linux", "Figma"] },
 ];
 

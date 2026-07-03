@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -17,6 +18,9 @@ const LINKS = [
 
 const MotionLink = motion.create(Link);
 
+// useLayoutEffect warns during SSR; this client component is still SSR'd.
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
   const pathname = usePathname();
   // "home" only on "/" exactly — on routes without a nav item (e.g. /contact)
@@ -25,6 +29,29 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
     pathname === "/"
       ? "home"
       : LINKS.find((l) => l.href !== "/" && pathname.startsWith(l.href))?.id;
+
+  // The active-pill slides by measuring the active item's layout offset and
+  // animating transform-x + width on a single persistent element. offsetLeft /
+  // offsetWidth are layout metrics, unaffected by window scroll — so unlike a
+  // shared-layout (layoutId) FLIP, the slide can't be corrupted by the scroll
+  // reset that fires on route navigation.
+  const itemRefs = useRef<Record<string, HTMLLIElement | null>>({});
+  const [pill, setPill] = useState<{ x: number; width: number } | null>(null);
+
+  const measure = useCallback(() => {
+    const el = active ? itemRefs.current[active] : null;
+    setPill(el ? { x: el.offsetLeft, width: el.offsetWidth } : null);
+  }, [active]);
+
+  // Position before paint on active change; the pill snaps on first mount
+  // (initial={false}) and springs only when its value changes while mounted.
+  useIsoLayoutEffect(measure, [measure]);
+
+  // Re-measure if the nav reflows (e.g. viewport resize changes wrapping).
+  useEffect(() => {
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [measure]);
 
   return (
     <motion.nav
@@ -48,28 +75,34 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
         </Link>
         <span className="mx-0.5 h-6 w-px bg-[#4A524C]" aria-hidden />
 
-        <ul className="flex items-center gap-0.5">
+        <ul className="relative flex items-center gap-0.5">
+          {/* Sliding active highlight — one persistent element. */}
+          {pill && (
+            <motion.span
+              aria-hidden
+              className="absolute inset-y-0 left-0 rounded-full bg-[#3A423D]"
+              initial={false}
+              animate={{ x: pill.x, width: pill.width }}
+              transition={{ type: "spring", stiffness: 400, damping: 35 }}
+            />
+          )}
           {LINKS.map((link) => {
             const isActive = active === link.id;
             return (
-              <li key={link.id}>
+              <li
+                key={link.id}
+                ref={(el) => {
+                  itemRefs.current[link.id] = el;
+                }}
+              >
                 <Link
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
                   className={`relative block rounded-full px-5 py-2 text-[15px] font-medium transition-colors ${
-                    isActive
-                      ? "text-[#ECECEA]"
-                      : "text-[#A6B0A8] hover:text-[#ECECEA]"
+                    isActive ? "text-[#ECECEA]" : "text-[#A6B0A8] hover:text-[#ECECEA]"
                   }`}
                 >
-                  {isActive && (
-                    <motion.span
-                      layoutId="nav-active-pill"
-                      className="absolute inset-0 rounded-full bg-[#3A423D]"
-                      transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                    />
-                  )}
-                  <span className="relative">{link.label}</span>
+                  {link.label}
                 </Link>
               </li>
             );

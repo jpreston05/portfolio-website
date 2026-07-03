@@ -82,6 +82,14 @@ h3 {
   color: #181f1c;
 }
 
+/* On the hero card the accent selection would vanish once the card dyes pink —
+   invert using the dye vars instead: light-on-dark at the top of the page,
+   near-black with pink text on the docked pink card. */
+[data-on-accent] ::selection {
+  background: var(--hero-ink, #10120f);
+  color: var(--hero-card, #db5461);
+}
+
 /* Film grain — a static SVG noise tile over the flat carbon bg so the dark
    field has material quality instead of reading as an empty div. Fixed, ~3%
    opacity, no motion (trivially reduced-motion safe). */
