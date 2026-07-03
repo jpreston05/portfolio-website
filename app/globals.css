@@ -95,6 +95,17 @@ h3 {
   background-size: 128px 128px;
 }
 
+/* Repeat-visit intro suppression (paired with the blocking script in
+   layout.tsx): if this session already saw the intro, hide the preloader at
+   first paint and show the page content immediately — no hydration flash.
+   React reaches the same end state (introSeen) once it hydrates. */
+html[data-intro-seen] [data-preloader] {
+  display: none !important;
+}
+html[data-intro-seen] [data-page-reveal] {
+  opacity: 1 !important;
+}
+
 /* Hero card focus ring tracks the dye-on-dock state: accent pink while the
    card is dark (top of page), ink once the card has dyed pink (docked). */
 [data-on-accent] :focus-visible {

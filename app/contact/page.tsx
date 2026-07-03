@@ -1,0 +1,44 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { Footer } from "@/components/Footer";
+import { ContactForm } from "@/components/ContactForm";
+import { c } from "@/components/palette";
+
+/* /contact — the shared form as its own page (the nav CTA lands here). */
+
+export default function ContactPage() {
+  return (
+    <>
+      <motion.div
+        className="relative z-10 min-h-screen"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        <main className="mx-auto max-w-[640px] px-4 pb-16 pt-26 sm:px-6">
+          <header className="mb-8">
+            <h1
+              className="text-3xl font-bold tracking-tight sm:text-4xl"
+              style={{ color: c.text }}
+            >
+              Let&apos;s talk<span style={{ color: c.accent }}>.</span>
+            </h1>
+            <p className="mt-2 max-w-[60ch] text-sm leading-relaxed" style={{ color: c.muted }}>
+              Have a role, a project, or just want to say hi? Send me a message
+              and I&apos;ll get back to you.
+            </p>
+          </header>
+
+          <section
+            className="rounded-2xl p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)] sm:p-8"
+            style={{ background: c.surface }}
+          >
+            <ContactForm />
+          </section>
+        </main>
+        <Footer />
+      </motion.div>
+    </>
+  );
+}
