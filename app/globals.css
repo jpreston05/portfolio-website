@@ -101,6 +101,32 @@ h3 {
   outline-color: var(--hero-focus, #10120f);
 }
 
+/* Hero scroll cue — a pink dot dropping down a short hairline track. */
+@keyframes cue-drop {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+.animate-cue {
+  animation: cue-drop 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-cue {
+    animation: none;
+  }
+}
+
 /* Intro typing caret — blinking red block cursor. */
 @keyframes caret-blink {
   0%,

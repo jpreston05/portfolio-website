@@ -22,7 +22,7 @@ export const SectionCard = ({
   return (
   <motion.section
     id={id}
-    className={`scroll-mt-24 rounded-2xl p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)] sm:p-8 ${className}`}
+    className={`scroll-mt-26 rounded-2xl p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)] sm:p-8 ${className}`}
     style={{ background: c.surface }}
     initial={{ opacity: 0, y: reduce ? 0 : 8 }}
     whileInView={{ opacity: 1, y: 0 }}

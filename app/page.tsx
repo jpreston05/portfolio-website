@@ -45,10 +45,13 @@ export default function Home() {
       >
       <Navbar brandVisible={navBrandShown} />
 
-      <main id="home" className="mx-auto grid max-w-[1400px] gap-6 px-4 pb-10 pt-24 sm:px-6 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
+      {/* Vertical rhythm: 24px above the nav (top-6) + ~56px pill = nav bottom
+          at 80px; content starts 24px below that (top-26 = 104px) and the
+          docked rail keeps the same 24px at the viewport bottom (8rem total). */}
+      <main id="home" className="mx-auto grid max-w-[1400px] gap-6 px-4 pb-10 pt-26 sm:px-6 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
         {/* LEFT RAIL — collapsing hero, pinned the whole way on desktop */}
-        <div className="relative z-10 lg:sticky lg:top-24 lg:flex lg:h-[calc(100vh-7rem)] lg:items-center">
-          <Hero />
+        <div className="relative z-10 lg:sticky lg:top-26 lg:flex lg:h-[calc(100vh-8rem)] lg:items-center">
+          <Hero revealed={revealContent} />
         </div>
 
         {/* RIGHT COLUMN — during the collapse the content is held in place by a
@@ -57,7 +60,7 @@ export default function Home() {
             range, after which the content scrolls normally. */}
         <div className="flex flex-col">
           <motion.div
-            className="flex flex-col gap-6 lg:sticky lg:top-24 lg:gap-8"
+            className="flex flex-col gap-6 lg:sticky lg:top-26 lg:gap-8"
             style={
               enabled ? { opacity: contentOpacity, x: contentX } : undefined
             }
