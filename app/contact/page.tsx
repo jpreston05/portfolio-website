@@ -11,12 +11,12 @@ export default function ContactPage() {
   return (
     <>
       <motion.div
-        className="relative z-10 min-h-screen"
+        className="relative z-10 flex min-h-screen flex-col"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        <main className="mx-auto max-w-[640px] px-4 pb-16 pt-26 sm:px-6">
+        <main className="mx-auto w-full max-w-[640px] flex-1 px-4 pb-16 pt-26 sm:px-6">
           <header className="mb-8">
             <h1
               className="text-3xl font-bold tracking-tight sm:text-4xl"
