@@ -35,9 +35,9 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 const CURRENTLY = [
   "building this site, in the open",
-  "learning low-latency systems",
-  "reading about market microstructure",
-  "shipping side projects",
+  "applying for summer internships",
+  "starting that leetcode grind",
+  "building passion projects",
 ];
 
 /* Rotating "currently:" status — specific, not generic role-cycling. */

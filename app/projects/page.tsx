@@ -35,7 +35,7 @@ export default function ProjectsPage() {
               Projects<span style={{ color: c.accent }}>.</span>
             </h1>
             <p className="mt-2 max-w-[60ch] text-sm leading-relaxed" style={{ color: c.muted }}>
-              Things I&apos;ve built — expand a card for screenshots and the details.
+              Things I&apos;ve built. Expand a card for screenshots and the details.
             </p>
           </header>
 

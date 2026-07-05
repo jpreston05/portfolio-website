@@ -7,6 +7,7 @@ import { Preloader } from "@/components/Preloader";
 import { useIntro } from "@/components/SiteChrome";
 import { Hero } from "@/components/Herov2";
 import { useHeroMotion } from "@/components/useHeroMotion";
+import { AboutMe } from "@/components/AboutMe";
 import { FeaturedProjects } from "@/components/FeaturedProjects";
 import { TechStack } from "@/components/TechStack";
 import { Contact } from "@/components/Contact";
@@ -62,6 +63,7 @@ export default function Home() {
               enabled ? { opacity: contentOpacity, x: contentX } : undefined
             }
           >
+            <AboutMe />
             <FeaturedProjects />
             <TechStack />
             <Contact />
