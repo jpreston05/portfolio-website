@@ -72,13 +72,19 @@ const CurrentlyLine = () => {
   );
 };
 
-type ActionProps = { href: string; label: string; icon: React.ReactNode };
+type ActionProps = {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  download?: string; // set ⇒ downloads (with this filename) instead of opening a tab
+};
 
-const Action = ({ href, label, icon }: ActionProps) => (
+const Action = ({ href, label, icon, download }: ActionProps) => (
   <motion.a
     href={href}
-    target="_blank"
-    rel="noreferrer"
+    download={download}
+    target={download ? undefined : "_blank"}
+    rel={download ? undefined : "noreferrer"}
     whileHover={{ y: -2 }}
     whileTap={{ scale: 0.97 }}
     className="group flex flex-1 basis-[8em] items-center justify-center gap-[0.5em] rounded-lg px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
@@ -175,8 +181,18 @@ const Headline = () => (
 /* Action buttons — one row when wide, wraps to 2×2 as the column narrows. */
 const ButtonRow = () => (
   <div className="flex flex-wrap gap-[0.6em]">
-    <Action href="/cv.pdf" label="CV" icon={<FiDownload />} />
-    <Action href="/transcript.pdf" label="Transcript" icon={<FiFileText />} />
+    <Action
+      href="/Jack-Preston-CV.pdf"
+      label="CV"
+      icon={<FiDownload />}
+      download="Jack-Preston-CV.pdf"
+    />
+    <Action
+      href="/Jack-Preston-Transcript.pdf"
+      label="Transcript"
+      icon={<FiFileText />}
+      download="Jack-Preston-Transcript.pdf"
+    />
     <Action
       href="https://github.com/jpreston05"
       label="GitHub"
