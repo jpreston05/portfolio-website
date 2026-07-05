@@ -1,38 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiChevronLeft, FiChevronRight, FiMaximize2 } from "react-icons/fi";
 import { c } from "@/components/palette";
 import { EASE_SNAPPY } from "@/lib/motion";
+import { Lightbox } from "@/components/Lightbox";
+import { initials } from "@/lib/projects";
 
 /* Lightweight photo carousel for project cards — slide track + prev/next +
-   dots, swipeable. No images yet ⇒ renders placeholder tiles so the mechanics
-   are visible before real screenshots exist. */
+   dots, swipeable. Click a real image to enlarge it in a fullscreen Lightbox.
+   No images yet ⇒ renders a branded placeholder tile. */
 
 const SWIPE_PX = 60; // drag distance that commits a slide change
+const TAP_SLOP = 6; // pointer travel (px) still treated as a tap, not a drag
 
-type CarouselProps = { images: string[]; title: string };
+type CarouselProps = {
+  images: string[];
+  title: string;
+  coverLayoutId?: string; // shared-element id for slide 0 (thumbnail morph)
+};
 
-const PlaceholderTile = ({ n }: { n: number }) => (
+const PlaceholderTile = ({ title }: { title: string }) => (
   <div
-    className="flex h-full w-full shrink-0 flex-col items-center justify-center gap-2"
+    className="flex h-full w-full shrink-0 items-center justify-center"
     style={{ background: c.surface2 }}
   >
-    <span className="text-6xl font-black leading-none" style={{ color: "rgba(236,236,234,0.08)" }}>
-      JP.
-    </span>
-    <span className="font-mono text-xs" style={{ color: c.muted }}>
-      screenshot {n} coming soon
+    <span className="text-7xl font-black leading-none" style={{ color: "rgba(236,236,234,0.08)" }}>
+      {initials(title)}
     </span>
   </div>
 );
 
-export const Carousel = ({ images, title }: CarouselProps) => {
+export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
   const reduce = useReducedMotion();
   const [index, setIndex] = useState(0);
-  const count = images.length || 3; // 3 placeholder tiles when no images yet
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const downXY = useRef<{ x: number; y: number } | null>(null);
+  const hasImages = images.length > 0;
+  const count = images.length || 1; // single branded tile when no images yet
 
   const go = (n: number) => setIndex((n + count) % count);
 
@@ -50,21 +57,46 @@ export const Carousel = ({ images, title }: CarouselProps) => {
             if (info.offset.x < -SWIPE_PX) go(index + 1);
             else if (info.offset.x > SWIPE_PX) go(index - 1);
           }}
+          onPointerDown={(e) => {
+            downXY.current = { x: e.clientX, y: e.clientY };
+          }}
+          onClickCapture={(e) => {
+            const d = downXY.current;
+            if (!d) return;
+            // A swipe drags the pointer; a tap barely moves it. Swallow the
+            // click after a drag so it never opens the lightbox.
+            if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > TAP_SLOP) {
+              e.stopPropagation();
+              return;
+            }
+            if (hasImages) setLightboxOpen(true);
+          }}
         >
-          {images.length > 0
+          {hasImages
             ? images.map((src, i) => (
-                <div key={src} className="relative h-full w-full shrink-0">
+                <motion.div
+                  key={src}
+                  layoutId={i === 0 ? coverLayoutId : undefined}
+                  className="group/slide relative h-full w-full shrink-0 cursor-zoom-in"
+                >
                   <Image
                     src={src}
                     alt={`${title} — screenshot ${i + 1} of ${count}`}
                     fill
                     sizes="(min-width: 1024px) 560px, 100vw"
-                    className="object-cover"
+                    className="object-contain"
                     draggable={false}
                   />
-                </div>
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute bottom-2 right-2 rounded-full p-1.5 opacity-0 transition-opacity duration-200 group-hover/slide:opacity-100"
+                    style={{ background: "rgba(24,31,28,0.7)", color: c.muted }}
+                  >
+                    <FiMaximize2 className="text-sm" />
+                  </span>
+                </motion.div>
               ))
-            : [1, 2, 3].map((n) => <PlaceholderTile key={n} n={n} />)}
+            : <PlaceholderTile title={title} />}
         </motion.div>
 
         {count > 1 && (
@@ -105,6 +137,17 @@ export const Carousel = ({ images, title }: CarouselProps) => {
             />
           ))}
         </div>
+      )}
+
+      {hasImages && (
+        <Lightbox
+          open={lightboxOpen}
+          images={images}
+          title={title}
+          index={index}
+          onIndex={go}
+          onClose={() => setLightboxOpen(false)}
+        />
       )}
     </div>
   );
