@@ -59,7 +59,11 @@ export const projects: Project[] = [
     ],
     stack: ["React", "CSS"],
     links: { },
-    images: [],
+    images: [
+      "/projects/skool-swaps/home_page.webp",
+      "/projects/skool-swaps/collections.webp",
+      "/projects/skool-swaps/collection.webp",
+    ],
     featured: false,
   },
   {
@@ -74,7 +78,11 @@ export const projects: Project[] = [
     ],
     stack: ["React", "CSS"],
     links: { },
-    images: [],
+    images: [
+      "/projects/logic-lift/award.webp",
+      "/projects/logic-lift/home_page.webp",
+      "/projects/logic-lift/quiz_page.webp",
+    ],
     featured: true,
   },
   {
