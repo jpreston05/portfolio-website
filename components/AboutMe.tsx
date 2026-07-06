@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FiArrowRight } from "react-icons/fi";
+import { FiArrowRight, FiArrowUpRight } from "react-icons/fi";
 import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
 
@@ -13,15 +13,19 @@ const MotionLink = motion.create(Link);
 
 // Placeholder — Jack to write. A few sentences on who he is / what he's after.
 const PARAGRAPH =
-  "Placeholder — a short paragraph about who I am, what I'm drawn to in engineering, and what I'm looking for. To be written.";
+  "I grew up in Waihi Beach, a small rural town in New Zealand, attending a primary school of under 300 students and a high school of around 800. My interest in programming started early. At around age 10, I was building simple games on my iPad using block-coding apps. In high school, I built on that foundation: I learned HTML and CSS and built my first website in Year 10, studied searching and sorting algorithms, and started learning Java. That's when I knew software engineering was the path for me, and it's been my goal ever since.";
 
-// Placeholder — swap for the real papers once confirmed.
 const COURSES = [
-  "Course 1 — placeholder",
-  "Course 2 — placeholder",
-  "Course 3 — placeholder",
-  "Course 4 — placeholder",
+  { code: "SOFTENG 364", name: "Networks and Security" },
+  { code: "SOFTENG 325", name: "Software Architecture" },
+  { code: "SOFTENG 306", name: "Software Engineering Design 2" },
+  { code: "ACCTG 102", name: "Accounting Concepts" },
+  { code: "BUSINESS 202", name: "Business Consulting" },
 ];
+
+// UoA Curriculum Catalogue — one stable "about the course" page per code.
+const courseUrl = (code: string) =>
+  `https://study.auckland.ac.nz/ords/r/uoa/catalogue/course?p6_code=${code.replace(/ /g, "+")}`;
 
 const Stat = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="rounded-xl p-4" style={{ background: c.surface2 }}>
@@ -42,7 +46,7 @@ export const AboutMe = () => (
       <div className="grid gap-4 sm:grid-cols-2">
         <Stat label="Degree">
           <p className="text-sm font-semibold" style={{ color: c.text }}>
-            BE(Hons), Software Engineering &amp; BCom
+            BE(Hons), Software Engineering &amp; BCom, Finance &amp; Management
           </p>
           <p className="mt-0.5 text-sm" style={{ color: c.muted }}>
             University of Auckland · Third year
@@ -72,13 +76,18 @@ export const AboutMe = () => (
         </p>
         <div className="flex flex-wrap gap-2">
           {COURSES.map((course) => (
-            <span
-              key={course}
-              className="rounded-md px-2 py-0.5 font-mono text-xs"
-              style={{ background: c.bg, color: c.muted }}
+            // Colour lives in classes (not inline style) so the hover wins.
+            <a
+              key={course.code}
+              href={courseUrl(course.code)}
+              target="_blank"
+              rel="noreferrer"
+              className="group inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-mono text-xs text-[#A6B0A8] transition-colors hover:text-[#DB5461]"
+              style={{ background: c.bg }}
             >
-              {course}
-            </span>
+              {course.code} — {course.name}
+              <FiArrowUpRight className="shrink-0 text-[0.95em] transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
+            </a>
           ))}
         </div>
       </div>
