@@ -65,7 +65,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
       <div className="flex items-center gap-1.5 rounded-2xl bg-[#2F3733] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_32px_rgba(0,0,0,0.45)]">
         <Link
           href="/"
-          aria-label="Home — Jack Preston"
+          aria-label="Home, Jack Preston"
           className="px-4 text-base font-bold tracking-tight text-[#ECECEA] transition-opacity duration-200"
           style={{ opacity: brandVisible ? 1 : 0 }}
         >
