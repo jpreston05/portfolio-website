@@ -13,7 +13,7 @@ export const Footer = () => {
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
     >
-      <p>&copy; {new Date().getFullYear()} Jack Preston — designed &amp; built in Auckland.</p>
+      <p>&copy; {new Date().getFullYear()} Jack Preston. Designed &amp; built in Auckland, New Zealand.</p>
     </motion.footer>
   );
 };

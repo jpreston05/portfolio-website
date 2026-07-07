@@ -18,6 +18,7 @@ import {
   RAIL_W,
   useHeroMotion,
 } from "@/components/useHeroMotion";
+import { EASE_SNAPPY } from "@/lib/motion";
 
 /* Seamless hero. The card width + height, the portrait (size + right→top
    position) and the text/buttons are all interpolated continuously from `dock`
@@ -30,15 +31,13 @@ const BIG_CARD_RATIO = 0.68; // big card height as a fraction of the docked (ful
 const NAME_EM_DOCKED = 4.2; // display-name size (em of the text wrapper) when docked
 const NAME_EM_BIG_MAX = 5.2; // poster-size ceiling for the big state
 const BIG_BTN_W = 590; // cap on the big-state row: fits 4 buttons (basis-8em) in one tidy line
-// Framer twin of the CSS --ease-snappy token.
-const EASE_SNAPPY: [number, number, number, number] = [0.23, 1, 0.32, 1];
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 const CURRENTLY = [
   "building this site, in the open",
-  "learning low-latency systems",
-  "reading about market microstructure",
-  "shipping side projects",
+  "applying for summer internships",
+  "starting that leetcode grind",
+  "building passion projects",
 ];
 
 /* Rotating "currently:" status — specific, not generic role-cycling. */
@@ -73,13 +72,19 @@ const CurrentlyLine = () => {
   );
 };
 
-type ActionProps = { href: string; label: string; icon: React.ReactNode };
+type ActionProps = {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  download?: string; // set ⇒ downloads (with this filename) instead of opening a tab
+};
 
-const Action = ({ href, label, icon }: ActionProps) => (
+const Action = ({ href, label, icon, download }: ActionProps) => (
   <motion.a
     href={href}
-    target="_blank"
-    rel="noreferrer"
+    download={download}
+    target={download ? undefined : "_blank"}
+    rel={download ? undefined : "noreferrer"}
     whileHover={{ y: -2 }}
     whileTap={{ scale: 0.97 }}
     className="group flex flex-1 basis-[8em] items-center justify-center gap-[0.5em] rounded-lg px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
@@ -108,6 +113,7 @@ const PortraitArt = () => (
       alt="Portrait of Jack Preston"
       fill
       priority
+      sizes="(min-width: 1024px) 560px, 280px"
       className="z-10 object-cover object-bottom"
     />
   </>
@@ -175,8 +181,18 @@ const Headline = () => (
 /* Action buttons — one row when wide, wraps to 2×2 as the column narrows. */
 const ButtonRow = () => (
   <div className="flex flex-wrap gap-[0.6em]">
-    <Action href="/cv.pdf" label="CV" icon={<FiDownload />} />
-    <Action href="/transcript.pdf" label="Transcript" icon={<FiFileText />} />
+    <Action
+      href="/Jack-Preston-CV.pdf"
+      label="CV"
+      icon={<FiDownload />}
+      download="Jack-Preston-CV.pdf"
+    />
+    <Action
+      href="/Jack-Preston-Transcript.pdf"
+      label="Transcript"
+      icon={<FiFileText />}
+      download="Jack-Preston-Transcript.pdf"
+    />
     <Action
       href="https://github.com/jpreston05"
       label="GitHub"

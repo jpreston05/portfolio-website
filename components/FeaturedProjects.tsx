@@ -1,43 +1,31 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { FiArrowUpRight } from "react-icons/fi";
+import { FiArrowRight, FiArrowUpRight } from "react-icons/fi";
 import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
+import { featuredProjects } from "@/lib/projects";
+import { EASE_SNAPPY } from "@/lib/motion";
 
-const projects = [
-  {
-    title: "Project One",
-    description: "A brief description of Project One.",
-    stack: ["React", "TypeScript", "Node"],
-    href: "#",
-  },
-  {
-    title: "Project Two",
-    description: "A brief description of Project Two.",
-    stack: ["Python", "FastAPI", "Postgres"],
-    href: "#",
-  },
-  {
-    title: "Project Three",
-    description: "A brief description of Project Three.",
-    stack: ["C++", "CMake"],
-    href: "#",
-  },
-];
+/* Home-page preview of /projects — reads the shared data module, so anything
+   tagged `featured: true` in lib/projects.ts appears here automatically.
+   Each card deep-links to /projects with itself expanded. */
+
+const MotionLink = motion.create(Link);
 
 export const FeaturedProjects = () => (
-  <SectionCard id="projects" title="Featured Projects">
+  <SectionCard id="featured" title="Featured Projects">
     <div className="flex flex-col gap-4">
-      {projects.map((p) => (
-        <motion.a
-          key={p.title}
-          href={p.href}
+      {featuredProjects.map((p) => (
+        <MotionLink
+          key={p.slug}
+          href={`/projects?open=${p.slug}`}
           className="group flex flex-col gap-3 rounded-xl p-5 transition-colors"
           style={{ background: c.surface2 }}
           whileHover={{ y: -3, boxShadow: "0 12px 28px rgba(0,0,0,0.28)" }}
           whileTap={{ scale: 0.985 }}
-          transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ duration: 0.2, ease: EASE_SNAPPY }}
         >
           <div className="flex items-start justify-between gap-3">
             <h3
@@ -46,12 +34,10 @@ export const FeaturedProjects = () => (
             >
               {p.title}
             </h3>
-            <FiArrowUpRight
-              className="mt-0.5 shrink-0 text-lg text-[#737F77] transition-[transform,color] duration-200 ease-snappy group-hover:translate-x-0.5 group-hover:text-[#DB5461]"
-            />
+            <FiArrowUpRight className="mt-0.5 shrink-0 text-lg text-[#737F77] transition-[transform,color] duration-200 ease-snappy group-hover:translate-x-0.5 group-hover:text-[#DB5461]" />
           </div>
           <p className="text-sm leading-relaxed" style={{ color: c.muted }}>
-            {p.description}
+            {p.tagline}
           </p>
           <div className="flex flex-wrap gap-2">
             {p.stack.map((tech) => (
@@ -64,8 +50,20 @@ export const FeaturedProjects = () => (
               </span>
             ))}
           </div>
-        </motion.a>
+        </MotionLink>
       ))}
+    </div>
+
+    <div className="mt-5 flex justify-end">
+      {/* Colour lives in classes (not inline style) so the hover actually wins. */}
+      <MotionLink
+        href="/projects"
+        whileTap={{ scale: 0.97 }}
+        className="group inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-[#A6B0A8] transition-colors hover:text-[#DB5461]"
+      >
+        All projects
+        <FiArrowRight className="transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
+      </MotionLink>
     </div>
   </SectionCard>
 );

@@ -117,6 +117,7 @@ export const Preloader = ({
 
   return (
     <motion.div
+      data-preloader
       className="pointer-events-none fixed inset-0 z-[2000]"
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}

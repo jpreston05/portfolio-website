@@ -82,6 +82,14 @@ h3 {
   color: #181f1c;
 }
 
+/* On the hero card the accent selection would vanish once the card dyes pink —
+   invert using the dye vars instead: light-on-dark at the top of the page,
+   near-black with pink text on the docked pink card. */
+[data-on-accent] ::selection {
+  background: var(--hero-ink, #10120f);
+  color: var(--hero-card, #db5461);
+}
+
 /* Film grain — a static SVG noise tile over the flat carbon bg so the dark
    field has material quality instead of reading as an empty div. Fixed, ~3%
    opacity, no motion (trivially reduced-motion safe). */
@@ -93,6 +101,17 @@ h3 {
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 128px 128px;
+}
+
+/* Repeat-visit intro suppression (paired with the blocking script in
+   layout.tsx): if this session already saw the intro, hide the preloader at
+   first paint and show the page content immediately — no hydration flash.
+   React reaches the same end state (introSeen) once it hydrates. */
+html[data-intro-seen] [data-preloader] {
+  display: none !important;
+}
+html[data-intro-seen] [data-page-reveal] {
+  opacity: 1 !important;
 }
 
 /* Hero card focus ring tracks the dye-on-dock state: accent pink while the
