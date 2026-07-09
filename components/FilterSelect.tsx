@@ -73,7 +73,7 @@ export const FilterSelect = ({ options, value, onChange, ariaLabel, trackBg }: P
 
   return (
     <div ref={rootRef} className="relative z-30">
-      <button
+      <motion.button
         ref={triggerRef}
         type="button"
         aria-haspopup="listbox"
@@ -87,6 +87,9 @@ export const FilterSelect = ({ options, value, onChange, ariaLabel, trackBg }: P
             setOpen(true);
           }
         }}
+        whileHover={{ filter: "brightness(1.18)" }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ duration: 0.2, ease: EASE_SNAPPY }}
         className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium"
         style={{ background: trackBg, color: c.text }}
       >
@@ -107,7 +110,7 @@ export const FilterSelect = ({ options, value, onChange, ariaLabel, trackBg }: P
         >
           <FiChevronDown />
         </motion.span>
-      </button>
+      </motion.button>
 
       <AnimatePresence>
         {open && (
@@ -133,7 +136,7 @@ export const FilterSelect = ({ options, value, onChange, ariaLabel, trackBg }: P
               const isActive = o.id === value;
               return (
                 <li key={o.id} role="none">
-                  <button
+                  <motion.button
                     data-opt
                     type="button"
                     role="option"
@@ -143,11 +146,11 @@ export const FilterSelect = ({ options, value, onChange, ariaLabel, trackBg }: P
                       onChange(o.id);
                       close(true);
                     }}
-                    className={`flex w-full items-center justify-between gap-6 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                      isActive ? "" : "hover:text-[#ECECEA]"
-                    }`}
+                    whileHover={isActive ? undefined : { backgroundColor: "rgba(255,255,255,0.06)", color: "#ECECEA" }}
+                    transition={{ duration: 0.15, ease: EASE_SNAPPY }}
+                    className="flex w-full items-center justify-between gap-6 rounded-xl px-3 py-2.5 text-sm font-medium"
                     style={{
-                      background: isActive ? c.bg : "transparent",
+                      backgroundColor: isActive ? c.bg : "transparent",
                       color: isActive ? c.text : c.muted,
                     }}
                   >
@@ -155,7 +158,7 @@ export const FilterSelect = ({ options, value, onChange, ariaLabel, trackBg }: P
                     <span className="font-mono text-xs" style={{ color: c.muted }}>
                       {o.count}
                     </span>
-                  </button>
+                  </motion.button>
                 </li>
               );
             })}

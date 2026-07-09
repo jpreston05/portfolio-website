@@ -63,16 +63,18 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
       {/* Solid surface dock — same material AND shape language as the section
           cards (rounded-2xl); the links/CTA inside stay pills for hierarchy. */}
       <div className="flex items-center gap-1 rounded-2xl bg-[#2F3733] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_32px_rgba(0,0,0,0.45)] sm:gap-1.5 sm:p-2">
-        <Link
+        <MotionLink
           href="/"
           aria-label="Home, Jack Preston"
-          className="px-2 text-sm font-bold tracking-tight text-[#ECECEA] transition-opacity duration-200 sm:px-4 sm:text-base"
+          whileHover={{ backgroundColor: "rgba(255,255,255,0.12)" }}
+          transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+          className="rounded-full px-2 py-2 text-sm font-bold tracking-tight text-[#ECECEA] sm:px-4 sm:text-base"
           style={{ opacity: brandVisible ? 1 : 0 }}
         >
           <span data-brand>
             JP<span style={{ color: "#DB5461" }}>.</span>
           </span>
-        </Link>
+        </MotionLink>
         <span className="mx-0.5 hidden h-6 w-px bg-[#4A524C] sm:block" aria-hidden />
 
         <ul className="relative flex items-center gap-0.5">
@@ -95,15 +97,17 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
                   itemRefs.current[link.id] = el;
                 }}
               >
-                <Link
+                <MotionLink
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
-                  className={`relative block rounded-full px-2 py-2 text-[13px] font-medium transition-colors sm:px-5 sm:text-[15px] ${
-                    isActive ? "text-[#ECECEA]" : "text-[#A6B0A8] hover:text-[#ECECEA]"
+                  whileHover={{ backgroundColor: "rgba(255,255,255,0.12)", color: "#ECECEA" }}
+                  transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+                  className={`relative block rounded-full px-2 py-2 text-[13px] font-medium sm:px-5 sm:text-[15px] ${
+                    isActive ? "text-[#ECECEA]" : "text-[#A6B0A8]"
                   }`}
                 >
                   {link.label}
-                </Link>
+                </MotionLink>
               </li>
             );
           })}
@@ -112,7 +116,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
         <MotionLink
           href="/contact"
           className="ml-1 whitespace-nowrap rounded-full bg-[#DB5461] px-2.5 py-2 text-[13px] font-semibold text-[#10120F] sm:ml-1.5 sm:px-5 sm:text-[15px]"
-          whileHover={{ y: -2 }}
+          whileHover={{ y: -2, filter: "brightness(1.08)" }}
           whileTap={{ scale: 0.97 }}
         >
           {/* Full label everywhere it fits; the shorter one only on the

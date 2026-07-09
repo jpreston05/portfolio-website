@@ -29,16 +29,18 @@ const LinkChip = ({
   label: string;
   icon: React.ReactNode;
 }) => (
-  <a
+  <motion.a
     href={href}
     target="_blank"
     rel="noreferrer"
-    className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors hover:text-[#ECECEA]"
+    whileHover={{ y: -2, color: "#ECECEA" }}
+    transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+    className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium"
     style={{ color: c.muted, background: c.bg }}
   >
     {icon}
     {label}
-  </a>
+  </motion.a>
 );
 
 const ProjectCard = ({
@@ -82,12 +84,14 @@ const ProjectCard = ({
       transition={{ duration: 0.4, ease: EASE_SNAPPY }}
     >
       {/* Collapsed header — the whole row toggles. */}
-      <button
+      <motion.button
         type="button"
         aria-expanded={open}
         aria-controls={`${project.slug}-body`}
         onClick={onToggle}
-        className="flex w-full items-start gap-5 rounded-2xl p-5 text-left sm:p-6"
+        whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}
+        transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+        className="group flex w-full items-start gap-5 rounded-2xl p-5 text-left sm:p-6"
       >
         {/* Thumbnail — only while collapsed, so on expand it's gone and the text
             slides over to fill the space. The box reserves its slot as soon as a
@@ -164,16 +168,18 @@ const ProjectCard = ({
           </div>
         </motion.div>
 
+        {/* Colour in classes so the group-hover wins — the chevron lightening
+            is the header's "this expands" hover hint (same grammar as the
+            timeline rows). */}
         <motion.span
           aria-hidden
-          className="shrink-0 self-center text-xl"
-          style={{ color: c.muted }}
+          className="shrink-0 self-center text-xl text-[#A6B0A8] transition-colors group-hover:text-[#ECECEA]"
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: 0.25, ease: EASE_SNAPPY }}
         >
           <FiChevronDown />
         </motion.span>
-      </button>
+      </motion.button>
 
       {/* Expanded body — height animates open; instant under reduced motion. */}
       <AnimatePresence initial={false}>
@@ -293,14 +299,14 @@ export const ProjectShowcase = ({ initialOpen }: { initialOpen?: string }) => {
         {FILTERS.map(({ id, label }) => {
           const isActive = filter === id;
           return (
-            <button
+            <motion.button
               key={id}
               type="button"
               aria-pressed={isActive}
               onClick={() => setFilter(id)}
-              className={`relative rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                isActive ? "" : "hover:text-[#ECECEA]"
-              }`}
+              whileHover={{ backgroundColor: "rgba(255,255,255,0.12)" }}
+              transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+              className="relative rounded-full px-4 py-2 text-sm font-medium"
               style={{ color: isActive ? c.text : c.muted }}
             >
               {isActive && (
@@ -319,7 +325,7 @@ export const ProjectShowcase = ({ initialOpen }: { initialOpen?: string }) => {
                   {countFor(id)}
                 </span>
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>

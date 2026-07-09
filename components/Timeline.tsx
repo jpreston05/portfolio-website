@@ -68,10 +68,11 @@ const TimelineEntry = ({
         </p>
       </div>
       {expandable && (
+        // Colour lives in classes (not inline style) so the group-hover wins —
+        // the chevron lightening is the row's "this expands" hover hint.
         <motion.span
           aria-hidden
-          className="mt-0.5 shrink-0 text-lg"
-          style={{ color: c.muted }}
+          className="mt-0.5 shrink-0 text-lg text-[#A6B0A8] transition-colors group-hover:text-[#ECECEA]"
           animate={{ rotate: open ? 180 : 0 }}
           transition={{ duration: reduce ? 0 : 0.25, ease: EASE_SNAPPY }}
         >
@@ -94,15 +95,19 @@ const TimelineEntry = ({
 
       <div className={`min-w-0 flex-1 ${last ? "" : "pb-8"}`}>
         {expandable ? (
-          <button
+          // Negative margin + matching padding nets to zero, so the resting
+          // layout is unchanged but the hover background gets breathing room.
+          <motion.button
             type="button"
             aria-expanded={open}
             aria-controls={`${slug}-details`}
             onClick={onToggle}
-            className="flex w-full items-start justify-between gap-3 text-left"
+            whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}
+            transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+            className="group -mx-3 -my-2 flex w-full items-start justify-between gap-3 rounded-lg px-3 py-2 text-left"
           >
             {Head}
-          </button>
+          </motion.button>
         ) : (
           <div className="flex items-start justify-between gap-3">{Head}</div>
         )}
@@ -174,14 +179,14 @@ export const Timeline = () => {
         {TABS.map(({ id, label }) => {
           const isActive = tab === id;
           return (
-            <button
+            <motion.button
               key={id}
               type="button"
               aria-pressed={isActive}
               onClick={() => setTab(id)}
-              className={`relative rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                isActive ? "" : "hover:text-[#ECECEA]"
-              }`}
+              whileHover={{ backgroundColor: "rgba(255,255,255,0.12)" }}
+              transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+              className="relative rounded-full px-4 py-2 text-sm font-medium"
               style={{ color: isActive ? c.text : c.muted }}
             >
               {isActive && (
@@ -199,7 +204,7 @@ export const Timeline = () => {
                   {countFor(id)}
                 </span>
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>

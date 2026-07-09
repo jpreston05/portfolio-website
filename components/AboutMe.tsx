@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { FiArrowRight, FiArrowUpRight } from "react-icons/fi";
 import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
+import { EASE_SNAPPY } from "@/lib/motion";
 
 /* Home-page "About Me" — degree, GPA and current courses at a glance, with a CTA
    to /timeline for the full journey (mirrors FeaturedProjects → /projects). */
@@ -38,9 +39,9 @@ const Stat = ({ label, children }: { label: string; children: React.ReactNode })
 export const AboutMe = () => (
   <SectionCard id="about" title="About Me">
     <div className="flex flex-col gap-6">
-      {/* 70ch cap — the right column runs ~100+ chars/line unclamped on wide
-          screens, past the ~75ch readability ceiling. */}
-      <p className="max-w-[70ch] text-sm leading-relaxed" style={{ color: c.muted }}>
+      {/* 60ch cap ≈ 75 real characters/line in Inter (ch measures the wide "0",
+          so 70ch still let ~88 through) — the unclamped column ran 100+. */}
+      <p className="max-w-[60ch] text-sm leading-relaxed" style={{ color: c.muted }}>
         {PARAGRAPH}
       </p>
 
@@ -77,32 +78,34 @@ export const AboutMe = () => (
         </p>
         <div className="flex flex-wrap gap-2">
           {COURSES.map((course) => (
-            // Colour lives in classes (not inline style) so the hover wins.
-            <a
+            <motion.a
               key={course.code}
               href={courseUrl(course.code)}
               target="_blank"
               rel="noreferrer"
-              className="group inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-mono text-xs text-[#A6B0A8] transition-colors hover:text-[#DB5461]"
+              whileHover={{ y: -2, color: "#DB5461" }}
+              transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-mono text-xs text-[#A6B0A8]"
               style={{ background: c.bg }}
             >
               {course.code} — {course.name}
-              <FiArrowUpRight className="shrink-0 text-[0.95em] transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
-            </a>
+              <FiArrowUpRight className="shrink-0 text-[0.95em]" />
+            </motion.a>
           ))}
         </div>
       </div>
     </div>
 
     <div className="mt-5 flex justify-end">
-      {/* Colour lives in classes (not inline style) so the hover actually wins. */}
       <MotionLink
         href="/timeline"
+        whileHover={{ x: 3, color: "#DB5461" }}
         whileTap={{ scale: 0.97 }}
-        className="group inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-[#A6B0A8] transition-colors hover:text-[#DB5461]"
+        transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+        className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-[#A6B0A8]"
       >
         My journey
-        <FiArrowRight className="transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
+        <FiArrowRight />
       </MotionLink>
     </div>
   </SectionCard>

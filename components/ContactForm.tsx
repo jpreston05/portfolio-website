@@ -114,7 +114,7 @@ export const ContactForm = () => {
         type="submit"
         className="rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         style={{ background: c.accent, color: c.heroInk }}
-        whileHover={formStatus.submitting ? undefined : { y: -2 }}
+        whileHover={formStatus.submitting ? undefined : { y: -2, filter: "brightness(1.08)" }}
         whileTap={formStatus.submitting ? undefined : { scale: 0.98 }}
         disabled={formStatus.submitting}
         aria-busy={formStatus.submitting}
@@ -152,12 +152,14 @@ export const ContactForm = () => {
           text on these surfaces misses AA). */}
       <p className="mt-2 text-sm" style={{ color: c.muted }}>
         Prefer email?{" "}
-        <a
+        <motion.a
           href="mailto:jackdeanpreston@gmail.com"
-          className="font-medium text-[#ECECEA] underline decoration-[#4A524C] underline-offset-4 transition-colors hover:decoration-[#DB5461]"
+          whileHover={{ color: "#DB5461" }}
+          transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+          className="font-medium text-[#ECECEA] underline decoration-[#4A524C] underline-offset-4"
         >
           jackdeanpreston@gmail.com
-        </a>
+        </motion.a>
       </p>
     </form>
   );
