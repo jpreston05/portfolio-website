@@ -38,7 +38,9 @@ const Stat = ({ label, children }: { label: string; children: React.ReactNode })
 export const AboutMe = () => (
   <SectionCard id="about" title="About Me">
     <div className="flex flex-col gap-6">
-      <p className="text-sm leading-relaxed" style={{ color: c.muted }}>
+      {/* 70ch cap — the right column runs ~100+ chars/line unclamped on wide
+          screens, past the ~75ch readability ceiling. */}
+      <p className="max-w-[70ch] text-sm leading-relaxed" style={{ color: c.muted }}>
         {PARAGRAPH}
       </p>
 

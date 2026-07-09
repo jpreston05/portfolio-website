@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { Footer } from "@/components/Footer";
 import { ContactForm } from "@/components/ContactForm";
 import { c } from "@/components/palette";
@@ -36,6 +37,30 @@ export default function ContactPage() {
           >
             <ContactForm />
           </section>
+
+          {/* Elsewhere — the funnel shouldn't end on a single channel. */}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="https://github.com/jpreston05"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors hover:text-[#ECECEA]"
+              style={{ color: c.muted, background: c.surface }}
+            >
+              <FaGithub aria-hidden />
+              GitHub
+            </a>
+            <a
+              href="https://www.linkedin.com/in/jackdpreston/"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors hover:text-[#ECECEA]"
+              style={{ color: c.muted, background: c.surface }}
+            >
+              <FaLinkedin aria-hidden />
+              LinkedIn
+            </a>
+          </div>
         </main>
         <Footer />
       </motion.div>

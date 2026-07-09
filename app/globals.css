@@ -77,10 +77,10 @@ h3 {
   background: var(--color-line);
 }
 
-/* Selection color */
+/* Selection color — hero-ink on pink, the same pairing as every pink surface. */
 ::selection {
   background: var(--color-accent);
-  color: #181f1c;
+  color: var(--color-hero-ink);
 }
 
 /* On the hero card the accent selection would vanish once the card dyes pink —

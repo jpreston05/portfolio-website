@@ -111,7 +111,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
 
         <MotionLink
           href="/contact"
-          className="ml-1 whitespace-nowrap rounded-full bg-[#DB5461] px-2.5 py-2 text-[13px] font-semibold text-[#181F1C] sm:ml-1.5 sm:px-5 sm:text-[15px]"
+          className="ml-1 whitespace-nowrap rounded-full bg-[#DB5461] px-2.5 py-2 text-[13px] font-semibold text-[#10120F] sm:ml-1.5 sm:px-5 sm:text-[15px]"
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.97 }}
         >
