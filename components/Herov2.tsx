@@ -53,8 +53,10 @@ const CurrentlyLine = () => {
 
   // Crossfade + slight blur (no vertical travel — nothing to clip, and the
   // text keeps its natural inline baseline next to "Currently").
+  // Deliberately NOT aria-live: announcing a decorative rotation every few
+  // seconds is noise for screen reader users; they get the current item.
   return (
-    <span aria-live="polite">
+    <span>
       <AnimatePresence mode="wait">
         <motion.span
           key={i}
@@ -429,7 +431,10 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
           </motion.div>
         </>
       ) : (
-        <div className="flex flex-col text-base">
+        // Base font scales with the viewport on small phones so the em-relative
+        // name (Preston. is whitespace-nowrap) can't overflow the card below
+        // ~360px; capped at 16px so larger screens are unaffected.
+        <div className="flex flex-col text-[clamp(13px,4.2vw,16px)]">
           <div
             className="relative mx-auto aspect-[6/7] w-full max-w-[280px] overflow-hidden rounded-xl"
           >

@@ -124,7 +124,9 @@ export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
       </div>
 
       {count > 1 && (
-        <div className="mt-3 flex justify-center gap-2">
+        <div className="mt-1.5 flex justify-center">
+          {/* 24px buttons around the 8px dots — a real touch target (WCAG
+              2.5.8) without changing the visual. */}
           {Array.from({ length: count }, (_, i) => (
             <button
               key={i}
@@ -132,9 +134,13 @@ export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
               aria-label={`Go to slide ${i + 1}`}
               aria-current={i === index}
               onClick={() => go(i)}
-              className="h-2 w-2 rounded-full transition-colors"
-              style={{ background: i === index ? c.accent : c.line }}
-            />
+              className="flex h-6 w-6 items-center justify-center"
+            >
+              <span
+                className="h-2 w-2 rounded-full transition-colors"
+                style={{ background: i === index ? c.accent : c.line }}
+              />
+            </button>
           ))}
         </div>
       )}

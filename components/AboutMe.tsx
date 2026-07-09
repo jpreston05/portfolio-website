@@ -11,7 +11,6 @@ import { c } from "@/components/palette";
 
 const MotionLink = motion.create(Link);
 
-// Placeholder — Jack to write. A few sentences on who he is / what he's after.
 const PARAGRAPH =
   "I grew up in Waihi Beach, a small rural town in New Zealand, attending a primary school of under 300 students and a high school of around 800. My interest in programming started early. At around age 10, I was building simple games on my iPad using block-coding apps. In high school, I built on that foundation: I learned HTML and CSS and built my first website in Year 10, studied searching and sorting algorithms, and started learning Java. That's when I knew software engineering was the path for me, and it's been my goal ever since.";
 
