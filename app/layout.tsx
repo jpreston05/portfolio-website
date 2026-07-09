@@ -9,10 +9,22 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+// The OG/Twitter image is the static app/opengraph-image.png (baked once with
+// Satori, like app/icon.png) — Next wires og:image/twitter:image from the file
+// convention; Vercel supplies the absolute URL base at deploy time.
 export const metadata: Metadata = {
   title: "Jack Preston | Portfolio",
   description:
     "Aspiring Software Engineer. Software Engineering, Finance and Management student at the University of Auckland.",
+  openGraph: {
+    title: "Jack Preston | Portfolio",
+    description:
+      "Software Engineering, Finance and Management student at the University of Auckland.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({

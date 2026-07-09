@@ -30,12 +30,13 @@ export const projects: Project[] = [
     slug: "trial-ai",
     title: "Trial AI",
     category: "personal",
-    tagline: "An AI Ethics Simulation Trainer.",
+    tagline: "A courtroom mystery game with AI-powered characters.",
     description:
-      "Placeholder — a paragraph about what this project is, the problem it solves, and why it was interesting to build.",
+      "A desktop courtroom mystery game where you play the investigator: interrogate the suspects and witnesses, piece together the evidence, and deliver a verdict. Each character is powered by the OpenAI API with their own persona and hidden knowledge, so no two interrogations play out the same way. Built in Java with JavaFX.",
     highlights: [
-      "Placeholder highlight — what you built and how",
-      "Placeholder highlight — a measured outcome or hard problem solved",
+      "Prompt-engineered character personas that hold their secrets until the right questions are asked",
+      "Multi-scene investigation flow with state management, evidence tracking feeding the final verdict",
+      "Text-to-speech dialogue so every character speaks their lines",
     ],
     stack: ["OpenAI API", "Java", "JavaFX"],
     links: { github: "https://github.com/jpreston05/TrialAI" },
@@ -72,7 +73,7 @@ export const projects: Project[] = [
     category: "hackathon",
     tagline: "Made during the SESA x DEVS Beginners Hackathon 2025",
     description:
-      "A study tool for students to practice concpets taught in 'Software Engineering Theory' (SOFTENG 282) at the University of Auckland. The app features multiple-choice questions, notes on each topic, and a leaderboard to encourage friendly competition among students.",
+      "A study tool for students to practice concepts taught in 'Software Engineering Theory' (SOFTENG 282) at the University of Auckland. The app features multiple-choice questions, notes on each topic, and a leaderboard to encourage friendly competition among students.",
     highlights: [
       "Won 'Most Useful Solution' at the SESA x DEVS Beginners Hackathon 2025",
     ],

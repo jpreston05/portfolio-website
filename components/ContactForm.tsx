@@ -66,25 +66,42 @@ export const ContactForm = () => {
 
   return (
     <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+      {/* Labels are visually hidden (the placeholders carry the visual design)
+          but real, so the fields keep their names for screen readers and after
+          the placeholder disappears mid-typing. */}
+      <label htmlFor="contact-name" className="sr-only">
+        Your name
+      </label>
       <input
+        id="contact-name"
         type="text"
         name="name"
         placeholder="Your name…"
+        autoComplete="name"
         required
         value={formData.name}
         onChange={handleInputChange}
         className={fieldClass}
       />
+      <label htmlFor="contact-email" className="sr-only">
+        Your email
+      </label>
       <input
+        id="contact-email"
         type="email"
         name="email"
         placeholder="Your email…"
+        autoComplete="email"
         required
         value={formData.email}
         onChange={handleInputChange}
         className={fieldClass}
       />
+      <label htmlFor="contact-message" className="sr-only">
+        Your message
+      </label>
       <textarea
+        id="contact-message"
         name="message"
         placeholder="Your message…"
         required
@@ -110,9 +127,10 @@ export const ContactForm = () => {
           aria-live={formStatus.success ? "polite" : "assertive"}
           className="mt-1 flex items-center gap-2 rounded-lg border p-3 text-sm font-medium"
           style={{
-            borderColor: formStatus.success ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)",
-            background: formStatus.success ? "rgba(74,222,128,0.08)" : "rgba(248,113,113,0.08)",
-            color: formStatus.success ? "#4ade80" : "#F87171",
+            // Error red is #F98D8D (5.4:1 on surface) — #F87171 missed AA at 4.4:1.
+            borderColor: formStatus.success ? "rgba(74,222,128,0.3)" : "rgba(249,141,141,0.3)",
+            background: formStatus.success ? "rgba(74,222,128,0.08)" : "rgba(249,141,141,0.08)",
+            color: formStatus.success ? "#4ade80" : "#F98D8D",
           }}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}

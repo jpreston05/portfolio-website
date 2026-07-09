@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FiChevronDown, FiExternalLink, FiGithub } from "react-icons/fi";
 import { Carousel } from "@/components/Carousel";
+import { FilterSelect } from "@/components/FilterSelect";
 import { c } from "@/components/palette";
 import {
   CATEGORY_LABELS,
@@ -274,9 +275,19 @@ export const ProjectShowcase = ({ initialOpen }: { initialOpen?: string }) => {
 
   return (
     <div>
-      {/* Filter control — solid track, sliding active pill (matches the nav). */}
+      {/* Category filter. Phones get a dropdown (the pill row doesn't fit);
+          sm+ gets the segmented control with the sliding active pill. */}
+      <div className="mb-8 sm:hidden">
+        <FilterSelect
+          options={FILTERS.map((f) => ({ ...f, count: countFor(f.id) }))}
+          value={filter}
+          onChange={(id) => setFilter(id as Filter)}
+          ariaLabel="Filter projects by category"
+          trackBg={c.surface}
+        />
+      </div>
       <div
-        className="mb-8 inline-flex flex-wrap gap-1 rounded-full p-1.5"
+        className="mb-8 hidden gap-1 rounded-full p-1.5 sm:inline-flex"
         style={{ background: c.surface }}
       >
         {FILTERS.map(({ id, label }) => {
@@ -302,7 +313,11 @@ export const ProjectShowcase = ({ initialOpen }: { initialOpen?: string }) => {
               )}
               <span className="relative">
                 {label}
-                <span className="ml-1.5 text-xs opacity-50">{countFor(id)}</span>
+                {/* Mono to match the timeline tabs; full-opacity muted — the
+                    dimmed version fell under the 4.5:1 AA floor. */}
+                <span className="ml-1.5 font-mono text-xs" style={{ color: c.muted }}>
+                  {countFor(id)}
+                </span>
               </span>
             </button>
           );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import emailjs from "@emailjs/browser";
 import { AnimatePresence, motion } from "framer-motion";
 import { Preloader } from "@/components/Preloader";
 import { useIntro } from "@/components/SiteChrome";
@@ -31,7 +30,6 @@ export default function Home() {
       window.history.scrollRestoration = "manual";
     }
     if (!window.location.hash) window.scrollTo(0, 0);
-    emailjs.init(process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!);
   }, []);
 
   return (

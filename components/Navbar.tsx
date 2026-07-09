@@ -62,18 +62,18 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
     >
       {/* Solid surface dock — same material AND shape language as the section
           cards (rounded-2xl); the links/CTA inside stay pills for hierarchy. */}
-      <div className="flex items-center gap-1.5 rounded-2xl bg-[#2F3733] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_32px_rgba(0,0,0,0.45)]">
+      <div className="flex items-center gap-1 rounded-2xl bg-[#2F3733] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_32px_rgba(0,0,0,0.45)] sm:gap-1.5 sm:p-2">
         <Link
           href="/"
           aria-label="Home, Jack Preston"
-          className="px-4 text-base font-bold tracking-tight text-[#ECECEA] transition-opacity duration-200"
+          className="px-2 text-sm font-bold tracking-tight text-[#ECECEA] transition-opacity duration-200 sm:px-4 sm:text-base"
           style={{ opacity: brandVisible ? 1 : 0 }}
         >
           <span data-brand>
             JP<span style={{ color: "#DB5461" }}>.</span>
           </span>
         </Link>
-        <span className="mx-0.5 h-6 w-px bg-[#4A524C]" aria-hidden />
+        <span className="mx-0.5 hidden h-6 w-px bg-[#4A524C] sm:block" aria-hidden />
 
         <ul className="relative flex items-center gap-0.5">
           {/* Sliding active highlight — one persistent element. */}
@@ -98,7 +98,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
                 <Link
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
-                  className={`relative block rounded-full px-5 py-2 text-[15px] font-medium transition-colors ${
+                  className={`relative block rounded-full px-2 py-2 text-[13px] font-medium transition-colors sm:px-5 sm:text-[15px] ${
                     isActive ? "text-[#ECECEA]" : "text-[#A6B0A8] hover:text-[#ECECEA]"
                   }`}
                 >
@@ -111,11 +111,14 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
 
         <MotionLink
           href="/contact"
-          className="ml-1.5 rounded-full bg-[#DB5461] px-5 py-2 text-[15px] font-semibold text-[#181F1C]"
+          className="ml-1 whitespace-nowrap rounded-full bg-[#DB5461] px-2.5 py-2 text-[13px] font-semibold text-[#181F1C] sm:ml-1.5 sm:px-5 sm:text-[15px]"
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.97 }}
         >
-          Let&apos;s talk
+          {/* Full label everywhere it fits; the shorter one only on the
+              narrowest phones (≤359px) so the pill never clips. */}
+          <span className="hidden max-[359px]:inline">Talk</span>
+          <span className="max-[359px]:hidden">Let&apos;s talk</span>
         </MotionLink>
       </div>
     </motion.nav>

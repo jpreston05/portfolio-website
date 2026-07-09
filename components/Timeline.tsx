@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FiChevronDown } from "react-icons/fi";
+import { FilterSelect } from "@/components/FilterSelect";
 import { c } from "@/components/palette";
 import { EASE_SNAPPY } from "@/lib/motion";
 import {
@@ -155,9 +156,19 @@ export const Timeline = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: EASE_SNAPPY }}
     >
-      {/* Tab filter: solid track, sliding active pill (matches the nav / projects). */}
+      {/* Tab filter. Phones get a dropdown (the tab row doesn't fit); sm+ gets
+          the segmented control with the sliding active pill. */}
+      <div className="mb-8 sm:hidden">
+        <FilterSelect
+          options={TABS.map(({ id, label }) => ({ id, label, count: countFor(id) }))}
+          value={tab}
+          onChange={(id) => setTab(id as Tab)}
+          ariaLabel="Filter timeline by category"
+          trackBg={c.bg}
+        />
+      </div>
       <div
-        className="mb-8 inline-flex flex-wrap gap-1 rounded-full p-1.5"
+        className="mb-8 hidden gap-1 rounded-full p-1.5 sm:inline-flex"
         style={{ background: c.bg }}
       >
         {TABS.map(({ id, label }) => {
@@ -183,7 +194,10 @@ export const Timeline = () => {
               )}
               <span className="relative">
                 {label}
-                <span className="ml-1.5 font-mono text-xs opacity-50">{countFor(id)}</span>
+                {/* Full-opacity muted — dimming fell under the 4.5:1 AA floor. */}
+                <span className="ml-1.5 font-mono text-xs" style={{ color: c.muted }}>
+                  {countFor(id)}
+                </span>
               </span>
             </button>
           );
