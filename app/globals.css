@@ -53,6 +53,19 @@ h3 {
   text-wrap: balance;
 }
 
+/* Pointer cursor on interactive elements. Tailwind Preflight (and the UA
+   stylesheet) leave <button> at `cursor: default`, so filters, accordions, the
+   submit button and carousel controls read as non-interactive — only <a href>
+   gets the hand. Restore it site-wide; disabled buttons show not-allowed. */
+button:not(:disabled),
+[role="button"],
+summary {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
 /* Keyboard focus. Components style their interactive elements with inline
    styles / hardcoded classes, so the accent focus ring lives here once — a
    single, consistent, on-brand indicator (mouse clicks don't trigger it). */
@@ -77,10 +90,10 @@ h3 {
   background: var(--color-line);
 }
 
-/* Selection color */
+/* Selection color — hero-ink on pink, the same pairing as every pink surface. */
 ::selection {
   background: var(--color-accent);
-  color: #181f1c;
+  color: var(--color-hero-ink);
 }
 
 /* On the hero card the accent selection would vanish once the card dyes pink —

@@ -230,10 +230,20 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
 
   // Card content-box height GROWS from a shorter big card to the full rail
   // height as it docks; the geometry below reads hcAt(d), not a fixed Hc.
-  const pwSmall = PORTRAIT_SMALL;
   const dockedHc = (vh || 800) - NAVBAR - 2 * PAD; // full rail content height
   const bigHc = dockedHc * BIG_CARD_RATIO; // shorter big card
   const hcAt = (d: number) => lerp(bigHc, dockedHc, d);
+
+  // Short-viewport guard: the docked stack (portrait + headline + buttons, all
+  // of which scale with `s`) must fit dockedHc — on ~768-800px-tall laptops it
+  // doesn't at full size and the buttons clipped the "Currently" line. Scale
+  // the docked portrait + type down just enough to fit; ≥ ~860px viewports get
+  // s = 1 and are pixel-identical. (312.5/235/90 are the portrait block,
+  // docked headline and button block heights at s = 1; 12/16 the fixed gaps.)
+  const DOCKED_STACK = PORTRAIT_SMALL * 1.25 + 235 + 90;
+  const DOCKED_GAPS = 12 + 16 + 8; // portrait→headline, headline→buttons, slack
+  const s = Math.min(1, Math.max(0.78, (dockedHc - DOCKED_GAPS) / DOCKED_STACK));
+  const pwSmall = PORTRAIT_SMALL * s;
 
   // Poster name: as large as the big card's height allows. Estimated big-state
   // block height at font 20 ≈ 215 + 36·nameEm (eyebrow + 2 name lines + blurb +
@@ -300,20 +310,24 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
   // (so they can't collide). HEADLINE_H tracks the real text height as it scales
   // with the font (poster-big name → shorter docked) — the big value derives
   // from nameEmBig (eyebrow + 2 name lines + blurb + currently ≈ 145 + 36·em).
-  const headlineHAt = (d: number) => lerp(145 + 36 * nameEmBig, 235, d);
-  const BTN_BLOCK = 90; // ~2 rows of buttons
+  const headlineHAt = (d: number) => lerp(145 + 36 * nameEmBig, 235 * s, d);
+  const BTN_BLOCK = 90 * s; // ~2 rows of buttons at the docked font size
   const buttonsTopV = useTransform(dock, (d) => {
     const belowHeadline = headlineYAt(d) + headlineHAt(d) + 16;
     const floorTop = hcAt(d) - BTN_BLOCK; // floor grows with the card
-    return lerp(belowHeadline, floorTop, ease(phase(d, 0.2, 0.85)));
+    // Math.max ENFORCES the never-above-the-headline rule — on short viewports
+    // the mid-collapse floor sits higher than the still-tall headline block and
+    // the un-clamped lerp used to pull the buttons up through the text.
+    return Math.max(lerp(belowHeadline, floorTop, ease(phase(d, 0.2, 0.85))), belowHeadline);
   });
   // Buttons width shrinks MONOTONICALLY from the big one-row cap to the docked
   // column — so they wrap 4×1 → 2×2 exactly once and never flip back.
   const buttonsW = useTransform([dock, cardWidth], ([d, w]: number[]) =>
     Math.min(w - 2 * PAD, lerp(BIG_BTN_W, dockedW, ease(phase(d, 0.25, 0.85))))
   );
-  // Whole text block scales as it docks (children are em-relative).
-  const textFont = useTransform(dock, [0, 1], [20, 16]);
+  // Whole text block scales as it docks (children are em-relative); the docked
+  // size shrinks with `s` on short viewports so the stack fits the card.
+  const textFont = useTransform(dock, [0, 1], [20, 16 * s]);
 
   return (
     <>

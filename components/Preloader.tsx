@@ -16,6 +16,10 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 type Phase = "name" | "combine" | "loading" | "glide" | "done";
 type Flip = { x: number; y: number; scale: number };
 
+// Phases only ever move forward — guards the skip interaction and any timer
+// that fires after the user has already jumped ahead.
+const ORDER: Phase[] = ["name", "combine", "loading", "glide", "done"];
+
 const NAME_HOLD = 1000; // ms: fade-in + hold on the full name
 const COMBINE_MS = 700; // collapse → JP
 const HOLD_JP = 350; // pause on "JP." before gliding
@@ -37,6 +41,8 @@ export const Preloader = ({
 }) => {
   const reduce = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("name");
+  const advance = (to: Phase) =>
+    setPhase((p) => (ORDER.indexOf(to) > ORDER.indexOf(p) ? to : p));
   const [flip, setFlip] = useState<Flip | null>(null);
   const readyRef = useRef(false);
   const phaseRef = useRef<Phase>("name");
@@ -73,10 +79,10 @@ export const Preloader = ({
       return () => clearTimeout(t);
     }
     const timers = [
-      setTimeout(() => setPhase("combine"), NAME_HOLD),
+      setTimeout(() => advance("combine"), NAME_HOLD),
       // After "JP." forms: glide if the page is ready, else wait (bouncing dot).
       setTimeout(
-        () => setPhase(readyRef.current ? "glide" : "loading"),
+        () => advance(readyRef.current ? "glide" : "loading"),
         NAME_HOLD + COMBINE_MS + HOLD_JP
       ),
     ];
@@ -84,11 +90,24 @@ export const Preloader = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduce]);
 
+  // The intro is a signature, not a toll gate: any click or key skips straight
+  // to the glide (reduced-motion users never see the choreography anyway).
+  useEffect(() => {
+    if (reduce) return;
+    const skip = () => advance("glide");
+    window.addEventListener("pointerdown", skip);
+    window.addEventListener("keydown", skip);
+    return () => {
+      window.removeEventListener("pointerdown", skip);
+      window.removeEventListener("keydown", skip);
+    };
+  }, [reduce]);
+
   // While the page is still loading, hold on "JP." (dot bounces). The load
   // handler above advances us when ready; this is just the safety cap.
   useEffect(() => {
     if (phase !== "loading") return;
-    const cap = setTimeout(() => setPhase("glide"), LOAD_CAP);
+    const cap = setTimeout(() => advance("glide"), LOAD_CAP);
     return () => clearTimeout(cap);
   }, [phase]);
 
@@ -122,9 +141,11 @@ export const Preloader = ({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      {/* Carbon backdrop — fades as the JP glides, revealing the site. */}
+      {/* Carbon backdrop — fades as the JP glides, revealing the site. Catches
+          pointer events while visible so a skip-click can't also fall through
+          to the invisible page (nav links) beneath it. */}
       <motion.div
-        className="absolute inset-0"
+        className={`absolute inset-0 ${backdropGone ? "pointer-events-none" : "pointer-events-auto"}`}
         style={{ background: "#181F1C" }}
         animate={{ opacity: backdropGone ? 0 : 1 }}
         transition={{ duration: 0.6, ease: "easeInOut" }}

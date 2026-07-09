@@ -59,7 +59,7 @@ export const ContactForm = () => {
         success: false,
         error: true,
         message:
-          "An error occurred while sending your message. Please try again.",
+          "Something went wrong sending your message. Please try again, or use the email below.",
       });
     }
   };
@@ -109,11 +109,12 @@ export const ContactForm = () => {
         onChange={handleInputChange}
         className={`${fieldClass} min-h-[140px] resize-y`}
       />
+      {/* heroInk, not bg, for text on pink — bg is 4.36:1, heroInk 4.89:1 AA. */}
       <motion.button
         type="submit"
         className="rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-        style={{ background: c.accent, color: c.bg }}
-        whileHover={formStatus.submitting ? undefined : { y: -2 }}
+        style={{ background: c.accent, color: c.heroInk }}
+        whileHover={formStatus.submitting ? undefined : { y: -2, filter: "brightness(1.08)" }}
         whileTap={formStatus.submitting ? undefined : { scale: 0.98 }}
         disabled={formStatus.submitting}
         aria-busy={formStatus.submitting}
@@ -144,6 +145,22 @@ export const ContactForm = () => {
           <span>{formStatus.message}</span>
         </motion.div>
       )}
+
+      {/* Direct-email fallback — the recovery path when the form (EmailJS)
+          fails, and the channel for people who prefer their own mail client.
+          Text stays ink; only the underline takes the accent on hover (pink
+          text on these surfaces misses AA). */}
+      <p className="mt-2 text-sm" style={{ color: c.muted }}>
+        Prefer email?{" "}
+        <motion.a
+          href="mailto:jackdeanpreston@gmail.com"
+          whileHover={{ color: "#DB5461" }}
+          transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+          className="font-medium text-[#ECECEA] underline decoration-[#4A524C] underline-offset-4"
+        >
+          jackdeanpreston@gmail.com
+        </motion.a>
+      </p>
     </form>
   );
 };

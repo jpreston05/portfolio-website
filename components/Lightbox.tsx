@@ -110,16 +110,19 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
           exit={{ opacity: 0 }}
           transition={{ duration: dur, ease: EASE_SNAPPY }}
         >
-          <button
+          <motion.button
             ref={closeRef}
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="absolute right-4 top-4 z-10 rounded-full p-2.5 transition-colors hover:text-[#ECECEA]"
+            whileHover={{ scale: 1.12, color: "#ECECEA" }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+            className="absolute right-4 top-4 z-10 rounded-full p-2.5"
             style={{ background: "rgba(24,31,28,0.7)", color: c.muted }}
           >
             <FiX className="text-xl" />
-          </button>
+          </motion.button>
 
           <motion.div
             className="relative flex h-[88vh] w-[92vw] items-center justify-center"
@@ -142,30 +145,36 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
 
           {count > 1 && (
             <>
-              <button
+              <motion.button
                 type="button"
                 aria-label="Previous screenshot"
                 onClick={(e) => {
                   e.stopPropagation();
                   onIndex(index - 1);
                 }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full p-3 transition-colors hover:text-[#ECECEA]"
-                style={{ background: "rgba(24,31,28,0.7)", color: c.muted }}
+                whileHover={{ scale: 1.12, color: "#ECECEA" }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+                className="absolute left-4 top-1/2 rounded-full p-3"
+                style={{ background: "rgba(24,31,28,0.7)", color: c.muted, y: "-50%" }}
               >
                 <FiChevronLeft className="text-xl" />
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 type="button"
                 aria-label="Next screenshot"
                 onClick={(e) => {
                   e.stopPropagation();
                   onIndex(index + 1);
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full p-3 transition-colors hover:text-[#ECECEA]"
-                style={{ background: "rgba(24,31,28,0.7)", color: c.muted }}
+                whileHover={{ scale: 1.12, color: "#ECECEA" }}
+                whileTap={{ scale: 0.92 }}
+                transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+                className="absolute right-4 top-1/2 rounded-full p-3"
+                style={{ background: "rgba(24,31,28,0.7)", color: c.muted, y: "-50%" }}
               >
                 <FiChevronRight className="text-xl" />
-              </button>
+              </motion.button>
               <div
                 className="absolute bottom-4 left-1/2 -translate-x-1/2 font-mono text-xs"
                 style={{ color: c.muted }}
