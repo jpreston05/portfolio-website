@@ -13,6 +13,8 @@ import { EASE_SNAPPY } from "@/lib/motion";
    document.body so framer layout transforms / overflow-hidden ancestors can't
    clip or mis-position the fixed overlay. */
 
+const SWIPE_PX = 60; // drag distance that commits a slide change
+
 type LightboxProps = {
   open: boolean;
   images: string[];
@@ -28,6 +30,7 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
   const closeRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const restoreRef = useRef<Element | null>(null);
+  const downXY = useRef<{ x: number; y: number } | null>(null);
 
   // SSR guard: createPortal needs document, which isn't there on the server.
   // useSyncExternalStore returns false during SSR/first render, true on the
@@ -126,7 +129,19 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
 
           <motion.div
             className="relative flex h-[88vh] w-[92vw] items-center justify-center"
+            style={{ touchAction: "pan-y" }}
             onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => {
+              downXY.current = { x: e.clientX, y: e.clientY };
+            }}
+            onPointerUp={(e) => {
+              const d = downXY.current;
+              if (!d || count <= 1) return;
+              const dx = e.clientX - d.x;
+              if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(e.clientY - d.y)) {
+                onIndex(dx < 0 ? index + 1 : index - 1);
+              }
+            }}
             initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
             animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}

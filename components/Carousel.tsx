@@ -48,17 +48,22 @@ export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
       <div className="relative overflow-hidden rounded-xl" style={{ background: c.surface2 }}>
         <motion.div
           className="flex aspect-video"
+          style={{ touchAction: "pan-y" }}
           animate={{ x: `${-index * 100}%` }}
           transition={reduce ? { duration: 0 } : { duration: 0.35, ease: EASE_SNAPPY }}
-          drag={count > 1 ? "x" : false}
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.15}
-          onDragEnd={(_, info) => {
-            if (info.offset.x < -SWIPE_PX) go(index + 1);
-            else if (info.offset.x > SWIPE_PX) go(index - 1);
-          }}
           onPointerDown={(e) => {
             downXY.current = { x: e.clientX, y: e.clientY };
+          }}
+          onPointerUp={(e) => {
+            // Swipe from the raw pointer travel — no framer `drag`, so the
+            // index-driven `animate` owns `x` alone (dragging it too made the
+            // track flash back to slide 0 before landing on the next one).
+            const d = downXY.current;
+            if (!d || count <= 1) return;
+            const dx = e.clientX - d.x;
+            if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(e.clientY - d.y)) {
+              go(dx < 0 ? index + 1 : index - 1);
+            }
           }}
           onClickCapture={(e) => {
             const d = downXY.current;
