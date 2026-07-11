@@ -53,8 +53,10 @@ const CurrentlyLine = () => {
 
   // Crossfade + slight blur (no vertical travel — nothing to clip, and the
   // text keeps its natural inline baseline next to "Currently").
+  // Deliberately NOT aria-live: announcing a decorative rotation every few
+  // seconds is noise for screen reader users; they get the current item.
   return (
-    <span aria-live="polite">
+    <span>
       <AnimatePresence mode="wait">
         <motion.span
           key={i}
@@ -113,7 +115,7 @@ const PortraitArt = () => (
       alt="Portrait of Jack Preston"
       fill
       priority
-      sizes="(min-width: 1024px) 560px, (min-width: 640px) 300px, 280px"
+      sizes="(min-width: 1024px) 560px, 280px"
       className="z-10 object-cover object-bottom"
     />
   </>
@@ -151,9 +153,7 @@ const Headline = () => (
       className="font-bold leading-[0.9] tracking-tight"
       style={{
         color: "var(--hero-ink)",
-        // The vw cap only bites on very narrow phones (≲365px) where the
-        // nowrap "Preston." would otherwise overflow the card.
-        fontSize: "min(calc(var(--hero-name, 4.2) * 1em), 18.5vw)",
+        fontSize: "calc(var(--hero-name, 4.2) * 1em)",
       }}
     >
       <motion.span variants={entranceItem} className="block whitespace-nowrap">
@@ -234,23 +234,23 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
   const bigHc = dockedHc * BIG_CARD_RATIO; // shorter big card
   const hcAt = (d: number) => lerp(bigHc, dockedHc, d);
 
-  // Short-viewport guard: the docked stack needs ~640px of content height
-  // (portrait 312 + headline 235 + buttons 90 + gaps) and the big block ~420px.
-  // s / sBig shrink the docked / big portrait + type just enough that the
-  // stacks fit on short screens (Nest Hub, 768–800px-tall laptops) — without
-  // them the buttons rose over the "Currently" line. Viewports ≳860px tall get
-  // exactly 1, pixel-identical to the tuned look.
-  const s = Math.min(1, (dockedHc - 40) / 640);
-  const sBig = Math.min(1, bigHc / 420);
+  // Short-viewport guard: the docked stack (portrait + headline + buttons, all
+  // of which scale with `s`) must fit dockedHc — on ~768-800px-tall laptops it
+  // doesn't at full size and the buttons clipped the "Currently" line. Scale
+  // the docked portrait + type down just enough to fit; ≥ ~860px viewports get
+  // s = 1 and are pixel-identical. (312.5/235/90 are the portrait block,
+  // docked headline and button block heights at s = 1; 12/16 the fixed gaps.)
+  const DOCKED_STACK = PORTRAIT_SMALL * 1.25 + 235 + 90;
+  const DOCKED_GAPS = 12 + 16 + 8; // portrait→headline, headline→buttons, slack
+  const s = Math.min(1, Math.max(0.78, (dockedHc - DOCKED_GAPS) / DOCKED_STACK));
   const pwSmall = PORTRAIT_SMALL * s;
 
   // Poster name: as large as the big card's height allows. Estimated big-state
   // block height at font 20 ≈ 215 + 36·nameEm (eyebrow + 2 name lines + blurb +
   // currently + gap + one button row); keep it inside bigHc with ~40px margin.
-  // (The px estimates were calibrated at font 20, so they scale by sBig.)
   const nameEmBig = Math.min(
     NAME_EM_BIG_MAX,
-    Math.max(NAME_EM_DOCKED, (bigHc / sBig - 255) / 36)
+    Math.max(NAME_EM_DOCKED, (bigHc - 255) / 36)
   );
   const nameEm = useTransform(dock, [0, 0.66], [nameEmBig, NAME_EM_DOCKED]);
   // Big portrait sized so (a) the CENTRED square + its hair overhang (~0.167·w
@@ -259,7 +259,7 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
   const pwBig = Math.min(
     PORTRAIT_BIG,
     (bigHc / 2 - 10) / 0.667,
-    bigCardW - 2 * PAD - BIG_BTN_W * sBig - 16
+    bigCardW - 2 * PAD - BIG_BTN_W - 16
   );
 
   const phase = (d: number, a: number, b: number) =>
@@ -279,7 +279,7 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
   // Headline glides between FIXED endpoints (monotonic — no bob).
   const dockedY = pwSmall * 1.25 + 12; // headline top sits just below docked portrait
   // Centre the whole headline+buttons block (height tracks the poster name size).
-  const bigBlockH = (215 + 36 * nameEmBig) * sBig;
+  const bigBlockH = 215 + 36 * nameEmBig;
   const bigY = Math.max(PAD, (bigHc - bigBlockH) / 2);
   const dockedW = RAIL_W - 2 * PAD; // docked text/button column width (344)
 
@@ -303,44 +303,40 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
   // wrap at every size — final composition from the start, never re-wraps.
   // (The name is whitespace-nowrap, so the column width doesn't affect it.)
   const headlineW = useTransform([dock, cardWidth], ([d, w]: number[]) =>
-    Math.min(w - 2 * PAD, lerp(dockedW * 1.25 * sBig, dockedW * s, d))
+    Math.min(w - 2 * PAD, lerp(dockedW * 1.25, dockedW, d))
   );
 
   // Buttons GLIDE down to the card floor, but never above the headline's bottom
   // (so they can't collide). HEADLINE_H tracks the real text height as it scales
   // with the font (poster-big name → shorter docked) — the big value derives
   // from nameEmBig (eyebrow + 2 name lines + blurb + currently ≈ 145 + 36·em).
-  const headlineHAt = (d: number) =>
-    lerp((145 + 36 * nameEmBig) * sBig, 235 * s, d);
-  const BTN_BLOCK = 90; // ~2 rows of buttons
+  const headlineHAt = (d: number) => lerp(145 + 36 * nameEmBig, 235 * s, d);
+  const BTN_BLOCK = 90 * s; // ~2 rows of buttons at the docked font size
   const buttonsTopV = useTransform(dock, (d) => {
     const belowHeadline = headlineYAt(d) + headlineHAt(d) + 16;
-    const floorTop = hcAt(d) - BTN_BLOCK * s; // floor grows with the card
-    // Clamped so on short viewports the buttons never rise over the headline.
+    const floorTop = hcAt(d) - BTN_BLOCK; // floor grows with the card
+    // Math.max ENFORCES the never-above-the-headline rule — on short viewports
+    // the mid-collapse floor sits higher than the still-tall headline block and
+    // the un-clamped lerp used to pull the buttons up through the text.
     return Math.max(lerp(belowHeadline, floorTop, ease(phase(d, 0.2, 0.85))), belowHeadline);
   });
   // Buttons width shrinks MONOTONICALLY from the big one-row cap to the docked
   // column — so they wrap 4×1 → 2×2 exactly once and never flip back.
   const buttonsW = useTransform([dock, cardWidth], ([d, w]: number[]) =>
-    Math.min(w - 2 * PAD, lerp(BIG_BTN_W * sBig, dockedW * s, ease(phase(d, 0.25, 0.85))))
+    Math.min(w - 2 * PAD, lerp(BIG_BTN_W, dockedW, ease(phase(d, 0.25, 0.85))))
   );
-  // Whole text block scales as it docks (children are em-relative); the ends
-  // carry the short-viewport scales so the type shrinks with the geometry.
-  const textFont = useTransform(dock, [0, 1], [20 * sBig, 16 * s]);
+  // Whole text block scales as it docks (children are em-relative); the docked
+  // size shrinks with `s` on short viewports so the stack fits the card.
+  const textFont = useTransform(dock, [0, 1], [20, 16 * s]);
 
   return (
     <>
     <motion.div
       data-on-accent
-      // Static variant (below lg / reduced-motion): the dye vars come from CSS
-      // ([data-hero-static] in globals.css) so the FIRST paint is already right
-      // per breakpoint — phones get the docked pink card, sm–lg tablets get the
-      // big-state look (dark card, pink held in the square + full stop).
-      data-hero-static={enabled ? undefined : ""}
       className={
         enabled
           ? "relative shrink-0 overflow-hidden rounded-2xl"
-          : "mx-auto w-full max-w-md rounded-2xl p-6 sm:max-lg:max-w-none sm:max-lg:p-8"
+          : "w-full max-w-md rounded-2xl p-6"
       }
       style={{
         background: "var(--hero-card)",
@@ -357,7 +353,16 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
               "--hero-focus": focusColor,
               "--hero-name": nameEm,
             }
-          : {}),
+          : {
+              // Static variant (mobile / reduced-motion): the docked look.
+              "--hero-card": c.accent,
+              "--hero-square": c.bg,
+              "--hero-ink": c.heroInk,
+              "--hero-sub": c.heroMuted,
+              "--hero-dot": c.heroMuted,
+              "--hero-focus": c.heroInk,
+              "--hero-name": NAME_EM_DOCKED,
+            }),
       }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -440,18 +445,19 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
           </motion.div>
         </>
       ) : (
-        /* One DOM order, two compositions: phones (and the reduced-motion lg
-           rail) stack portrait → headline → buttons — the docked look. On
-           sm–lg tablets the same children re-place into the big-state
-           composition: headline + buttons left, portrait bottom-right. */
-        <div className="flex flex-col text-base sm:max-lg:grid sm:max-lg:grid-cols-[1fr_auto] sm:max-lg:items-end sm:max-lg:gap-x-8 sm:max-lg:text-lg md:max-lg:text-xl">
-          <div className="relative mx-auto aspect-[6/7] w-full max-w-[280px] overflow-hidden rounded-xl sm:max-lg:col-start-2 sm:max-lg:row-span-2 sm:max-lg:row-start-1 sm:max-lg:mx-0 sm:max-lg:w-[34vw] sm:max-lg:max-w-[300px]">
+        // Base font scales with the viewport on small phones so the em-relative
+        // name (Preston. is whitespace-nowrap) can't overflow the card below
+        // ~360px; capped at 16px so larger screens are unaffected.
+        <div className="flex flex-col text-[clamp(13px,4.2vw,16px)]">
+          <div
+            className="relative mx-auto aspect-[6/7] w-full max-w-[280px] overflow-hidden rounded-xl"
+          >
             <PortraitArt />
           </div>
-          <div className="mt-6 sm:max-lg:col-start-1 sm:max-lg:row-start-1 sm:max-lg:mt-0 sm:max-lg:self-center">
+          <div className="mt-6">
             <Headline />
           </div>
-          <div className="mt-6 sm:max-lg:col-start-1 sm:max-lg:row-start-2 sm:max-lg:mt-8">
+          <div className="mt-6">
             <ButtonRow />
           </div>
         </div>

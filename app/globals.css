@@ -4,15 +4,16 @@
    v4 theme tokens (bg-bg, text-ink, text-muted, text-accent, …). Kept in sync
    with components/palette.ts. */
 @theme {
-  --color-primary: #181f1c;
-  --color-secondary: #88958d;
-  --color-accent: #db5461;
-  --color-ink: #ececea;
-  --color-muted: #a6b0a8;
   --color-bg: #181f1c;
   --color-surface: #2f3733;
-  --color-card: #2f3733;
+  --color-surface-2: #3a423d;
   --color-line: #4a524c;
+  --color-ink: #ececea;
+  --color-muted: #a6b0a8;
+  --color-muted-2: #737f77; /* decorative only — fails AA as text */
+  --color-accent: #db5461;
+  --color-hero-ink: #10120f;
+  --color-hero-muted: #2a1013;
 
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
@@ -52,8 +53,10 @@ h3 {
   text-wrap: balance;
 }
 
-/* Tailwind Preflight leaves <button> at cursor: default, which makes every
-   non-link control read as dead — restore the pointer once, globally. */
+/* Pointer cursor on interactive elements. Tailwind Preflight (and the UA
+   stylesheet) leave <button> at `cursor: default`, so filters, accordions, the
+   submit button and carousel controls read as non-interactive — only <a href>
+   gets the hand. Restore it site-wide; disabled buttons show not-allowed. */
 button:not(:disabled),
 [role="button"],
 summary {
@@ -87,10 +90,10 @@ button:disabled {
   background: var(--color-line);
 }
 
-/* Selection color */
+/* Selection color — hero-ink on pink, the same pairing as every pink surface. */
 ::selection {
   background: var(--color-accent);
-  color: #181f1c;
+  color: var(--color-hero-ink);
 }
 
 /* On the hero card the accent selection would vanish once the card dyes pink —
@@ -129,32 +132,6 @@ html[data-intro-seen] [data-page-reveal] {
    card is dark (top of page), ink once the card has dyed pink (docked). */
 [data-on-accent] :focus-visible {
   outline-color: var(--hero-focus, #10120f);
-}
-
-/* Static hero (below lg / reduced-motion) — the dye vars live here (not inline)
-   so the first paint is breakpoint-correct. Phones and the reduced-motion lg
-   rail pin the DOCKED pink look; sm–lg tablets pin the BIG-state look instead
-   (dark card, pink held in the portrait square + full stop) so a tablet gets
-   the initial hero composition, not a half-width docked card. Values mirror
-   components/palette.ts. */
-[data-hero-static] {
-  --hero-card: #db5461;
-  --hero-square: #181f1c;
-  --hero-ink: #10120f;
-  --hero-sub: #2a1013;
-  --hero-dot: #2a1013;
-  --hero-focus: #10120f;
-  --hero-name: 4.2;
-}
-@media (min-width: 640px) and (max-width: 1023.98px) {
-  [data-hero-static] {
-    --hero-card: #2f3733;
-    --hero-square: #db5461;
-    --hero-ink: #ececea;
-    --hero-sub: #a6b0a8;
-    --hero-dot: #db5461;
-    --hero-focus: #db5461;
-  }
 }
 
 /* Hero scroll cue — a pink dot dropping down a short hairline track. */
