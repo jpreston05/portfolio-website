@@ -53,8 +53,10 @@ const CurrentlyLine = () => {
 
   // Crossfade + slight blur (no vertical travel — nothing to clip, and the
   // text keeps its natural inline baseline next to "Currently").
+  // Deliberately NOT aria-live: announcing a decorative rotation every few
+  // seconds is noise for screen reader users; they get the current item.
   return (
-    <span aria-live="polite">
+    <span>
       <AnimatePresence mode="wait">
         <motion.span
           key={i}

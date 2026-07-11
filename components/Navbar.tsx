@@ -82,8 +82,8 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
           <span data-brand>
             JP<span style={{ color: "#DB5461" }}>.</span>
           </span>
-        </Link>
-        <span className="mx-0.5 h-6 w-px bg-[#4A524C]" aria-hidden />
+        </MotionLink>
+        <span className="mx-0.5 hidden h-6 w-px bg-[#4A524C] sm:block" aria-hidden />
 
         <ul className="relative flex items-center gap-0.5">
           {/* Sliding active highlight — one persistent element. */}
@@ -106,7 +106,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
                 }}
                 className={link.id === "home" ? "hidden sm:block" : undefined}
               >
-                <Link
+                <MotionLink
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
                   className={`relative block rounded-full px-3 py-2 text-sm font-medium transition-colors max-[319px]:px-2 max-[319px]:text-[13px] sm:px-5 sm:text-[15px] ${
@@ -114,7 +114,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
                   }`}
                 >
                   {link.label}
-                </Link>
+                </MotionLink>
               </li>
             );
           })}
@@ -126,7 +126,10 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.97 }}
         >
-          Let&apos;s talk
+          {/* Full label everywhere it fits; the shorter one only on the
+              narrowest phones (≤359px) so the pill never clips. */}
+          <span className="hidden max-[359px]:inline">Talk</span>
+          <span className="max-[359px]:hidden">Let&apos;s talk</span>
         </MotionLink>
       </div>
     </motion.nav>

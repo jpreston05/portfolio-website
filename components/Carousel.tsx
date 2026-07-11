@@ -77,6 +77,7 @@ export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
                 <motion.div
                   key={src}
                   layoutId={i === 0 ? coverLayoutId : undefined}
+                  whileHover={reduce ? undefined : { scale: 1.03 }}
                   className="group/slide relative h-full w-full shrink-0 cursor-zoom-in"
                 >
                   <Image
@@ -101,40 +102,55 @@ export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
 
         {count > 1 && (
           <>
-            <button
+            <motion.button
               type="button"
               aria-label="Previous screenshot"
               onClick={() => go(index - 1)}
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition-colors hover:text-[#ECECEA]"
-              style={{ background: "rgba(24,31,28,0.7)", color: c.muted }}
+              whileHover={{ scale: 1.15, color: "#ECECEA" }}
+              whileTap={{ scale: 0.92 }}
+              transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+              className="absolute left-2 top-1/2 rounded-full p-2"
+              style={{ background: "rgba(24,31,28,0.7)", color: c.muted, y: "-50%" }}
             >
               <FiChevronLeft />
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               type="button"
               aria-label="Next screenshot"
               onClick={() => go(index + 1)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 transition-colors hover:text-[#ECECEA]"
-              style={{ background: "rgba(24,31,28,0.7)", color: c.muted }}
+              whileHover={{ scale: 1.15, color: "#ECECEA" }}
+              whileTap={{ scale: 0.92 }}
+              transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+              className="absolute right-2 top-1/2 rounded-full p-2"
+              style={{ background: "rgba(24,31,28,0.7)", color: c.muted, y: "-50%" }}
             >
               <FiChevronRight />
-            </button>
+            </motion.button>
           </>
         )}
       </div>
 
       {count > 1 && (
-        <div className="mt-3 flex justify-center gap-2">
+        <div className="mt-1.5 flex justify-center">
+          {/* 24px buttons around the 8px dots — a real touch target (WCAG
+              2.5.8) without changing the visual. */}
           {Array.from({ length: count }, (_, i) => (
-            <button
+            <motion.button
               key={i}
               type="button"
               aria-label={`Go to slide ${i + 1}`}
               aria-current={i === index}
               onClick={() => go(i)}
-              className="h-2 w-2 rounded-full transition-colors"
-              style={{ background: i === index ? c.accent : c.line }}
-            />
+              whileHover={{ scale: 1.3 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+              className="flex h-6 w-6 items-center justify-center"
+            >
+              <span
+                className="h-2 w-2 rounded-full transition-colors"
+                style={{ background: i === index ? c.accent : c.line }}
+              />
+            </motion.button>
           ))}
         </div>
       )}

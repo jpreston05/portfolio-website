@@ -58,11 +58,13 @@ export const FeaturedProjects = () => (
       {/* Colour lives in classes (not inline style) so the hover actually wins. */}
       <MotionLink
         href="/projects"
+        whileHover={{ x: 3, color: "#DB5461" }}
         whileTap={{ scale: 0.97 }}
-        className="group inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-[#A6B0A8] transition-colors hover:text-[#DB5461]"
+        transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+        className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-[#A6B0A8]"
       >
         All projects
-        <FiArrowRight className="transition-transform duration-200 ease-snappy group-hover:translate-x-0.5" />
+        <FiArrowRight />
       </MotionLink>
     </div>
   </SectionCard>

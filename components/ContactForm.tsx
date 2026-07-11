@@ -59,32 +59,49 @@ export const ContactForm = () => {
         success: false,
         error: true,
         message:
-          "An error occurred while sending your message. Please try again.",
+          "Something went wrong sending your message. Please try again, or use the email below.",
       });
     }
   };
 
   return (
     <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+      {/* Labels are visually hidden (the placeholders carry the visual design)
+          but real, so the fields keep their names for screen readers and after
+          the placeholder disappears mid-typing. */}
+      <label htmlFor="contact-name" className="sr-only">
+        Your name
+      </label>
       <input
+        id="contact-name"
         type="text"
         name="name"
         placeholder="Your name…"
+        autoComplete="name"
         required
         value={formData.name}
         onChange={handleInputChange}
         className={fieldClass}
       />
+      <label htmlFor="contact-email" className="sr-only">
+        Your email
+      </label>
       <input
+        id="contact-email"
         type="email"
         name="email"
         placeholder="Your email…"
+        autoComplete="email"
         required
         value={formData.email}
         onChange={handleInputChange}
         className={fieldClass}
       />
+      <label htmlFor="contact-message" className="sr-only">
+        Your message
+      </label>
       <textarea
+        id="contact-message"
         name="message"
         placeholder="Your message…"
         required
@@ -92,11 +109,12 @@ export const ContactForm = () => {
         onChange={handleInputChange}
         className={`${fieldClass} min-h-[140px] resize-y`}
       />
+      {/* heroInk, not bg, for text on pink — bg is 4.36:1, heroInk 4.89:1 AA. */}
       <motion.button
         type="submit"
         className="rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-        style={{ background: c.accent, color: c.bg }}
-        whileHover={formStatus.submitting ? undefined : { y: -2 }}
+        style={{ background: c.accent, color: c.heroInk }}
+        whileHover={formStatus.submitting ? undefined : { y: -2, filter: "brightness(1.08)" }}
         whileTap={formStatus.submitting ? undefined : { scale: 0.98 }}
         disabled={formStatus.submitting}
         aria-busy={formStatus.submitting}
@@ -110,9 +128,10 @@ export const ContactForm = () => {
           aria-live={formStatus.success ? "polite" : "assertive"}
           className="mt-1 flex items-center gap-2 rounded-lg border p-3 text-sm font-medium"
           style={{
-            borderColor: formStatus.success ? "rgba(74,222,128,0.3)" : "rgba(248,113,113,0.3)",
-            background: formStatus.success ? "rgba(74,222,128,0.08)" : "rgba(248,113,113,0.08)",
-            color: formStatus.success ? "#4ade80" : "#F87171",
+            // Error red is #F98D8D (5.4:1 on surface) — #F87171 missed AA at 4.4:1.
+            borderColor: formStatus.success ? "rgba(74,222,128,0.3)" : "rgba(249,141,141,0.3)",
+            background: formStatus.success ? "rgba(74,222,128,0.08)" : "rgba(249,141,141,0.08)",
+            color: formStatus.success ? "#4ade80" : "#F98D8D",
           }}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
@@ -126,6 +145,22 @@ export const ContactForm = () => {
           <span>{formStatus.message}</span>
         </motion.div>
       )}
+
+      {/* Direct-email fallback — the recovery path when the form (EmailJS)
+          fails, and the channel for people who prefer their own mail client.
+          Text stays ink; only the underline takes the accent on hover (pink
+          text on these surfaces misses AA). */}
+      <p className="mt-2 text-sm" style={{ color: c.muted }}>
+        Prefer email?{" "}
+        <motion.a
+          href="mailto:jackdeanpreston@gmail.com"
+          whileHover={{ color: "#DB5461" }}
+          transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+          className="font-medium text-[#ECECEA] underline decoration-[#4A524C] underline-offset-4"
+        >
+          jackdeanpreston@gmail.com
+        </motion.a>
+      </p>
     </form>
   );
 };

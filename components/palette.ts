@@ -1,6 +1,5 @@
-/* Shared CLAUDE.md palette. Kept as a TS object (consumed via inline styles)
-   until the global token migration — the globals.css @theme values are still the
-   stale Vite-era colors, so we don't rely on bg-bg/text-accent here yet. */
+/* Shared brand palette, consumed via inline styles. Mirrors the @theme tokens
+   in globals.css (bg-bg, text-muted, …) — change a color in BOTH places. */
 export const c = {
   bg: "#181F1C", // Carbon Black
   surface: "#2F3733", // card — olive-tinted mid grey, clearly visible
