@@ -99,7 +99,7 @@ export const projects: Project[] = [
     ],
     stack: [],
     links: { },
-    images: [],
+    images: ["/projects/red-bull/team_pic.webp", "/projects/red-bull/initial_drawing1.webp", "/projects/red-bull/initial_drawing2.webp", "/projects/red-bull/logo.webp", "/projects/red-bull/frame1.webp", "/projects/red-bull/frame2.webp", "/projects/red-bull/frame3.webp", "/projects/red-bull/drilling.webp", "/projects/red-bull/track.webp", "/projects/red-bull/steering.webp", "/projects/red-bull/trol1.webp", "/projects/red-bull/trol2.webp", "/projects/red-bull/trol3.webp", "/projects/red-bull/side1.webp", "/projects/red-bull/side2.webp", "/projects/red-bull/side3.webp"],
     featured: false,
   },
   {
@@ -114,7 +114,7 @@ export const projects: Project[] = [
     ],
     stack: ["Python", "Numpy"],
     links: { github: "https://github.com/jpreston05/Monte-Carlo-Battleships" },
-    images: [],
+    images: ["/projects/battleships/start.webp", "/projects/battleships/turn.webp", "/projects/battleships/end.webp"],
     featured: true,
   },
 ];
