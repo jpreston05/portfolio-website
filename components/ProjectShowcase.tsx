@@ -89,7 +89,11 @@ const ProjectCard = ({
         aria-expanded={open}
         aria-controls={`${project.slug}-body`}
         onClick={onToggle}
-        whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}
+        // Only the collapsed header carries the "click to expand" background
+        // lift. Expanded, the tint would highlight just the top strip of a big
+        // card (reading as a false whole-card toggle), so drop it — the rotated
+        // chevron's group-hover lightening is the quiet "click to collapse" hint.
+        whileHover={open ? undefined : { backgroundColor: "rgba(255,255,255,0.05)" }}
         transition={{ duration: 0.2, ease: EASE_SNAPPY }}
         className="group flex w-full items-start gap-5 rounded-2xl p-5 text-left sm:p-6"
       >
