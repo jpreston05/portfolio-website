@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FiChevronDown, FiExternalLink, FiGithub } from "react-icons/fi";
 import { Carousel } from "@/components/Carousel";
+import { FilterSelect } from "@/components/FilterSelect";
 import { c } from "@/components/palette";
 import {
   CATEGORY_LABELS,
@@ -274,9 +275,17 @@ export const ProjectShowcase = ({ initialOpen }: { initialOpen?: string }) => {
 
   return (
     <div>
-      {/* Filter control — solid track, sliding active pill (matches the nav). */}
+      {/* Filter control — segmented pills from sm up; below sm the row can't
+          fit, so a dropdown (FilterSelect) takes over. */}
+      <FilterSelect
+        className="mb-8 sm:hidden"
+        label="Filter projects"
+        value={filter}
+        options={FILTERS.map((f) => ({ ...f, count: countFor(f.id) }))}
+        onChange={(id) => setFilter(id as Filter)}
+      />
       <div
-        className="mb-8 inline-flex flex-wrap gap-1 rounded-full p-1.5"
+        className="mb-8 hidden flex-wrap gap-1 rounded-full p-1.5 sm:inline-flex"
         style={{ background: c.surface }}
       >
         {FILTERS.map(({ id, label }) => {

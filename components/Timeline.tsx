@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FiChevronDown } from "react-icons/fi";
+import { FilterSelect } from "@/components/FilterSelect";
 import { c } from "@/components/palette";
 import { EASE_SNAPPY } from "@/lib/motion";
 import {
@@ -155,9 +156,18 @@ export const Timeline = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: EASE_SNAPPY }}
     >
-      {/* Tab filter: solid track, sliding active pill (matches the nav / projects). */}
+      {/* Tab filter: segmented pills from sm up; below sm the four tabs can't
+          fit on one row, so a dropdown (FilterSelect) takes over. */}
+      <FilterSelect
+        className="mb-8 sm:hidden"
+        label="Filter timeline"
+        value={tab}
+        options={TABS.map((t) => ({ ...t, count: countFor(t.id) }))}
+        onChange={(id) => setTab(id as Tab)}
+        surface={c.bg}
+      />
       <div
-        className="mb-8 inline-flex flex-wrap gap-1 rounded-full p-1.5"
+        className="mb-8 hidden flex-wrap gap-1 rounded-full p-1.5 sm:inline-flex"
         style={{ background: c.bg }}
       >
         {TABS.map(({ id, label }) => {

@@ -52,6 +52,17 @@ h3 {
   text-wrap: balance;
 }
 
+/* Tailwind Preflight leaves <button> at cursor: default, which makes every
+   non-link control read as dead — restore the pointer once, globally. */
+button:not(:disabled),
+[role="button"],
+summary {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
 /* Keyboard focus. Components style their interactive elements with inline
    styles / hardcoded classes, so the accent focus ring lives here once — a
    single, consistent, on-brand indicator (mouse clicks don't trigger it). */
@@ -118,6 +129,32 @@ html[data-intro-seen] [data-page-reveal] {
    card is dark (top of page), ink once the card has dyed pink (docked). */
 [data-on-accent] :focus-visible {
   outline-color: var(--hero-focus, #10120f);
+}
+
+/* Static hero (below lg / reduced-motion) — the dye vars live here (not inline)
+   so the first paint is breakpoint-correct. Phones and the reduced-motion lg
+   rail pin the DOCKED pink look; sm–lg tablets pin the BIG-state look instead
+   (dark card, pink held in the portrait square + full stop) so a tablet gets
+   the initial hero composition, not a half-width docked card. Values mirror
+   components/palette.ts. */
+[data-hero-static] {
+  --hero-card: #db5461;
+  --hero-square: #181f1c;
+  --hero-ink: #10120f;
+  --hero-sub: #2a1013;
+  --hero-dot: #2a1013;
+  --hero-focus: #10120f;
+  --hero-name: 4.2;
+}
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  [data-hero-static] {
+    --hero-card: #2f3733;
+    --hero-square: #db5461;
+    --hero-ink: #ececea;
+    --hero-sub: #a6b0a8;
+    --hero-dot: #db5461;
+    --hero-focus: #db5461;
+  }
 }
 
 /* Hero scroll cue — a pink dot dropping down a short hairline track. */

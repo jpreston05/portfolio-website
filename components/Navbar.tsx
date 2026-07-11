@@ -40,7 +40,11 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
 
   const measure = useCallback(() => {
     const el = active ? itemRefs.current[active] : null;
-    setPill(el ? { x: el.offsetLeft, width: el.offsetWidth } : null);
+    // A display:none item (Home below sm) measures 0 — no pill rather than a
+    // zero-width sliver.
+    setPill(
+      el && el.offsetWidth > 0 ? { x: el.offsetLeft, width: el.offsetWidth } : null
+    );
   }, [active]);
 
   // Position before paint on active change; the pill snaps on first mount
@@ -55,18 +59,24 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
 
   return (
     <motion.nav
-      className="fixed left-1/2 top-6 z-[1000] -translate-x-1/2"
+      // w-max: a fixed element's shrink-to-fit width is capped at the space
+      // right of left:50% (half the viewport) — without it the CTA label wraps
+      // on anything narrower than ~1000px.
+      className="fixed left-1/2 top-6 z-[1000] w-max -translate-x-1/2"
       initial={{ y: -24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: EASE_SNAPPY }}
     >
       {/* Solid surface dock — same material AND shape language as the section
-          cards (rounded-2xl); the links/CTA inside stay pills for hierarchy. */}
-      <div className="flex items-center gap-1.5 rounded-2xl bg-[#2F3733] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_32px_rgba(0,0,0,0.45)]">
+          cards (rounded-2xl); the links/CTA inside stay pills for hierarchy.
+          Below sm the dock compresses (tighter padding, 14px labels) and the
+          Home item hides — the JP. brand IS the home link — so the pill fits
+          a 320px viewport; max-[319px] squeezes once more for fold phones. */}
+      <div className="flex items-center gap-1 rounded-2xl bg-[#2F3733] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_32px_rgba(0,0,0,0.45)] sm:gap-1.5 sm:p-2">
         <Link
           href="/"
           aria-label="Home, Jack Preston"
-          className="px-4 text-base font-bold tracking-tight text-[#ECECEA] transition-opacity duration-200"
+          className="px-2.5 text-base font-bold tracking-tight text-[#ECECEA] transition-opacity duration-200 max-[319px]:px-1.5 sm:px-4"
           style={{ opacity: brandVisible ? 1 : 0 }}
         >
           <span data-brand>
@@ -94,11 +104,12 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
                 ref={(el) => {
                   itemRefs.current[link.id] = el;
                 }}
+                className={link.id === "home" ? "hidden sm:block" : undefined}
               >
                 <Link
                   href={link.href}
                   aria-current={isActive ? "page" : undefined}
-                  className={`relative block rounded-full px-5 py-2 text-[15px] font-medium transition-colors ${
+                  className={`relative block rounded-full px-3 py-2 text-sm font-medium transition-colors max-[319px]:px-2 max-[319px]:text-[13px] sm:px-5 sm:text-[15px] ${
                     isActive ? "text-[#ECECEA]" : "text-[#A6B0A8] hover:text-[#ECECEA]"
                   }`}
                 >
@@ -111,7 +122,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
 
         <MotionLink
           href="/contact"
-          className="ml-1.5 rounded-full bg-[#DB5461] px-5 py-2 text-[15px] font-semibold text-[#181F1C]"
+          className="ml-1 rounded-full bg-[#DB5461] px-3.5 py-2 text-sm font-semibold text-[#181F1C] max-[319px]:px-2.5 max-[319px]:text-[13px] sm:ml-1.5 sm:px-5 sm:text-[15px]"
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.97 }}
         >
