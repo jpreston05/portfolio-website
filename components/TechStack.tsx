@@ -4,7 +4,7 @@ import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
 
 const groups = [
-  { label: "Languages", items: ["Java", "Python", "C++", "C", "JavaScript", "SQL"] },
+  { label: "Languages", items: ["Java", "Python", "C#", "C", "JavaScript", "SQL", "MATLAB"] },
   { label: "Web", items: ["React", "Next.js", "HTML", "CSS"] },
   { label: "Tools", items: ["Git", "Linux", "Figma"] },
 ];
