@@ -27,6 +27,23 @@ export const CATEGORY_LABELS: Record<ProjectCategory, string> = {
 
 export const projects: Project[] = [
   {
+    slug: "leetcode-tracker",
+    title: "LeetCode Tracker",
+    category: "personal",
+    tagline: "A spaced-repetition tracker that resurfaces solved LeetCode problems on an expanding review schedule.",
+    description:
+      "A full-stack tool I use daily to decide what to revise: it logs each problem I solve, attaches photos of my handwritten notes, and brings the problem back for review on an expanding interval, from the next day out to six months later. Built with React and Supabase, with PostgreSQL backing both the relational scheduling data and authenticated storage for the note photos.",
+    highlights: [
+      "Completion-anchored scheduling model on a relational checkpoint schema, expanding review intervals from one day to six months",
+      "Review availability and locking enforced server-side rather than trusted to the UI, so the schedule can't be gamed from the client",
+      "Daily email reminders through a scheduled Supabase function, plus a GitHub-style activity heatmap backed by a SQL view",
+    ],
+    stack: ["React", "Supabase", "PostgreSQL"],
+    links: { github: "https://github.com/jpreston05/leetcode-tracker" },
+    images: ["/projects/leetcode-tracker/home1.png", "/projects/leetcode-tracker/home2.png", "/projects/leetcode-tracker/problems.png", "/projects/leetcode-tracker/problem.png", "/projects/leetcode-tracker/logproblem.png"],
+    featured: true,
+  },
+  {
     slug: "trial-ai",
     title: "Trial AI",
     category: "personal",
@@ -84,7 +101,7 @@ export const projects: Project[] = [
       "/projects/logic-lift/home_page.webp",
       "/projects/logic-lift/quiz_page.webp",
     ],
-    featured: true,
+    featured: false,
   },
   {
     slug: "red-bull",
