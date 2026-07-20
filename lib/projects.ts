@@ -40,8 +40,8 @@ export const projects: Project[] = [
     ],
     stack: ["React", "Supabase", "PostgreSQL"],
     links: { github: "https://github.com/jpreston05/leetcode-tracker" },
-    images: [],
-    featured: false,
+    images: ["/projects/leetcode-tracker/home1.png", "/projects/leetcode-tracker/home2.png", "/projects/leetcode-tracker/problems.png", "/projects/leetcode-tracker/problem.png", "/projects/leetcode-tracker/logproblem.png"],
+    featured: true,
   },
   {
     slug: "trial-ai",
@@ -101,7 +101,7 @@ export const projects: Project[] = [
       "/projects/logic-lift/home_page.webp",
       "/projects/logic-lift/quiz_page.webp",
     ],
-    featured: true,
+    featured: false,
   },
   {
     slug: "red-bull",
