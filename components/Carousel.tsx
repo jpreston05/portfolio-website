@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiChevronLeft, FiChevronRight, FiMaximize2 } from "react-icons/fi";
@@ -15,6 +15,7 @@ import { initials } from "@/lib/projects";
 
 const SWIPE_PX = 60; // drag distance that commits a slide change
 const TAP_SLOP = 6; // pointer travel (px) still treated as a tap, not a drag
+const DOT_SLOT = 24; // each dot's touch-target width (h-6 w-6) — see WCAG note below
 
 type CarouselProps = {
   images: string[];
@@ -38,13 +39,39 @@ export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
   const [index, setIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const downXY = useRef<{ x: number; y: number } | null>(null);
+  const dotsRef = useRef<HTMLDivElement>(null);
+  const [maxDots, setMaxDots] = useState(Infinity);
   const hasImages = images.length > 0;
   const count = images.length || 1; // single branded tile when no images yet
 
   const go = (n: number) => setIndex((n + count) % count);
 
+  // Cap the dot row to what fits: too many screenshots (e.g. Red Bull's 16) ran
+  // the dots — and the card with them — off the edge on phones. Measure the row's
+  // width and collapse the overflow into a "+N" counter, windowing the visible
+  // dots so the active one is always shown.
+  useLayoutEffect(() => {
+    const el = dotsRef.current;
+    if (!el) return;
+    const measure = () => setMaxDots(Math.max(1, Math.floor(el.clientWidth / DOT_SLOT)));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Which dots to render. When every dot fits, show them all. Otherwise keep room
+  // for the "+N" chip and slide a window across so `index` stays visible.
+  const dotIndices = (() => {
+    if (count <= maxDots) return Array.from({ length: count }, (_, i) => i);
+    const visible = Math.max(1, maxDots - 2); // 2 slots kept clear for the "+N" chip
+    const start = Math.min(Math.max(0, index - (visible >> 1)), count - visible);
+    return Array.from({ length: visible }, (_, k) => start + k);
+  })();
+  const hiddenCount = count - dotIndices.length;
+
   return (
-    <div role="group" aria-roledescription="carousel" aria-label={`${title} screenshots`}>
+    <div role="group" aria-roledescription="carousel" aria-label={`${title} screenshots`} className="min-w-0">
       <div className="relative overflow-hidden rounded-xl" style={{ background: c.surface2 }}>
         <motion.div
           className="flex aspect-video"
@@ -136,10 +163,10 @@ export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
       </div>
 
       {count > 1 && (
-        <div className="mt-1.5 flex justify-center">
+        <div ref={dotsRef} className="mt-1.5 flex items-center justify-center">
           {/* 24px buttons around the 8px dots — a real touch target (WCAG
               2.5.8) without changing the visual. */}
-          {Array.from({ length: count }, (_, i) => (
+          {dotIndices.map((i) => (
             <motion.button
               key={i}
               type="button"
@@ -157,6 +184,15 @@ export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
               />
             </motion.button>
           ))}
+          {hiddenCount > 0 && (
+            <span
+              aria-hidden
+              className="ml-1 select-none font-mono text-xs leading-none"
+              style={{ color: c.muted }}
+            >
+              +{hiddenCount}
+            </span>
+          )}
         </div>
       )}
 
