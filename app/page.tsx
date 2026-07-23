@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Preloader } from "@/components/Preloader";
+import { useEffect } from "react";
+import { motion } from "framer-motion";
 import { useIntro } from "@/components/SiteChrome";
 import { Hero } from "@/components/Herov2";
 import { useHeroMotion } from "@/components/useHeroMotion";
@@ -13,10 +12,10 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 
 export default function Home() {
-  // Intro loading screen → reveal → hand off the "JP." to the navbar brand.
-  // The once-per-session state lives in SiteChrome (shared with the nav).
-  const [intro, setIntro] = useState(true);
-  const { introSeen, revealed, onReveal, onDone } = useIntro();
+  // The intro loading screen (and its reveal → hand-off to the nav brand) is
+  // owned by SiteChrome so it plays on any page. Here we just gate the home
+  // content on `revealed`.
+  const { revealed } = useIntro();
 
   // Shared collapse motion. contentX is the card's overflow beyond its docked
   // width, so the content tracks the card's right edge with a constant gap
@@ -77,18 +76,6 @@ export default function Home() {
       {/* Full-width footer — spans the page, caps the end normally */}
       <Footer />
       </motion.div>
-
-      <AnimatePresence>
-        {intro && !introSeen && (
-          <Preloader
-            onReveal={onReveal}
-            onDone={() => {
-              onDone();
-              setIntro(false);
-            }}
-          />
-        )}
-      </AnimatePresence>
     </>
   );
 }
