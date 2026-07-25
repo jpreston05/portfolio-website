@@ -39,7 +39,7 @@ export const projects: Project[] = [
       "Daily email reminders through a scheduled Supabase function, plus a GitHub-style activity heatmap backed by a SQL view",
     ],
     stack: ["React", "Supabase", "PostgreSQL"],
-    links: { github: "https://github.com/jpreston05/leetcode-tracker" },
+    links: { github: "https://github.com/jpreston05/leetcode-tracker", live: "https://leetcode-tracker-liart.vercel.app/" },
     images: ["/projects/leetcode-tracker/home1.png", "/projects/leetcode-tracker/home2.png", "/projects/leetcode-tracker/problems.png", "/projects/leetcode-tracker/problem.png", "/projects/leetcode-tracker/logproblem.png"],
     featured: true,
   },
