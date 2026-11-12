@@ -137,7 +137,7 @@ const Headline = ({ home }: { home: boolean }) => {
       className="mt-[0.8em] text-[0.95em] leading-relaxed"
       style={{ color: "var(--hero-sub)" }}
     >
-      Third-year BE(Hons) &amp; BCom student at the University of Auckland.
+      Penultimate-year BE(Hons) &amp; BCom student at the University of Auckland.
     </motion.p>
     {/* Status chip — carbon on either card state (dark surface or pink), so
         its colours are fixed rather than dye vars. Always wraps to 2 lines:

@@ -1,11 +1,11 @@
 /* Single source of truth for the /timeline page. Mirrors lib/projects.ts: a
    typed array + a label map + a derived helper. Entries are reverse-chronological
    (newest first). `category` drives the tab filter; jobs live under "career" so
-   they don't clutter the University / High School life phases. Tag a milestone
-   `overview: true` and it shows in the default "Overview" tab (like a project's
-   `featured`). `detail` is a short, human paragraph revealed on expand; omit it
-   and the row renders static (no expand affordance). Keep the voice warm and
-   first-person; this is a story, not a CV. */
+   they don't clutter the University / High School life phases. The default
+   "Overview" tab is the ordered slug list OVERVIEW at the bottom of this file.
+   `detail` is a short, human paragraph revealed on expand; omit it and the row
+   renders static (no expand affordance). Keep the voice warm and first-person;
+   this is a story, not a CV. */
 
 export type TimelineCategory = "university" | "highschool" | "career";
 
@@ -17,7 +17,6 @@ export type Milestone = {
   org?: string;
   blurb: string; // one-liner shown collapsed
   detail?: string; // a sentence or two revealed on expand; omit ⇒ not expandable
-  overview?: boolean; // true ⇒ appears in the default "Overview" tab
   // 2-3 one-line bullets (what you built, one number, the stack). Shown on the
   // home Experience card for the latest role; omit and `detail` shows instead.
   highlights?: string[];
@@ -32,6 +31,14 @@ export const CATEGORY_LABELS: Record<TimelineCategory, string> = {
 export const milestones: Milestone[] = [
   // ── Career ────────────────────────────────────────────────────────────────
   {
+    slug: "marpos",
+    category: "career",
+    when: "Summer 2026–27",
+    title: "Summer Intern",
+    org: "Marpos",
+    blurb: "Just started: my second summer in a software team.",
+  },
+  {
     slug: "aeroqual",
     category: "career",
     when: "Summer 2025–26",
@@ -40,7 +47,6 @@ export const milestones: Milestone[] = [
     blurb: "My first real software job: a summer on a live cloud platform.",
     detail:
       "I spent the summer on Aeroqual's cloud team, getting my first taste of production engineering: modernising older C# code, making the build pipelines more reliable, and learning just how much care goes into software people actually depend on.",
-    overview: true,
   },
   {
     slug: "waihi-beach-chemist",
@@ -71,6 +77,14 @@ export const milestones: Milestone[] = [
 
   // ── University ──────────────────────────────────────────────────────────────
   {
+    slug: "sesa-vp",
+    category: "university",
+    when: "2027",
+    title: "Vice President, SESA",
+    org: "Software Engineering Students Association",
+    blurb: "Stepping up from Social Coordinator to help lead the association for 2027.",
+  },
+  {
     slug: "wdcc",
     category: "university",
     when: "2025 – now",
@@ -83,7 +97,7 @@ export const milestones: Milestone[] = [
   {
     slug: "sesa",
     category: "university",
-    when: "2025 – now",
+    when: "2025–26",
     title: "Social Coordinator, SESA",
     org: "Software Engineering Students Association",
     blurb: "Running the social side of the software engineering cohort.",
@@ -107,7 +121,6 @@ export const milestones: Milestone[] = [
     title: "140th Anniversary Scholarship",
     org: "University of Auckland",
     blurb: "A $5,000 scholarship from the university for academic performance.",
-    overview: true,
   },
   {
     slug: "red-bull-trolley",
@@ -128,7 +141,6 @@ export const milestones: Milestone[] = [
     blurb: "Began my engineering degree, the goal I'd had since high school.",
     detail:
       "I came in through Auckland's general first-year engineering before specialising into Software Engineering, the part I'd been most excited about all along.",
-    overview: true,
   },
 
   // ── High School ─────────────────────────────────────────────────────────────
@@ -141,7 +153,6 @@ export const milestones: Milestone[] = [
     blurb: "Left school as runner-up dux, a prefect, and hockey vice-captain.",
     detail:
       "I gave high school everything I had, finishing as Proxime Accessit (runner-up dux), a prefect, and vice-captain of the 1st XI hockey team.",
-    overview: true,
   },
   {
     slug: "ncea",
@@ -160,11 +171,25 @@ export const milestones: Milestone[] = [
     blurb: "Built my first website and, pretty much on the spot, knew this was it.",
     detail:
       "Around Year 10 I taught myself HTML and CSS and put together my first website. Somewhere between that and my first lines of Java, it clicked that software was what I wanted to do, and I haven't looked back since.",
-    overview: true,
   },
 ];
 
-export const overviewMilestones = milestones.filter((m) => m.overview);
+// The Overview tab: a curated cross-section, shown in THIS order (not the
+// array order above), so the headline items can lead regardless of category.
+const OVERVIEW = [
+  "sesa-vp",
+  "marpos",
+  "aeroqual",
+  "anniversary-scholarship",
+  "uoa-start",
+];
 
-// Most recent career entry (the list is newest-first) — the home Experience card.
-export const latestRole = milestones.find((m) => m.category === "career");
+export const overviewMilestones = OVERVIEW.flatMap(
+  (slug) => milestones.find((m) => m.slug === slug) ?? []
+);
+
+// The role shown on the home Experience card. Explicit rather than "newest
+// career entry" so a role that has only just started (no story yet) doesn't
+// take the card over. Point this at the new slug once it has a `detail`.
+const HOME_EXPERIENCE = "aeroqual";
+export const latestRole = milestones.find((m) => m.slug === HOME_EXPERIENCE);
