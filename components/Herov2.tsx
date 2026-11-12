@@ -143,7 +143,10 @@ const entranceItem: Variants = {
 
 /* Headline (no buttons) — em-relative so it scales with the wrapper font-size.
    The name reads its size from --hero-name (poster-big → docked). */
-const Headline = () => (
+const Headline = ({ home }: { home: boolean }) => {
+  // The name is the page h1 only on the home page; subpages carry their own.
+  const Name = home ? "h1" : "p";
+  return (
   <>
     <motion.p
       variants={entranceItem}
@@ -152,7 +155,7 @@ const Headline = () => (
     >
       Hello, I&apos;m
     </motion.p>
-    <h1
+    <Name
       className="font-bold leading-[0.9] tracking-tight"
       style={{
         color: "var(--hero-ink)",
@@ -165,7 +168,7 @@ const Headline = () => (
       <motion.span variants={entranceItem} className="block whitespace-nowrap">
         Preston<span style={{ color: "var(--hero-dot)" }}>.</span>
       </motion.span>
-    </h1>
+    </Name>
     <motion.p
       variants={entranceItem}
       className="mt-[0.8em] text-[0.95em] leading-relaxed"
@@ -181,7 +184,8 @@ const Headline = () => (
       Currently <CurrentlyLine />
     </motion.p>
   </>
-);
+  );
+};
 
 const CV = { href: "/Jack-Preston-CV.pdf", file: "Jack-Preston-CV.pdf" };
 const TRANSCRIPT = {
@@ -272,8 +276,16 @@ const DockedActions = () => (
   </div>
 );
 
-export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
-  const { enabled, dock, vh, cardWidth, bigCardW } = useHeroMotion();
+/* `home` = the collapsing hero (scroll-driven). Elsewhere the same card sits
+   pinned in its docked state as the persistent left rail. */
+export const Hero = ({
+  revealed = true,
+  home = true,
+}: {
+  revealed?: boolean;
+  home?: boolean;
+}) => {
+  const { enabled, dock, vh, cardWidth, bigCardW } = useHeroMotion(home);
 
   // Dye-on-dock: at the top the card is DARK with the pink held in the portrait
   // square + the full stop (the original accent discipline); scrolling dyes the
@@ -487,7 +499,7 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
               initial="hidden"
               animate={revealed ? "show" : "hidden"}
             >
-              <Headline />
+              <Headline home={home} />
             </motion.div>
           </motion.div>
 
@@ -537,7 +549,7 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
             <PortraitArt />
           </div>
           <div className="mt-6">
-            <Headline />
+            <Headline home={home} />
           </div>
           <div className="mt-6">
             <DockedActions />
@@ -551,7 +563,7 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
         the tab order + hit-testing entirely (visibility). Fixed bottom-centre.
         Three nested layers so the transforms never share an element: fixed
         centring (class) → bob (CSS keyframe) → hover/tap scale (framer). */}
-    {enabled && (
+    {enabled && home && (
       <motion.div
         className="fixed bottom-8 left-1/2 z-20 -translate-x-1/2"
         style={{ opacity: cueOpacity, visibility: cueVisibility }}

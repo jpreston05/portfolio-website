@@ -20,7 +20,10 @@ export const PORTRAIT_SMALL = 250; // portrait width (px) when docked
 // Horizontal padding outside the max-w container (lg:px-8) — used to size EXTRA.
 const CONTAINER_PAD = 64; // 2 * 2rem
 
-export function useHeroMotion() {
+// `collapsing` is true only on the home page. Everywhere else the rail is the
+// same card pinned at dock = 1 (no scroll choreography), so subpages show
+// exactly the docked state the home page ends on.
+export function useHeroMotion(collapsing = true) {
   const reduce = useReducedMotion();
   const [enabled, setEnabled] = useState(false);
   const [vh, setVh] = useState(0);
@@ -46,7 +49,9 @@ export function useHeroMotion() {
   // Window scroll is reliably 0 at the very top. dock: 0 = big, 1 = docked.
   const { scrollY } = useScroll();
   const intro = (vh || 800) * COLLAPSE_VH;
-  const dock = useTransform(scrollY, [0, intro], [0, 1], { clamp: true });
+  const dock = useTransform(scrollY, (y) =>
+    collapsing ? Math.max(0, Math.min(1, y / intro)) : 1
+  );
 
   // The card's overflow beyond its docked width. EXTRA appears in both cardWidth
   // and contentX so contentLeft - cardRight stays exactly the grid gap. Numeric

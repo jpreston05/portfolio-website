@@ -1,7 +1,10 @@
 "use client";
 
 import { createContext, useContext, useState, useSyncExternalStore, type ReactNode } from "react";
-import { AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import { Footer } from "@/components/Footer";
+import { Hero } from "@/components/Herov2";
 import { Navbar } from "@/components/Navbar";
 import { Preloader } from "@/components/Preloader";
 
@@ -52,6 +55,9 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
   // seen this session), the brand is visible everywhere.
   const brandVisible = navBrandShown || introSeen;
 
+  const revealed = revealContent || introSeen;
+  const isHome = usePathname() === "/";
+
   const onReveal = () => setRevealContent(true);
   const onDone = () => {
     // Flag AFTER the intro completes — flagging at mount would flip
@@ -64,13 +70,39 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
     <Ctx.Provider
       value={{
         introSeen,
-        revealed: revealContent || introSeen,
+        revealed,
         onReveal,
         onDone,
       }}
     >
       <Navbar brandVisible={brandVisible} />
-      {children}
+
+      {/* The shared page frame: left rail (the hero card) + right column (the
+          route's content) + footer. Mounted once, so the rail persists across
+          routes exactly like the nav. Opacity is gated on the intro reveal.
+          Vertical rhythm: nav bottom at 80px; content starts 24px below
+          (top-26 = 104px) and the rail keeps 24px at the viewport bottom. */}
+      <motion.div
+        data-page-reveal
+        className="relative z-10 flex min-h-screen w-full flex-col overflow-x-clip"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: revealed ? 1 : 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <main className="mx-auto grid w-full max-w-[1400px] flex-1 gap-6 px-4 pb-10 pt-26 sm:px-6 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
+          {/* LEFT RAIL — collapsing hero on home, pinned docked card elsewhere.
+              Below lg it only shows on home (subpages go straight to content). */}
+          <div
+            className={`relative z-10 lg:sticky lg:top-26 lg:flex lg:h-[calc(100vh-8rem)] lg:items-center ${
+              isHome ? "" : "hidden"
+            }`}
+          >
+            <Hero revealed={revealed} home={isHome} />
+          </div>
+          <div className="min-w-0">{children}</div>
+        </main>
+        <Footer />
+      </motion.div>
 
       {/* Branded intro — plays on the first load of any page, then hands the
           "JP." off to the nav brand. Rendered here (not per-page) so a direct
