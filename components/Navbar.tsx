@@ -79,7 +79,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
           aria-label="Home, Jack Preston"
           whileHover={{ backgroundColor: "rgba(255,255,255,0.12)" }}
           transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-          className="rounded-full px-2 py-2 text-sm font-bold tracking-tight text-[#ECECEA] sm:px-4 sm:text-base"
+          className="rounded-[10px] px-2 py-2 text-sm font-bold tracking-tight text-[#ECECEA] sm:px-4 sm:text-base"
           style={{ opacity: brandVisible ? 1 : 0 }}
         >
           <span data-brand>
@@ -93,7 +93,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
           {pill && (
             <motion.span
               aria-hidden
-              className="absolute inset-y-0 left-0 rounded-full bg-[#3A423D]"
+              className="absolute inset-y-0 left-0 rounded-[10px] bg-[#3A423D]"
               initial={false}
               animate={{ x: pill.x, width: pill.width }}
               transition={{ type: "spring", stiffness: 400, damping: 35 }}
@@ -114,7 +114,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
                   aria-current={isActive ? "page" : undefined}
                   whileHover={{ backgroundColor: "rgba(255,255,255,0.12)", color: "#ECECEA" }}
                   transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-                  className={`relative block rounded-full px-2 py-2 text-[13px] font-medium sm:px-5 sm:text-[15px] ${
+                  className={`relative block rounded-[10px] px-2 py-2 text-[13px] font-medium sm:px-5 sm:text-[15px] ${
                     isActive ? "text-[#ECECEA]" : "text-[#A6B0A8]"
                   }`}
                 >
@@ -127,7 +127,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
 
         <MotionLink
           href="/contact"
-          className="ml-1 whitespace-nowrap rounded-full bg-[#DB5461] px-2.5 py-2 text-[13px] font-semibold text-[#10120F] sm:ml-1.5 sm:px-5 sm:text-[15px]"
+          className="ml-1 whitespace-nowrap rounded-[10px] bg-[#DB5461] px-2.5 py-2 text-[13px] font-semibold text-[#10120F] sm:ml-1.5 sm:px-5 sm:text-[15px]"
           whileHover={{ y: -2, filter: "brightness(1.08)" }}
           whileTap={{ scale: 0.97 }}
         >

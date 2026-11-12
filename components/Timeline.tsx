@@ -207,7 +207,7 @@ export const Timeline = () => {
         />
       </div>
       <div
-        className="mb-8 hidden gap-1 rounded-full p-1.5 sm:inline-flex"
+        className="mb-8 hidden gap-1 rounded-2xl p-1.5 sm:inline-flex"
         style={{ background: c.surface }}
       >
         {TABS.map(({ id, label }) => {
@@ -220,13 +220,13 @@ export const Timeline = () => {
               onClick={() => setTab(id)}
               whileHover={{ backgroundColor: "rgba(255,255,255,0.12)" }}
               transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-              className="relative rounded-full px-4 py-2 text-sm font-medium"
+              className="relative rounded-[10px] px-4 py-2 text-sm font-medium"
               style={{ color: isActive ? c.text : c.muted }}
             >
               {isActive && (
                 <motion.span
                   layoutId="timeline-tab-pill"
-                  className="absolute inset-0 rounded-full"
+                  className="absolute inset-0 rounded-[10px]"
                   style={{ background: c.surface2 }}
                   transition={{ type: "spring", stiffness: 400, damping: 35 }}
                 />

@@ -121,7 +121,7 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
             whileHover={{ scale: 1.12, color: "#ECECEA" }}
             whileTap={{ scale: 0.92 }}
             transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-            className="absolute right-4 top-4 z-10 rounded-full p-2.5"
+            className="absolute right-4 top-4 z-10 rounded-xl p-2.5"
             style={{ background: "rgba(24,31,28,0.7)", color: c.muted }}
           >
             <FiX className="text-xl" />
@@ -170,7 +170,7 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
                 whileHover={{ scale: 1.12, color: "#ECECEA" }}
                 whileTap={{ scale: 0.92 }}
                 transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-                className="absolute left-4 top-1/2 rounded-full p-3"
+                className="absolute left-4 top-1/2 rounded-xl p-3"
                 style={{ background: "rgba(24,31,28,0.7)", color: c.muted, y: "-50%" }}
               >
                 <FiChevronLeft className="text-xl" />
@@ -185,7 +185,7 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
                 whileHover={{ scale: 1.12, color: "#ECECEA" }}
                 whileTap={{ scale: 0.92 }}
                 transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-                className="absolute right-4 top-1/2 rounded-full p-3"
+                className="absolute right-4 top-1/2 rounded-xl p-3"
                 style={{ background: "rgba(24,31,28,0.7)", color: c.muted, y: "-50%" }}
               >
                 <FiChevronRight className="text-xl" />

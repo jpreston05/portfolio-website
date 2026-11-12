@@ -80,7 +80,7 @@ export const ProjectCard = ({ project, tone = "surface", heading: Heading = "h2"
           {count > 1 && (
             <span
               aria-hidden
-              className="absolute bottom-2 right-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
+              className="absolute bottom-2 right-2 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium"
               style={{ background: "rgba(24,31,28,0.8)", color: c.text }}
             >
               <FiImage />
