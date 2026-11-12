@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   AnimatePresence,
   motion,
+  useMotionValueEvent,
   useReducedMotion,
   useTransform,
   type Variants,
 } from "framer-motion";
-import { FiArrowDown, FiDownload, FiFileText } from "react-icons/fi";
+import { FiArrowDown, FiArrowRight, FiDownload, FiFileText } from "react-icons/fi";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { c } from "@/components/palette";
 import {
@@ -31,7 +33,7 @@ const NAVBAR = 128; // 8rem — matches the rail: top-26 (104px) + 24px bottom g
 const BIG_CARD_RATIO = 0.68; // big card height as a fraction of the docked (full) height
 const NAME_EM_DOCKED = 4.2; // display-name size (em of the text wrapper) when docked
 const NAME_EM_BIG_MAX = 5.2; // poster-size ceiling for the big state
-const BIG_BTN_W = 590; // cap on the big-state row: fits 4 buttons (basis-8em) in one tidy line
+const BIG_BTN_W = 590; // horizontal room reserved for the big-state CTA row (BigActions ≈ 560px)
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 const CURRENTLY = [
@@ -90,7 +92,7 @@ const Action = ({ href, label, icon, download }: ActionProps) => (
     rel={download ? undefined : "noreferrer"}
     whileHover={{ y: -2 }}
     whileTap={{ scale: 0.97 }}
-    className="group flex flex-1 basis-[8em] items-center justify-center gap-[0.5em] rounded-lg px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
+    className="group flex items-center justify-center gap-[0.5em] rounded-lg px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
     style={{ color: c.muted, background: c.bg }}
   >
     <span className="text-[1.1em] transition-colors duration-200 group-hover:text-[#ECECEA]">
@@ -181,31 +183,92 @@ const Headline = () => (
   </>
 );
 
-/* Action buttons — one row when wide, wraps to 2×2 as the column narrows. */
-const ButtonRow = () => (
-  <div className="flex flex-wrap gap-[0.6em]">
-    <Action
-      href="/Jack-Preston-CV.pdf"
-      label="CV"
-      icon={<FiDownload />}
-      download="Jack-Preston-CV.pdf"
+const CV = { href: "/Jack-Preston-CV.pdf", file: "Jack-Preston-CV.pdf" };
+const TRANSCRIPT = {
+  href: "/Jack-Preston-Transcript.pdf",
+  file: "Jack-Preston-Transcript.pdf",
+};
+const GITHUB = "https://github.com/jpreston05";
+const LINKEDIN = "https://www.linkedin.com/in/jackdpreston/";
+
+const MotionLink = motion.create(Link);
+
+/* Icon-only squircle for the big CTA row (label lives in aria-label). */
+const IconAction = ({ href, label, icon, download }: ActionProps) => (
+  <motion.a
+    href={href}
+    aria-label={label}
+    title={label}
+    download={download}
+    target={download ? undefined : "_blank"}
+    rel={download ? undefined : "noreferrer"}
+    whileHover={{ y: -2, color: c.text }}
+    whileTap={{ scale: 0.97 }}
+    transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+    className="flex h-[2.9em] w-[2.9em] shrink-0 items-center justify-center rounded-xl"
+    style={{ color: c.muted, background: c.bg }}
+  >
+    <span className="text-[1.15em]">{icon}</span>
+  </motion.a>
+);
+
+/* Big-state CTA row — one primary action (projects), one secondary (CV), then
+   the quiet icon links. Only exists at the top of the page: it fades out before
+   the card dyes pink (so the pink CTA never sits on a pink card) and the
+   DockedActions grid takes over. Sized in em of the 20px big-state font; the
+   whole row must stay inside BIG_BTN_W. */
+const BigActions = () => (
+  <div className="flex items-center gap-[0.6em] whitespace-nowrap text-[0.8em]">
+    <MotionLink
+      href="/projects"
+      whileHover={{ y: -2, filter: "brightness(1.08)" }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+      className="flex h-[2.9em] items-center gap-[0.6em] rounded-xl px-[1.3em] font-semibold"
+      style={{ background: c.accent, color: c.heroInk }}
+    >
+      View my projects
+      <FiArrowRight aria-hidden />
+    </MotionLink>
+    <motion.a
+      href={CV.href}
+      download={CV.file}
+      whileHover={{ y: -2, backgroundColor: "rgba(255,255,255,0.06)" }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+      className="flex h-[2.9em] items-center gap-[0.6em] rounded-xl px-[1.2em] font-semibold"
+      style={{
+        color: c.text,
+        boxShadow: "inset 0 0 0 1px rgba(236,236,234,0.35)",
+      }}
+    >
+      <FiDownload aria-hidden />
+      Download CV
+    </motion.a>
+    <span aria-hidden className="mx-[0.3em] h-[1.8em] w-px" style={{ background: c.line }} />
+    <IconAction
+      href={TRANSCRIPT.href}
+      label="Download transcript"
+      icon={<FiFileText />}
+      download={TRANSCRIPT.file}
     />
+    <IconAction href={GITHUB} label="GitHub" icon={<FaGithub />} />
+    <IconAction href={LINKEDIN} label="LinkedIn" icon={<FaLinkedin />} />
+  </div>
+);
+
+/* Docked action buttons — a fixed 2×2 grid (also the static mobile card). */
+const DockedActions = () => (
+  <div className="grid grid-cols-2 gap-[0.6em]">
+    <Action href={CV.href} label="CV" icon={<FiDownload />} download={CV.file} />
     <Action
-      href="/Jack-Preston-Transcript.pdf"
+      href={TRANSCRIPT.href}
       label="Transcript"
       icon={<FiFileText />}
-      download="Jack-Preston-Transcript.pdf"
+      download={TRANSCRIPT.file}
     />
-    <Action
-      href="https://github.com/jpreston05"
-      label="GitHub"
-      icon={<FaGithub />}
-    />
-    <Action
-      href="https://www.linkedin.com/in/jackdpreston/"
-      label="LinkedIn"
-      icon={<FaLinkedin />}
-    />
+    <Action href={GITHUB} label="GitHub" icon={<FaGithub />} />
+    <Action href={LINKEDIN} label="LinkedIn" icon={<FaLinkedin />} />
   </div>
 );
 
@@ -322,11 +385,13 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
     // the un-clamped lerp used to pull the buttons up through the text.
     return Math.max(lerp(belowHeadline, floorTop, ease(phase(d, 0.2, 0.85))), belowHeadline);
   });
-  // Buttons width shrinks MONOTONICALLY from the big one-row cap to the docked
-  // column — so they wrap 4×1 → 2×2 exactly once and never flip back.
-  const buttonsW = useTransform([dock, cardWidth], ([d, w]: number[]) =>
-    Math.min(w - 2 * PAD, lerp(BIG_BTN_W, dockedW, ease(phase(d, 0.25, 0.85))))
-  );
+  // Two button layers share this block: the big CTA row fades out early
+  // (before the dye reaches it) and the docked 2×2 grid fades in once the card
+  // is mostly pink. Whichever is invisible is `inert` (no focus, no clicks).
+  const bigActionsOpacity = useTransform(dock, [0.15, 0.35], [1, 0]);
+  const dockedActionsOpacity = useTransform(dock, [0.45, 0.65], [0, 1]);
+  const [actionsDocked, setActionsDocked] = useState(() => dock.get() > 0.4);
+  useMotionValueEvent(dock, "change", (d) => setActionsDocked(d > 0.4));
   // Whole text block scales as it docks (children are em-relative); the docked
   // size shrinks with `s` on short viewports so the stack fits the card.
   const textFont = useTransform(dock, [0, 1], [20, 16 * s]);
@@ -432,17 +497,32 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
             style={{
               top: PAD,
               left: PAD,
-              width: buttonsW,
+              width: dockedW,
               fontSize: textFont,
               y: buttonsTopV,
             }}
           >
             <motion.div
+              className="relative"
               initial={{ opacity: 0, y: 10 }}
               animate={revealed ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, ease: EASE_SNAPPY, delay: 0.6 }}
             >
-              <ButtonRow />
+              {/* Big row overflows the docked-width block to the right (nowrap,
+                  ≤ BIG_BTN_W, which pwBig keeps clear of the portrait). */}
+              <motion.div
+                className="absolute left-0 top-0"
+                style={{ opacity: bigActionsOpacity }}
+                inert={actionsDocked}
+              >
+                <BigActions />
+              </motion.div>
+              <motion.div
+                style={{ opacity: dockedActionsOpacity }}
+                inert={!actionsDocked}
+              >
+                <DockedActions />
+              </motion.div>
             </motion.div>
           </motion.div>
         </>
@@ -460,7 +540,7 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
             <Headline />
           </div>
           <div className="mt-6">
-            <ButtonRow />
+            <DockedActions />
           </div>
         </div>
       )}
