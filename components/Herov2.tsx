@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  AnimatePresence,
   motion,
   useMotionValueEvent,
-  useReducedMotion,
   useTransform,
   type Variants,
 } from "framer-motion";
@@ -34,48 +32,13 @@ const BIG_CARD_RATIO = 0.68; // big card height as a fraction of the docked (ful
 const NAME_EM_DOCKED = 4.2; // display-name size (em of the text wrapper) when docked
 const NAME_EM_BIG_MAX = 5.2; // poster-size ceiling for the big state
 const BIG_BTN_W = 590; // horizontal room reserved for the big-state CTA row (BigActions ≈ 560px)
+// Headline block heights (px), measured with the 2-line status chip:
+const HEADLINE_DOCKED = 275; // whole docked headline at font 16
+const BIG_REST = 194; // everything except the two name lines, at font 20
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-const CURRENTLY = [
-  "building this site, in the open",
-  "applying for summer internships",
-  "starting that leetcode grind",
-  "building passion projects",
-];
-
-/* Rotating "currently:" status — specific, not generic role-cycling. */
-const CurrentlyLine = () => {
-  const reduce = useReducedMotion();
-  const [i, setI] = useState(0);
-
-  useEffect(() => {
-    if (reduce) return;
-    const id = setInterval(() => setI((n) => (n + 1) % CURRENTLY.length), 3200);
-    return () => clearInterval(id);
-  }, [reduce]);
-
-  // Crossfade + slight blur (no vertical travel — nothing to clip, and the
-  // text keeps its natural inline baseline next to "Currently").
-  // Deliberately NOT aria-live: announcing a decorative rotation every few
-  // seconds is noise for screen reader users; they get the current item.
-  return (
-    <span>
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={i}
-          className="inline-block whitespace-nowrap"
-          style={{ color: "var(--hero-ink)" }}
-          initial={reduce ? false : { opacity: 0, filter: "blur(3px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          exit={reduce ? undefined : { opacity: 0, filter: "blur(3px)" }}
-          transition={{ duration: 0.3, ease: EASE_SNAPPY }}
-        >
-          {CURRENTLY[i]}
-        </motion.span>
-      </AnimatePresence>
-    </span>
-  );
-};
+// Static status chip under the blurb (edit here to update it).
+const STATUS = "Seeking a 2027–28 summer internship. Open to Sydney.";
 
 type ActionProps = {
   href: string;
@@ -176,12 +139,20 @@ const Headline = ({ home }: { home: boolean }) => {
     >
       Third-year BE(Hons) &amp; BCom student at the University of Auckland.
     </motion.p>
+    {/* Status chip — carbon on either card state (dark surface or pink), so
+        its colours are fixed rather than dye vars. Always wraps to 2 lines:
+        the block width scales with the font, like the blurb above. */}
     <motion.p
       variants={entranceItem}
-      className="mt-[0.3em] text-[0.95em] leading-relaxed"
-      style={{ color: "var(--hero-sub)" }}
+      className="mt-[1.1em] flex items-start gap-[0.6em] rounded-lg px-[0.9em] py-[0.7em] text-[0.8em] font-medium leading-[1.45]"
+      style={{ background: c.bg, color: c.text }}
     >
-      Currently <CurrentlyLine />
+      <span
+        aria-hidden
+        className="mt-[0.5em] h-[0.45em] w-[0.45em] shrink-0 rounded-full"
+        style={{ background: c.accent }}
+      />
+      {STATUS}
     </motion.p>
   </>
   );
@@ -313,21 +284,22 @@ export const Hero = ({
 
   // Short-viewport guard: the docked stack (portrait + headline + buttons, all
   // of which scale with `s`) must fit dockedHc — on ~768-800px-tall laptops it
-  // doesn't at full size and the buttons clipped the "Currently" line. Scale
-  // the docked portrait + type down just enough to fit; ≥ ~860px viewports get
-  // s = 1 and are pixel-identical. (312.5/235/90 are the portrait block,
-  // docked headline and button block heights at s = 1; 12/16 the fixed gaps.)
-  const DOCKED_STACK = PORTRAIT_SMALL * 1.25 + 235 + 90;
+  // doesn't at full size and the buttons clipped the status chip. Scale the
+  // docked portrait + type down just enough to fit; ≥ ~900px viewports get
+  // s = 1 and are pixel-identical. (312.5/HEADLINE_DOCKED/90 are the portrait
+  // block, docked headline and button block heights at s = 1; 12/16 the gaps.)
+  const DOCKED_STACK = PORTRAIT_SMALL * 1.25 + HEADLINE_DOCKED + 90;
   const DOCKED_GAPS = 12 + 16 + 8; // portrait→headline, headline→buttons, slack
-  const s = Math.min(1, Math.max(0.78, (dockedHc - DOCKED_GAPS) / DOCKED_STACK));
+  const s = Math.min(1, Math.max(0.72, (dockedHc - DOCKED_GAPS) / DOCKED_STACK));
   const pwSmall = PORTRAIT_SMALL * s;
 
   // Poster name: as large as the big card's height allows. Estimated big-state
-  // block height at font 20 ≈ 215 + 36·nameEm (eyebrow + 2 name lines + blurb +
-  // currently + gap + one button row); keep it inside bigHc with ~40px margin.
+  // block height at font 20 ≈ BIG_REST + 70 + 36·nameEm (eyebrow + 2 name lines
+  // + blurb + status chip, then gap + one button row); keep it inside bigHc
+  // with ~40px margin.
   const nameEmBig = Math.min(
     NAME_EM_BIG_MAX,
-    Math.max(NAME_EM_DOCKED, (bigHc - 255) / 36)
+    Math.max(NAME_EM_DOCKED, (bigHc - BIG_REST - 110) / 36)
   );
   const nameEm = useTransform(dock, [0, 0.66], [nameEmBig, NAME_EM_DOCKED]);
   // Big portrait sized so (a) the CENTRED square + its hair overhang (~0.167·w
@@ -356,7 +328,7 @@ export const Hero = ({
   // Headline glides between FIXED endpoints (monotonic — no bob).
   const dockedY = pwSmall * 1.25 + 12; // headline top sits just below docked portrait
   // Centre the whole headline+buttons block (height tracks the poster name size).
-  const bigBlockH = 215 + 36 * nameEmBig;
+  const bigBlockH = BIG_REST + 70 + 36 * nameEmBig;
   const bigY = Math.max(PAD, (bigHc - bigBlockH) / 2);
   const dockedW = RAIL_W - 2 * PAD; // docked text/button column width (344)
 
@@ -386,8 +358,8 @@ export const Hero = ({
   // Buttons GLIDE down to the card floor, but never above the headline's bottom
   // (so they can't collide). HEADLINE_H tracks the real text height as it scales
   // with the font (poster-big name → shorter docked) — the big value derives
-  // from nameEmBig (eyebrow + 2 name lines + blurb + currently ≈ 145 + 36·em).
-  const headlineHAt = (d: number) => lerp(145 + 36 * nameEmBig, 235 * s, d);
+  // from nameEmBig (eyebrow + 2 name lines + blurb + chip ≈ BIG_REST + 36·em).
+  const headlineHAt = (d: number) => lerp(BIG_REST + 36 * nameEmBig, HEADLINE_DOCKED * s, d);
   const BTN_BLOCK = 90 * s; // ~2 rows of buttons at the docked font size
   const buttonsTopV = useTransform(dock, (d) => {
     const belowHeadline = headlineYAt(d) + headlineHAt(d) + 16;
