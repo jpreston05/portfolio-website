@@ -111,7 +111,7 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
         animate={{ opacity: revealed ? 1 : 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <main className="mx-auto grid w-full max-w-[1400px] flex-1 gap-6 px-4 pb-10 pt-26 sm:px-6 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
+        <main className="mx-auto grid w-full max-w-[1400px] flex-1 gap-6 px-4 pb-6 pt-26 sm:px-6 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
           {/* LEFT RAIL — collapsing hero on home, pinned docked card elsewhere.
               Below lg it only shows on home (subpages go straight to content). */}
           <div
@@ -121,9 +121,17 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
           >
             <Hero revealed={revealed} home={isHome} held={heroHeld} />
           </div>
-          <div className="min-w-0">{children}</div>
+          {/* The footer lives INSIDE the right column, so the rail stays pinned
+              all the way to the end of the page (a full-width footer below the
+              grid made the rail scroll away and the whole screen move). mt-auto
+              in Footer parks it at the column floor on short pages. main's
+              pb-6 matches the rail's 24px bottom gap, so nothing shifts at the
+              very end of the scroll. */}
+          <div className="flex min-w-0 flex-col">
+            {children}
+            <Footer />
+          </div>
         </main>
-        <Footer />
       </motion.div>
 
       {/* Branded intro — plays on the first load of any page, then hands the
