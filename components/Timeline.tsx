@@ -14,19 +14,18 @@ import {
   type TimelineCategory,
 } from "@/lib/timeline";
 
-/* Milestone list on the /timeline page: same tonal card surface as SectionCard,
-   without the heading (the page's h1 carries it). Tabs filter by category
-   (Overview = a curated cross-section); each entry with a `detail` expands to its
-   fuller story. Filter-pill + accordion patterns mirror ProjectShowcase. */
+/* The /timeline list: category tabs (Overview = a curated cross-section) over
+   a dated rail of entry cards. Each row is [date | rail dot + line | card];
+   below sm the date column folds into the card. An entry with a `detail`
+   expands in place (several may be open at once); one-liners render static. */
 
 type Tab = "overview" | TimelineCategory;
 
+// Explicit order: most recent life-phase first, after the curated Overview.
+const TAB_ORDER: TimelineCategory[] = ["career", "university", "highschool"];
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
-  ...(Object.keys(CATEGORY_LABELS) as TimelineCategory[]).map((id) => ({
-    id,
-    label: CATEGORY_LABELS[id],
-  })),
+  ...TAB_ORDER.map((id) => ({ id, label: CATEGORY_LABELS[id] })),
 ];
 
 const countFor = (id: Tab) =>
@@ -36,40 +35,60 @@ const countFor = (id: Tab) =>
 
 const TimelineEntry = ({
   milestone,
+  first,
   last,
+  showCategory,
   open,
   onToggle,
 }: {
   milestone: Milestone;
+  first: boolean;
   last: boolean;
+  showCategory: boolean; // only on Overview, where categories are mixed
   open: boolean;
   onToggle: () => void;
 }) => {
   const reduce = useReducedMotion();
-  const { slug, when, title, org, blurb, detail } = milestone;
+  const { category, when, title, org, blurb, detail } = milestone;
   const expandable = !!detail;
 
   const Head = (
     <>
-      <div className="min-w-0">
-        <p className="text-xs" style={{ color: c.muted }}>
-          {when}
-        </p>
-        <p className="mt-1 font-semibold" style={{ color: c.text }}>
+      <span className="block min-w-0">
+        {/* Category chip (Overview only) + the date on phones, where the date
+            column is hidden. Nothing to show ⇒ the whole row drops out. */}
+        <span
+          className={`mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 ${
+            showCategory ? "" : "sm:hidden"
+          }`}
+        >
+          {showCategory && (
+            <span
+              className="rounded-md px-2 py-0.5 text-xs font-semibold"
+              style={{ background: c.bg, color: c.muted }}
+            >
+              {CATEGORY_LABELS[category]}
+            </span>
+          )}
+          <span className="text-xs sm:hidden" style={{ color: c.muted }}>
+            {when}
+          </span>
+        </span>
+        <span className="block text-lg font-semibold leading-snug" style={{ color: c.text }}>
           {title}
-        </p>
+        </span>
         {org && (
-          <p className="text-sm" style={{ color: c.muted }}>
+          <span className="mt-0.5 block text-sm" style={{ color: c.muted }}>
             {org}
-          </p>
+          </span>
         )}
-        <p className="mt-1 text-sm leading-relaxed" style={{ color: c.muted }}>
+        <span className="mt-1.5 block text-sm leading-relaxed" style={{ color: c.muted }}>
           {blurb}
-        </p>
-      </div>
+        </span>
+      </span>
       {expandable && (
         // Colour lives in classes (not inline style) so the group-hover wins —
-        // the chevron lightening is the row's "this expands" hover hint.
+        // the chevron lightening is the card's "this expands" hover hint.
         <motion.span
           aria-hidden
           className="mt-0.5 shrink-0 text-lg text-[#A6B0A8] transition-colors group-hover:text-[#ECECEA]"
@@ -84,52 +103,72 @@ const TimelineEntry = ({
 
   return (
     <li className="flex gap-4">
-      {/* rail: a uniform dot per entry + a connector line */}
-      <div className="flex flex-col items-center">
+      {/* Date column — right-aligned against the rail (sm+). */}
+      <p
+        className="hidden w-24 shrink-0 pt-[1.3rem] text-right text-xs leading-snug tabular-nums sm:block"
+        style={{ color: c.muted }}
+      >
+        {when}
+      </p>
+
+      {/* Rail: line segment above the marker, the squircle marker (same shape
+          language as the cards and buttons), line segment below. The
+          row's bottom padding is inside this column's height, so the line runs
+          unbroken through the gap between cards. */}
+      <div aria-hidden className="flex flex-col items-center">
+        <span className="h-6 w-0.5" style={{ background: first ? "transparent" : c.line }} />
         <span
-          className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
-          style={{ background: c.accent }}
+          className="h-3 w-3 shrink-0 rounded-[4px]"
+          style={{
+            background: c.accent,
+            // The newest entry in view gets a ring.
+            ...(first && { outline: `2px solid ${c.accent}`, outlineOffset: 3 }),
+          }}
         />
-        {!last && <span className="w-px flex-1" style={{ background: c.line }} />}
+        <span className="w-0.5 flex-1" style={{ background: last ? "transparent" : c.line }} />
       </div>
 
-      <div className={`min-w-0 flex-1 ${last ? "" : "pb-8"}`}>
-        {expandable ? (
-          // Negative margin + matching padding nets to zero, so the resting
-          // layout is unchanged but the hover background gets breathing room.
-          <motion.button
-            type="button"
-            aria-expanded={open}
-            aria-controls={`${slug}-details`}
-            onClick={onToggle}
-            whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}
-            transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-            className="group -mx-3 -my-2 flex w-full items-start justify-between gap-3 rounded-lg px-3 py-2 text-left"
-          >
-            {Head}
-          </motion.button>
-        ) : (
-          <div className="flex items-start justify-between gap-3">{Head}</div>
-        )}
-
-        {expandable && (
-          <AnimatePresence initial={false}>
-            {open && (
-              <motion.div
-                id={`${slug}-details`}
-                className="overflow-hidden"
-                initial={reduce ? { height: "auto" } : { height: 0 }}
-                animate={{ height: "auto" }}
-                exit={{ height: 0 }}
-                transition={{ duration: reduce ? 0 : 0.3, ease: EASE_SNAPPY }}
-              >
-                <p className="pt-3 text-sm leading-relaxed" style={{ color: c.muted }}>
-                  {detail}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        )}
+      <div className={`min-w-0 flex-1 ${last ? "" : "pb-3"}`}>
+        <div
+          className="rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)]"
+          style={{ background: c.surface }}
+        >
+          {expandable ? (
+            // The WHOLE card is the toggle — the detail lives inside the
+            // button, so the hover lift and the click target always match the
+            // card's full (collapsed or expanded) size.
+            <motion.button
+              type="button"
+              aria-expanded={open}
+              onClick={onToggle}
+              whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}
+              transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+              className="group block w-full rounded-2xl p-5 text-left"
+            >
+              <span className="flex items-start justify-between gap-3">{Head}</span>
+              <AnimatePresence initial={false}>
+                {open && (
+                  <motion.span
+                    className="block overflow-hidden"
+                    initial={reduce ? { height: "auto" } : { height: 0 }}
+                    animate={{ height: "auto" }}
+                    exit={{ height: 0 }}
+                    transition={{ duration: reduce ? 0 : 0.3, ease: EASE_SNAPPY }}
+                  >
+                    <span
+                      className="block max-w-[65ch] pt-3 text-sm leading-relaxed"
+                      style={{ color: c.muted }}
+                    >
+                      {detail}
+                    </span>
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          ) : (
+            <div className="flex items-start justify-between gap-3 p-5">{Head}</div>
+          )}
+        </div>
       </div>
     </li>
   );
@@ -138,8 +177,8 @@ const TimelineEntry = ({
 export const Timeline = () => {
   const reduce = useReducedMotion();
   const [tab, setTab] = useState<Tab>("overview");
-  // Multiple entries may be open at once, friendlier for scanning than the
-  // one-at-a-time projects accordion. Keyed by slug so it survives a tab switch.
+  // Multiple entries may be open at once, friendlier for scanning. Keyed by
+  // slug so it survives a tab switch.
   const [open, setOpen] = useState<Set<string>>(new Set());
 
   const toggle = (slug: string) =>
@@ -154,27 +193,22 @@ export const Timeline = () => {
     tab === "overview" ? overviewMilestones : milestones.filter((m) => m.category === tab);
 
   return (
-    <motion.section
-      className="rounded-2xl p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)] sm:p-8"
-      style={{ background: c.surface }}
-      initial={{ opacity: 0, y: reduce ? 0 : 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: EASE_SNAPPY }}
-    >
-      {/* Tab filter. Phones get a dropdown (the tab row doesn't fit); sm+ gets
-          the segmented control with the sliding active pill. */}
+    <div>
+      {/* Tab filter — same control as the /projects filter. Phones get a
+          dropdown (the tab row doesn't fit); sm+ gets the segmented control
+          with the sliding active pill. */}
       <div className="mb-8 sm:hidden">
         <FilterSelect
           options={TABS.map(({ id, label }) => ({ id, label, count: countFor(id) }))}
           value={tab}
           onChange={(id) => setTab(id as Tab)}
           ariaLabel="Filter timeline by category"
-          trackBg={c.bg}
+          trackBg={c.surface}
         />
       </div>
       <div
         className="mb-8 hidden gap-1 rounded-full p-1.5 sm:inline-flex"
-        style={{ background: c.bg }}
+        style={{ background: c.surface }}
       >
         {TABS.map(({ id, label }) => {
           const isActive = tab === id;
@@ -209,7 +243,7 @@ export const Timeline = () => {
         })}
       </div>
 
-      {/* Keyed by tab so the list cross-fades on switch; the rail's connector
+      {/* Keyed by tab so the list cross-fades on switch; the rail's first/last
           logic (index within `shown`) then never animates mid-transition. */}
       <motion.ol
         key={tab}
@@ -222,12 +256,14 @@ export const Timeline = () => {
           <TimelineEntry
             key={m.slug}
             milestone={m}
+            first={i === 0}
             last={i === shown.length - 1}
+            showCategory={tab === "overview"}
             open={open.has(m.slug)}
             onToggle={() => toggle(m.slug)}
           />
         ))}
       </motion.ol>
-    </motion.section>
+    </div>
   );
 };
