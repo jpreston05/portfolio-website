@@ -42,7 +42,7 @@ const BTN_GAP_DOCKED = 16;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 // Static status chip under the blurb (edit here to update it).
-const STATUS = "Seeking a 2027–28 summer internship. Open to Sydney.";
+export const STATUS = "Seeking a 2027–28 summer internship. Open to Sydney.";
 
 type ActionProps = {
   href: string;
