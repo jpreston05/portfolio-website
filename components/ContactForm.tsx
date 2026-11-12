@@ -7,7 +7,7 @@ import { FiAlertCircle, FiCheckCircle } from "react-icons/fi";
 import { c } from "@/components/palette";
 import { EASE_SNAPPY } from "@/lib/motion";
 
-/* The contact form — shared by the home #contact section and /contact.
+/* The contact form — rendered on the /contact page.
    Sends via EmailJS (the public key is passed per-send, so no init needed). */
 
 const fieldClass =
@@ -65,7 +65,10 @@ export const ContactForm = () => {
   };
 
   return (
-    <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+    // flex-1 + the textarea's flex-1: when the card around the form is taller
+    // than the form needs (on /contact it stretches to match the cards beside
+    // it), the message box absorbs the extra height.
+    <form className="flex flex-1 flex-col gap-3" onSubmit={handleSubmit}>
       {/* Labels are visually hidden (the placeholders carry the visual design)
           but real, so the fields keep their names for screen readers and after
           the placeholder disappears mid-typing. */}
@@ -107,12 +110,12 @@ export const ContactForm = () => {
         required
         value={formData.message}
         onChange={handleInputChange}
-        className={`${fieldClass} min-h-[140px] resize-y`}
+        className={`${fieldClass} min-h-[140px] flex-1 resize-y`}
       />
       {/* heroInk, not bg, for text on pink — bg is 4.36:1, heroInk 4.89:1 AA. */}
       <motion.button
         type="submit"
-        className="rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+        className="depth-cta rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         style={{ background: c.accent, color: c.heroInk }}
         whileHover={formStatus.submitting ? undefined : { y: -2, filter: "brightness(1.08)" }}
         whileTap={formStatus.submitting ? undefined : { scale: 0.98 }}

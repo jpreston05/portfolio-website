@@ -8,8 +8,8 @@ import { FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
 import { c } from "@/components/palette";
 import { EASE_SNAPPY } from "@/lib/motion";
 
-/* Fullscreen image viewer for the project Carousel. Presentational: the Carousel
-   owns index/go, so navigating here also moves the inline track. Portalled to
+/* Fullscreen image viewer for a project's screenshots. Presentational: the
+   ProjectCard owns the index (and wraps it). Portalled to
    document.body so framer layout transforms / overflow-hidden ancestors can't
    clip or mis-position the fixed overlay. */
 
@@ -121,7 +121,7 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
             whileHover={{ scale: 1.12, color: "#ECECEA" }}
             whileTap={{ scale: 0.92 }}
             transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-            className="absolute right-4 top-4 z-10 rounded-full p-2.5"
+            className="absolute right-4 top-4 z-10 rounded-xl p-2.5 depth-chip"
             style={{ background: "rgba(24,31,28,0.7)", color: c.muted }}
           >
             <FiX className="text-xl" />
@@ -170,7 +170,7 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
                 whileHover={{ scale: 1.12, color: "#ECECEA" }}
                 whileTap={{ scale: 0.92 }}
                 transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-                className="absolute left-4 top-1/2 rounded-full p-3"
+                className="absolute left-4 top-1/2 rounded-xl p-3 depth-chip"
                 style={{ background: "rgba(24,31,28,0.7)", color: c.muted, y: "-50%" }}
               >
                 <FiChevronLeft className="text-xl" />
@@ -185,13 +185,13 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
                 whileHover={{ scale: 1.12, color: "#ECECEA" }}
                 whileTap={{ scale: 0.92 }}
                 transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-                className="absolute right-4 top-1/2 rounded-full p-3"
+                className="absolute right-4 top-1/2 rounded-xl p-3 depth-chip"
                 style={{ background: "rgba(24,31,28,0.7)", color: c.muted, y: "-50%" }}
               >
                 <FiChevronRight className="text-xl" />
               </motion.button>
               <div
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 font-mono text-xs"
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs"
                 style={{ color: c.muted }}
               >
                 {index + 1} / {count}
