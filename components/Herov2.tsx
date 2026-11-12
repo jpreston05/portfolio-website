@@ -33,8 +33,12 @@ const NAME_EM_DOCKED = 4.2; // display-name size (em of the text wrapper) when d
 const NAME_EM_BIG_MAX = 5.2; // poster-size ceiling for the big state
 const BIG_BTN_W = 590; // horizontal room reserved for the big-state CTA row (BigActions ≈ 560px)
 // Headline block heights (px), measured with the 2-line status chip:
-const HEADLINE_DOCKED = 275; // whole docked headline at font 16
-const BIG_REST = 194; // everything except the two name lines, at font 20
+const HEADLINE_DOCKED = 281; // whole docked headline at font 16
+const BIG_REST = 202; // everything except the two name lines, at font 20
+// Gap between the headline block and the action buttons: roomy in the big
+// hero (the stack read as cluttered at 16), tight in the docked rail.
+const BTN_GAP_BIG = 36;
+const BTN_GAP_DOCKED = 16;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 // Static status chip under the blurb (edit here to update it).
@@ -144,7 +148,7 @@ const Headline = ({ home }: { home: boolean }) => {
         the block width scales with the font, like the blurb above. */}
     <motion.p
       variants={entranceItem}
-      className="mt-[1.1em] flex items-start gap-[0.6em] rounded-lg px-[0.9em] py-[0.7em] text-[0.8em] font-medium leading-[1.45]"
+      className="mt-[1.6em] flex items-start gap-[0.6em] rounded-lg px-[0.9em] py-[0.7em] text-[0.8em] font-medium leading-[1.45]"
       style={{ background: c.bg, color: c.text }}
     >
       <span
@@ -272,7 +276,6 @@ export const Hero = ({
   const dotColor = useTransform(dock, [0.42, 0.58], [c.accent, c.heroMuted]);
   const focusColor = useTransform(dock, [0.42, 0.58], [c.accent, c.heroInk]);
   // Big-state-only dressing fades away as the card docks.
-  const watermarkOpacity = useTransform(dock, [0.3, 0.7], [1, 0]);
   const cueOpacity = useTransform(dock, [0, 0.08], [1, 0]);
   const cueVisibility = useTransform(dock, (d) => (d >= 0.08 ? "hidden" : "visible"));
 
@@ -294,12 +297,12 @@ export const Hero = ({
   const pwSmall = PORTRAIT_SMALL * s;
 
   // Poster name: as large as the big card's height allows. Estimated big-state
-  // block height at font 20 ≈ BIG_REST + 70 + 36·nameEm (eyebrow + 2 name lines
+  // block height at font 20 ≈ BIG_REST + 54 + BTN_GAP_BIG + 36·nameEm (eyebrow + 2 name lines
   // + blurb + status chip, then gap + one button row); keep it inside bigHc
   // with ~40px margin.
   const nameEmBig = Math.min(
     NAME_EM_BIG_MAX,
-    Math.max(NAME_EM_DOCKED, (bigHc - BIG_REST - 110) / 36)
+    Math.max(NAME_EM_DOCKED, (bigHc - BIG_REST - 94 - BTN_GAP_BIG) / 36)
   );
   const nameEm = useTransform(dock, [0, 0.66], [nameEmBig, NAME_EM_DOCKED]);
   // Big portrait sized so (a) the CENTRED square + its hair overhang (~0.167·w
@@ -328,7 +331,7 @@ export const Hero = ({
   // Headline glides between FIXED endpoints (monotonic — no bob).
   const dockedY = pwSmall * 1.25 + 12; // headline top sits just below docked portrait
   // Centre the whole headline+buttons block (height tracks the poster name size).
-  const bigBlockH = BIG_REST + 70 + 36 * nameEmBig;
+  const bigBlockH = BIG_REST + 54 + BTN_GAP_BIG + 36 * nameEmBig;
   const bigY = Math.max(PAD, (bigHc - bigBlockH) / 2);
   const dockedW = RAIL_W - 2 * PAD; // docked text/button column width (344)
 
@@ -362,7 +365,8 @@ export const Hero = ({
   const headlineHAt = (d: number) => lerp(BIG_REST + 36 * nameEmBig, HEADLINE_DOCKED * s, d);
   const BTN_BLOCK = 90 * s; // ~2 rows of buttons at the docked font size
   const buttonsTopV = useTransform(dock, (d) => {
-    const belowHeadline = headlineYAt(d) + headlineHAt(d) + 16;
+    const belowHeadline =
+      headlineYAt(d) + headlineHAt(d) + lerp(BTN_GAP_BIG, BTN_GAP_DOCKED, d);
     const floorTop = hcAt(d) - BTN_BLOCK; // floor grows with the card
     // Math.max ENFORCES the never-above-the-headline rule — on short viewports
     // the mid-collapse floor sits higher than the still-tall headline block and
@@ -421,19 +425,6 @@ export const Hero = ({
     >
       {enabled ? (
         <>
-          {/* Monogram watermark — tone-on-tone poster crop, gone by mid-dye. */}
-          <motion.div
-            aria-hidden
-            className="pointer-events-none absolute bottom-0 right-2 select-none font-black leading-none tracking-tight"
-            style={{
-              fontSize: textFont,
-              color: "rgba(236,236,234,0.04)",
-              opacity: watermarkOpacity,
-            }}
-          >
-            <span className="block translate-y-[0.28em] text-[12em]">JP.</span>
-          </motion.div>
-
           <motion.div
             className="absolute aspect-[6/7] overflow-hidden rounded-xl"
             style={{
