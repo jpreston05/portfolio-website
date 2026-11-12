@@ -43,7 +43,7 @@ export const FeaturedProjects = () => (
             {p.stack.map((tech) => (
               <span
                 key={tech}
-                className="rounded-md px-2 py-0.5 font-mono text-xs"
+                className="rounded-md px-2 py-0.5 text-xs"
                 style={{ background: c.bg, color: c.muted }}
               >
                 {tech}

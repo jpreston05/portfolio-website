@@ -97,7 +97,7 @@ export const FilterSelect = ({ options, value, onChange, ariaLabel, trackBg }: P
           {current.label}
           {/* Count in full-opacity muted — the opacity-dimmed version fell to
               ~2.9:1, under the 4.5:1 AA floor. */}
-          <span className="ml-1.5 font-mono text-xs" style={{ color: c.muted }}>
+          <span className="ml-1.5 text-xs" style={{ color: c.muted }}>
             {current.count}
           </span>
         </span>
@@ -155,7 +155,7 @@ export const FilterSelect = ({ options, value, onChange, ariaLabel, trackBg }: P
                     }}
                   >
                     <span>{o.label}</span>
-                    <span className="font-mono text-xs" style={{ color: c.muted }}>
+                    <span className="text-xs" style={{ color: c.muted }}>
                       {o.count}
                     </span>
                   </motion.button>

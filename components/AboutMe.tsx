@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FiArrowRight, FiArrowUpRight } from "react-icons/fi";
+import { Label } from "@/components/Label";
 import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
 import { EASE_SNAPPY } from "@/lib/motion";
@@ -29,9 +30,7 @@ const courseUrl = (code: string) =>
 
 const Stat = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="rounded-xl p-4" style={{ background: c.surface2 }}>
-    <p className="mb-1.5 font-mono text-xs uppercase tracking-wider" style={{ color: c.muted }}>
-      {label}
-    </p>
+    <Label className="mb-1.5">{label}</Label>
     {children}
   </div>
 );
@@ -70,12 +69,7 @@ export const AboutMe = () => (
       </div>
 
       <div>
-        <p
-          className="mb-2 font-mono text-xs uppercase tracking-wider"
-          style={{ color: c.muted }}
-        >
-          Currently taking
-        </p>
+        <Label>Currently taking</Label>
         <div className="flex flex-wrap gap-2">
           {COURSES.map((course) => (
             <motion.a
@@ -85,10 +79,10 @@ export const AboutMe = () => (
               rel="noreferrer"
               whileHover={{ y: -2, color: "#DB5461" }}
               transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-              className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-mono text-xs text-[#A6B0A8]"
+              className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs text-[#A6B0A8]"
               style={{ background: c.bg }}
             >
-              {course.code} — {course.name}
+              {course.code} · {course.name}
               <FiArrowUpRight className="shrink-0 text-[0.95em]" />
             </motion.a>
           ))}

@@ -1,5 +1,6 @@
 "use client";
 
+import { Label } from "@/components/Label";
 import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
 
@@ -14,12 +15,7 @@ export const TechStack = () => (
     <div className="flex flex-col gap-6">
       {groups.map((g) => (
         <div key={g.label}>
-          <p
-            className="mb-2 font-mono text-xs uppercase tracking-wider"
-            style={{ color: c.muted }}
-          >
-            {g.label}
-          </p>
+          <Label>{g.label}</Label>
           <div className="flex flex-wrap gap-2">
             {g.items.map((item) => (
               <span

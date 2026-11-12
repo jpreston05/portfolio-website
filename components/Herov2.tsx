@@ -144,7 +144,7 @@ const Headline = () => (
   <>
     <motion.p
       variants={entranceItem}
-      className="mb-[0.4em] font-mono text-[0.72em] tracking-wide"
+      className="mb-[0.4em] text-[0.8em] font-medium"
       style={{ color: "var(--hero-sub)" }}
     >
       Hello, I&apos;m
@@ -479,7 +479,7 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
           transition={{ duration: 0.5, delay: 1 }}
         >
           <span
-            className="font-mono text-[11px] uppercase tracking-widest"
+            className="text-[11px] uppercase tracking-widest"
             style={{ color: c.muted }}
           >
             scroll

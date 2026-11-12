@@ -187,7 +187,7 @@ export const Carousel = ({ images, title, coverLayoutId }: CarouselProps) => {
           {hiddenCount > 0 && (
             <span
               aria-hidden
-              className="ml-1 select-none font-mono text-xs leading-none"
+              className="ml-1 select-none text-xs leading-none"
               style={{ color: c.muted }}
             >
               +{hiddenCount}

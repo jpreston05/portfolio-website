@@ -191,7 +191,7 @@ export const Lightbox = ({ open, images, title, index, onIndex, onClose }: Light
                 <FiChevronRight className="text-xl" />
               </motion.button>
               <div
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 font-mono text-xs"
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs"
                 style={{ color: c.muted }}
               >
                 {index + 1} / {count}

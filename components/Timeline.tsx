@@ -52,7 +52,7 @@ const TimelineEntry = ({
   const Head = (
     <>
       <div className="min-w-0">
-        <p className="font-mono text-xs" style={{ color: c.muted }}>
+        <p className="text-xs" style={{ color: c.muted }}>
           {when}
         </p>
         <p className="mt-1 font-semibold" style={{ color: c.text }}>
@@ -200,7 +200,7 @@ export const Timeline = () => {
               <span className="relative">
                 {label}
                 {/* Full-opacity muted — dimming fell under the 4.5:1 AA floor. */}
-                <span className="ml-1.5 font-mono text-xs" style={{ color: c.muted }}>
+                <span className="ml-1.5 text-xs" style={{ color: c.muted }}>
                   {countFor(id)}
                 </span>
               </span>

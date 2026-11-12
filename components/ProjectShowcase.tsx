@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FiChevronDown, FiExternalLink, FiGithub } from "react-icons/fi";
 import { Carousel } from "@/components/Carousel";
 import { FilterSelect } from "@/components/FilterSelect";
+import { Label } from "@/components/Label";
 import { c } from "@/components/palette";
 import {
   CATEGORY_LABELS,
@@ -163,7 +164,7 @@ const ProjectCard = ({
             {project.stack.map((tech) => (
               <span
                 key={tech}
-                className="rounded-md px-2 py-0.5 font-mono text-xs"
+                className="rounded-md px-2 py-0.5 text-xs"
                 style={{ background: c.bg, color: c.muted }}
               >
                 {tech}
@@ -216,12 +217,7 @@ const ProjectCard = ({
                 </p>
 
                 <div>
-                  <p
-                    className="mb-2 font-mono text-xs uppercase tracking-wider"
-                    style={{ color: c.muted }}
-                  >
-                    Highlights
-                  </p>
+                  <Label>Highlights</Label>
                   <ul className="flex flex-col gap-2">
                     {project.highlights.map((h) => (
                       <li key={h} className="flex gap-3 text-sm leading-relaxed">
@@ -325,7 +321,7 @@ export const ProjectShowcase = ({ initialOpen }: { initialOpen?: string }) => {
                 {label}
                 {/* Mono to match the timeline tabs; full-opacity muted — the
                     dimmed version fell under the 4.5:1 AA floor. */}
-                <span className="ml-1.5 font-mono text-xs" style={{ color: c.muted }}>
+                <span className="ml-1.5 text-xs" style={{ color: c.muted }}>
                   {countFor(id)}
                 </span>
               </span>
