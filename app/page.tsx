@@ -69,7 +69,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <motion.div
-        className="flex flex-col gap-6 lg:sticky lg:top-26 lg:gap-8"
+        className="flex flex-col gap-6 lg:sticky lg:top-28 lg:gap-8"
         style={enabled ? { opacity: contentOpacity, x: contentX } : undefined}
       >
         {/* Styled like the subpage titles, but a <p>: on this page the h1 is

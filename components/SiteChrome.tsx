@@ -103,7 +103,8 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
           route's content) + footer. Mounted once, so the rail persists across
           routes exactly like the nav. Opacity is gated on the intro reveal.
           Vertical rhythm: nav bottom at 80px; content starts 24px below
-          (top-26 = 104px) and the rail keeps 24px at the viewport bottom. */}
+          (lg: top-28 = 112px, a 32px gap matching the column and card gaps;
+          below lg, 104px) and the rail keeps 24px at the viewport bottom. */}
       <motion.div
         data-page-reveal
         className="relative z-10 flex min-h-screen w-full flex-col overflow-x-clip"
@@ -111,11 +112,11 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
         animate={{ opacity: revealed ? 1 : 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <main className="mx-auto grid w-full max-w-[1400px] flex-1 gap-6 px-4 pb-6 pt-26 sm:px-6 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
+        <main className="mx-auto grid w-full max-w-[1400px] flex-1 gap-6 px-4 pb-6 pt-26 sm:px-6 lg:pt-28 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
           {/* LEFT RAIL — collapsing hero on home, pinned docked card elsewhere.
               Below lg it only shows on home (subpages go straight to content). */}
           <div
-            className={`relative z-10 lg:sticky lg:top-26 lg:flex lg:h-[calc(100vh-8rem)] lg:items-center ${
+            className={`relative z-10 lg:sticky lg:top-28 lg:flex lg:h-[calc(100vh-8.5rem)] lg:items-center ${
               isHome ? "" : "hidden"
             }`}
           >

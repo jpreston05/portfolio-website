@@ -27,7 +27,7 @@ import { EASE_SNAPPY } from "@/lib/motion";
    On mobile / reduced-motion it renders as a plain static vertical card. */
 
 const PAD = 28; // card inset (matches the absolute children's top/left/bottom)
-const NAVBAR = 128; // 8rem — matches the rail: top-26 (104px) + 24px bottom gap
+const NAVBAR = 136; // 8.5rem, matches the rail: lg top-28 (112px) + 24px bottom gap
 const BIG_CARD_RATIO = 0.68; // big card height as a fraction of the docked (full) height
 const NAME_EM_DOCKED = 4.2; // display-name size (em of the text wrapper) when docked
 const NAME_EM_BIG_MAX = 5.2; // poster-size ceiling for the big state

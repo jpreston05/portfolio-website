@@ -46,7 +46,7 @@ export const ProjectCard = ({ project, tone = "surface", heading: Heading = "h2"
     <motion.article
       id={slug}
       layout="position"
-      className="flex scroll-mt-26 flex-col rounded-2xl p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)]"
+      className="flex scroll-mt-28 flex-col rounded-2xl p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)]"
       style={{ background: tone === "surface" ? c.surface : c.surface2 }}
       initial={{ opacity: 0, y: reduce ? 0 : 8 }}
       animate={{ opacity: 1, y: 0 }}
