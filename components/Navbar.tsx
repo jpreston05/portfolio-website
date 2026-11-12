@@ -112,11 +112,17 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
                   href={link.href}
                   onClick={link.href === "/" ? toTopIfHome : undefined}
                   aria-current={isActive ? "page" : undefined}
+                  // Colour is owned by framer (initial/animate), NOT a class. The
+                  // hover animates `color`; when it ends framer writes the colour
+                  // it started from back as an INLINE style. With the colour in
+                  // a class, that stale inline muted value beat the class as soon
+                  // as the link you just clicked became active (active item
+                  // stayed grey). Animating to the state colour fixes it.
+                  initial={false}
+                  animate={{ color: isActive ? "#ECECEA" : "#A6B0A8" }}
                   whileHover={{ backgroundColor: "rgba(255,255,255,0.12)", color: "#ECECEA" }}
                   transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-                  className={`relative block rounded-[10px] px-2 py-2 text-[13px] font-medium sm:px-5 sm:text-[15px] ${
-                    isActive ? "text-[#ECECEA]" : "text-[#A6B0A8]"
-                  }`}
+                  className="relative block rounded-[10px] px-2 py-2 text-[13px] font-medium sm:px-5 sm:text-[15px]"
                 >
                   {link.label}
                 </MotionLink>
