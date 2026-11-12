@@ -35,6 +35,16 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
   // offsetWidth are layout metrics, unaffected by window scroll — so unlike a
   // shared-layout (layoutId) FLIP, the slide can't be corrupted by the scroll
   // reset that fires on route navigation.
+  // Already on home: "Home" / "JP." scroll back to the very top (the big hero)
+  // instead of re-navigating. Arriving from another tab lands docked, so this
+  // is the obvious way back up. behavior "auto" follows the CSS (smooth, or
+  // instant under reduced motion).
+  const toTopIfHome = (e: React.MouseEvent) => {
+    if (pathname !== "/") return;
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
+
   const itemRefs = useRef<Record<string, HTMLLIElement | null>>({});
   const [pill, setPill] = useState<{ x: number; width: number } | null>(null);
 
@@ -65,6 +75,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
       <div className="flex items-center gap-1 rounded-2xl bg-[#2F3733] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_32px_rgba(0,0,0,0.45)] sm:gap-1.5 sm:p-2">
         <MotionLink
           href="/"
+          onClick={toTopIfHome}
           aria-label="Home, Jack Preston"
           whileHover={{ backgroundColor: "rgba(255,255,255,0.12)" }}
           transition={{ duration: 0.2, ease: EASE_SNAPPY }}
@@ -99,6 +110,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
               >
                 <MotionLink
                   href={link.href}
+                  onClick={link.href === "/" ? toTopIfHome : undefined}
                   aria-current={isActive ? "page" : undefined}
                   whileHover={{ backgroundColor: "rgba(255,255,255,0.12)", color: "#ECECEA" }}
                   transition={{ duration: 0.2, ease: EASE_SNAPPY }}

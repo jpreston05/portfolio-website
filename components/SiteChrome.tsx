@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Footer } from "@/components/Footer";
@@ -22,6 +29,8 @@ type IntroState = {
   revealed: boolean; // home content may show
   onReveal: () => void; // Preloader: backdrop starts fading
   onDone: () => void; // Preloader: "JP." landed on the nav brand
+  heroHeld: boolean; // arrived on home from another route: rail held docked
+  releaseHero: () => void; // home page: scroll is in place, follow it again
 };
 
 const Ctx = createContext<IntroState | null>(null);
@@ -58,6 +67,17 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
   const revealed = revealContent || introSeen;
   const isHome = usePathname() === "/";
 
+  // Coming back to home from another tab must not snap the docked rail open
+  // into the big hero. While on any other route we arm a hold; the home page
+  // then lands pre-scrolled past the collapse and releases it (app/page.tsx).
+  // Until released the card ignores scroll and stays docked, so there is no
+  // frame where it shows big. A first load / refresh on "/" is never held, so
+  // it opens on the big hero as before. (State adjusted during render: the
+  // hold must already be set in the render where isHome flips to true.)
+  const [heroHeld, setHeroHeld] = useState(false);
+  if (!isHome && !heroHeld) setHeroHeld(true);
+  const releaseHero = useCallback(() => setHeroHeld(false), []);
+
   const onReveal = () => setRevealContent(true);
   const onDone = () => {
     // Flag AFTER the intro completes — flagging at mount would flip
@@ -73,6 +93,8 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
         revealed,
         onReveal,
         onDone,
+        heroHeld,
+        releaseHero,
       }}
     >
       <Navbar brandVisible={brandVisible} />
@@ -97,7 +119,7 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
               isHome ? "" : "hidden"
             }`}
           >
-            <Hero revealed={revealed} home={isHome} />
+            <Hero revealed={revealed} home={isHome} held={heroHeld} />
           </div>
           <div className="min-w-0">{children}</div>
         </main>

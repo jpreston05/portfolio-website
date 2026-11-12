@@ -256,11 +256,13 @@ const DockedActions = () => (
 export const Hero = ({
   revealed = true,
   home = true,
+  held = false,
 }: {
   revealed?: boolean;
   home?: boolean;
+  held?: boolean; // on home but pinned docked (arriving from another route)
 }) => {
-  const { enabled, dock, vh, cardWidth, bigCardW } = useHeroMotion(home);
+  const { enabled, dock, vh, cardWidth, bigCardW } = useHeroMotion(home && !held);
 
   // Dye-on-dock: at the top the card is DARK with the pink held in the portrait
   // square + the full stop (the original accent discipline); scrolling dyes the

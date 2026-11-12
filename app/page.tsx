@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { useHeroMotion } from "@/components/useHeroMotion";
+import { useIntro } from "@/components/SiteChrome";
+import { COLLAPSE_VH, useHeroMotion } from "@/components/useHeroMotion";
 import { AboutMe } from "@/components/AboutMe";
 import { ExperienceCard } from "@/components/ExperienceCard";
 import { FeaturedProjects } from "@/components/FeaturedProjects";
@@ -20,14 +21,46 @@ export default function Home() {
   // (never behind it). Vertical hold is done with native sticky (see JSX).
   const { enabled, contentX, contentOpacity } = useHeroMotion();
 
+  const { heroHeld, releaseHero } = useIntro();
+  const scrolledOnce = useRef(false);
+
   useEffect(() => {
-    // Own scroll restoration so a refresh always starts at the top — but hash
-    // links from other pages (/#about, /#featured) must land on their target.
+    // Own scroll restoration so a refresh always starts at the top.
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
     }
-    if (!window.location.hash) window.scrollTo(0, 0);
-  }, []);
+    const hasHash = !!window.location.hash; // /#about etc. land on their target
+
+    if (heroHeld) {
+      // Arrived from another tab: land just past the collapse so the rail is
+      // already docked and the cards are in place, like every other tab. The
+      // big hero is still above (scroll up, or press Home / JP. in the nav).
+      // SiteChrome holds the card docked until we release it, two frames on,
+      // once the scroll position has reached the motion values.
+      scrolledOnce.current = true;
+      // Only where the collapse exists (lg+ with motion allowed, the same test
+      // as useHeroMotion). Phones / reduced motion have a static card and no
+      // collapse to skip, so they start at the top (Next's default).
+      const collapses =
+        window.matchMedia("(min-width: 1024px)").matches &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!hasHash && collapses) {
+        window.scrollTo({ top: window.innerHeight * COLLAPSE_VH, behavior: "instant" });
+      }
+      let inner = 0;
+      const outer = requestAnimationFrame(() => {
+        inner = requestAnimationFrame(releaseHero);
+      });
+      return () => {
+        cancelAnimationFrame(outer);
+        cancelAnimationFrame(inner);
+      };
+    }
+
+    // First load / refresh on home: start at the top with the big hero.
+    if (!scrolledOnce.current && !hasHash) window.scrollTo(0, 0);
+    scrolledOnce.current = true;
+  }, [heroHeld, releaseHero]);
 
   /* During the collapse the content is held in place by a native sticky pin
      (no transform jitter) while it slides in from the right (x) + fades; the
