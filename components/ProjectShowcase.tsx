@@ -45,7 +45,7 @@ export const ProjectShowcase = () => {
         />
       </div>
       <div
-        className="mb-8 hidden gap-1 rounded-2xl p-1.5 sm:inline-flex"
+        className="depth-track mb-8 hidden gap-1 rounded-2xl p-1.5 sm:inline-flex"
         style={{ background: c.surface }}
       >
         {FILTERS.map(({ id, label }) => {
@@ -64,7 +64,7 @@ export const ProjectShowcase = () => {
               {isActive && (
                 <motion.span
                   layoutId="project-filter-pill"
-                  className="absolute inset-0 rounded-[10px]"
+                  className="depth-chip absolute inset-0 rounded-[10px]"
                   style={{ background: c.surface2 }}
                   transition={{ type: "spring", stiffness: 400, damping: 35 }}
                 />

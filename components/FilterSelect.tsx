@@ -90,7 +90,7 @@ export const FilterSelect = ({ options, value, onChange, ariaLabel, trackBg }: P
         whileHover={{ filter: "brightness(1.18)" }}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-        className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium"
+        className="depth-track inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium"
         style={{ background: trackBg, color: c.text }}
       >
         <span>

@@ -115,7 +115,7 @@ export const ContactForm = () => {
       {/* heroInk, not bg, for text on pink — bg is 4.36:1, heroInk 4.89:1 AA. */}
       <motion.button
         type="submit"
-        className="rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+        className="depth-cta rounded-lg px-4 py-3 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         style={{ background: c.accent, color: c.heroInk }}
         whileHover={formStatus.submitting ? undefined : { y: -2, filter: "brightness(1.08)" }}
         whileTap={formStatus.submitting ? undefined : { scale: 0.98 }}

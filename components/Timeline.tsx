@@ -130,7 +130,7 @@ const TimelineEntry = ({
 
       <div className={`min-w-0 flex-1 ${last ? "" : "pb-3"}`}>
         <div
-          className="rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)]"
+          className="rounded-2xl depth-card"
           style={{ background: c.surface }}
         >
           {expandable ? (
@@ -207,7 +207,7 @@ export const Timeline = () => {
         />
       </div>
       <div
-        className="mb-8 hidden gap-1 rounded-2xl p-1.5 sm:inline-flex"
+        className="depth-track mb-8 hidden gap-1 rounded-2xl p-1.5 sm:inline-flex"
         style={{ background: c.surface }}
       >
         {TABS.map(({ id, label }) => {
@@ -226,7 +226,7 @@ export const Timeline = () => {
               {isActive && (
                 <motion.span
                   layoutId="timeline-tab-pill"
-                  className="absolute inset-0 rounded-[10px]"
+                  className="depth-chip absolute inset-0 rounded-[10px]"
                   style={{ background: c.surface2 }}
                   transition={{ type: "spring", stiffness: 400, damping: 35 }}
                 />

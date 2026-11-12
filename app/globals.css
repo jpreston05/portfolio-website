@@ -24,6 +24,76 @@
 
 :root {
   color-scheme: dark;
+
+  /* -- DEPTH -----------------------------------------------------------------
+     Every raised surface gets its depth from these four variables, so the
+     whole effect is tuned (or reverted) here. One light source from above: a
+     bright hairline on the top edge, a soft sheen fading down from it, a dark
+     hairline on the bottom edge, then a tight contact shadow plus a wide soft
+     one. Box-shadow only (no gradients, blur or glow), so it layers over each
+     component's own inline background colour.
+     Deliberately SUBTLE: a stronger version read as generic/"vibecoded", and
+     a "hard slab edges + recessed wells" version was tried and rejected.
+     The original flat values are kept in the comments for reference. */
+
+  /* Cards: section cards, stat tiles, project + timeline cards, scroll cue.
+     flat: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.25) */
+  --depth-card:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 24px 24px -24px rgba(255, 255, 255, 0.035),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 10px 28px rgba(0, 0, 0, 0.27);
+
+  /* The floating nav: same lighting, deeper drop (it sits above everything).
+     flat: inset 0 1px 0 rgba(255,255,255,0.05), 0 12px 32px rgba(0,0,0,0.45) */
+  --depth-dock:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 18px 18px -18px rgba(255, 255, 255, 0.04),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 14px 34px rgba(0, 0, 0, 0.47);
+
+  /* The hero / rail card (dark at the top of home, pink when docked).
+     flat: 0 24px 60px rgba(0,0,0,0.35) */
+  --depth-hero:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 40px 40px -40px rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.22),
+    0 24px 60px rgba(0, 0, 0, 0.37);
+
+  /* Pink buttons: a lit top edge and a shaded bottom edge read as "pressable".
+     flat: none */
+  --depth-cta:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.14),
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.16);
+}
+
+.depth-card {
+  box-shadow: var(--depth-card);
+}
+.depth-dock {
+  box-shadow: var(--depth-dock);
+}
+.depth-cta {
+  box-shadow: var(--depth-cta);
+}
+/* Filter bars (and the phone filter button): lit like a card. */
+.depth-track {
+  box-shadow: var(--depth-card);
+}
+
+/* Small raised controls: dark buttons and chips you can press, and the sliding
+   "active" highlight in the nav and filter bars. Same lighting, scaled down. */
+.depth-chip {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 3px 8px rgba(0, 0, 0, 0.12);
 }
 
 html {

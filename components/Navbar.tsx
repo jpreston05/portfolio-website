@@ -72,7 +72,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
     >
       {/* Solid surface dock — same material AND shape language as the section
           cards (rounded-2xl); the links/CTA inside stay pills for hierarchy. */}
-      <div className="flex items-center gap-1 rounded-2xl bg-[#2F3733] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_12px_32px_rgba(0,0,0,0.45)] sm:gap-1.5 sm:p-2">
+      <div className="flex items-center gap-1 rounded-2xl bg-[#2F3733] p-1.5 depth-dock sm:gap-1.5 sm:p-2">
         <MotionLink
           href="/"
           onClick={toTopIfHome}
@@ -93,7 +93,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
           {pill && (
             <motion.span
               aria-hidden
-              className="absolute inset-y-0 left-0 rounded-[10px] bg-[#3A423D]"
+              className="depth-chip absolute inset-y-0 left-0 rounded-[10px] bg-[#3A423D]"
               initial={false}
               animate={{ x: pill.x, width: pill.width }}
               transition={{ type: "spring", stiffness: 400, damping: 35 }}
@@ -133,7 +133,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
 
         <MotionLink
           href="/contact"
-          className="ml-1 whitespace-nowrap rounded-[10px] bg-[#DB5461] px-2.5 py-2 text-[13px] font-semibold text-[#10120F] sm:ml-1.5 sm:px-5 sm:text-[15px]"
+          className="depth-cta ml-1 whitespace-nowrap rounded-[10px] bg-[#DB5461] px-2.5 py-2 text-[13px] font-semibold text-[#10120F] sm:ml-1.5 sm:px-5 sm:text-[15px]"
           whileHover={{ y: -2, filter: "brightness(1.08)" }}
           whileTap={{ scale: 0.97 }}
         >

@@ -59,7 +59,7 @@ const Action = ({ href, label, icon, download }: ActionProps) => (
     rel={download ? undefined : "noreferrer"}
     whileHover={{ y: -2 }}
     whileTap={{ scale: 0.97 }}
-    className="group flex items-center justify-center gap-[0.5em] rounded-lg px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
+    className="depth-chip group flex items-center justify-center gap-[0.5em] rounded-lg px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
     style={{ color: c.muted, background: c.bg }}
   >
     <span className="text-[1.1em] transition-colors duration-200 group-hover:text-[#ECECEA]">
@@ -148,7 +148,7 @@ const Headline = ({ home }: { home: boolean }) => {
         the block width scales with the font, like the blurb above. */}
     <motion.p
       variants={entranceItem}
-      className="mt-[1.6em] flex items-start gap-[0.6em] rounded-lg px-[0.9em] py-[0.7em] text-[0.8em] font-medium leading-[1.45]"
+      className="depth-chip mt-[1.6em] flex items-start gap-[0.6em] rounded-lg px-[0.9em] py-[0.7em] text-[0.8em] font-medium leading-[1.45]"
       style={{ background: c.bg, color: c.text }}
     >
       <span
@@ -184,7 +184,7 @@ const IconAction = ({ href, label, icon, download }: ActionProps) => (
     whileHover={{ y: -2, color: c.text }}
     whileTap={{ scale: 0.97 }}
     transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-    className="flex h-[2.9em] w-[2.9em] shrink-0 items-center justify-center rounded-xl"
+    className="depth-chip flex h-[2.9em] w-[2.9em] shrink-0 items-center justify-center rounded-xl"
     style={{ color: c.muted, background: c.bg }}
   >
     <span className="text-[1.15em]">{icon}</span>
@@ -203,7 +203,7 @@ const BigActions = () => (
       whileHover={{ y: -2, filter: "brightness(1.08)" }}
       whileTap={{ scale: 0.97 }}
       transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-      className="flex h-[2.9em] items-center gap-[0.6em] rounded-xl px-[1.3em] font-semibold"
+      className="depth-cta flex h-[2.9em] items-center gap-[0.6em] rounded-xl px-[1.3em] font-semibold"
       style={{ background: c.accent, color: c.heroInk }}
     >
       View my projects
@@ -397,7 +397,7 @@ export const Hero = ({
       }
       style={{
         background: "var(--hero-card)",
-        boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
+        boxShadow: "var(--depth-hero)",
         ...(enabled
           ? {
               width: cardWidth,
@@ -551,7 +551,7 @@ export const Hero = ({
               whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-              className="flex h-11 w-11 items-center justify-center rounded-[14px] text-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_8px_24px_rgba(0,0,0,0.35)]"
+              className="flex h-11 w-11 items-center justify-center rounded-[14px] text-lg depth-card"
               style={{ background: c.surface, color: c.text }}
             >
               <FiArrowDown aria-hidden />

@@ -38,7 +38,7 @@ export const StatTiles = () => {
       {TILES.map((t) => (
         <div
           key={t.label}
-          className="rounded-2xl p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)]"
+          className="rounded-2xl p-5 depth-card"
           style={{ background: c.surface }}
         >
           <Label className="mb-2">{t.label}</Label>

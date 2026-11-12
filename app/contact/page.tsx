@@ -14,7 +14,7 @@ import { EASE_SNAPPY } from "@/lib/motion";
    only; SiteChrome owns the frame (rail + footer). */
 
 const CARD =
-  "rounded-2xl p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)]";
+  "rounded-2xl p-6 depth-card";
 
 // Mirrors the page intro ("a role, a project, or just want to say hi").
 const REASONS = [
@@ -104,7 +104,7 @@ export default function ContactPage() {
                   rel="noreferrer"
                   whileHover={{ y: -2, color: "#ECECEA" }}
                   transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-                  className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium"
+                  className="depth-chip inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium"
                   style={{ color: c.muted, background: c.bg }}
                 >
                   {icon}
