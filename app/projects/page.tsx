@@ -1,20 +1,11 @@
 "use client";
 
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { ProjectShowcase } from "@/components/ProjectShowcase";
 import { c } from "@/components/palette";
 
-/* /projects — all projects as big expandable cards (one open at a time).
-   Deep-linkable via ?open=<slug> (used by the home page's featured cards).
-   Renders the right column only; SiteChrome owns the frame (rail + footer). */
-
-// useSearchParams needs a Suspense boundary (Next CSR bailout).
-const ShowcaseWithParams = () => {
-  const initialOpen = useSearchParams().get("open") ?? undefined;
-  return <ProjectShowcase initialOpen={initialOpen} />;
-};
+/* /projects — every project as a card in a filterable grid. Renders the right
+   column only; SiteChrome owns the frame (rail + footer). */
 
 export default function ProjectsPage() {
   return (
@@ -31,13 +22,11 @@ export default function ProjectsPage() {
           Projects<span style={{ color: c.accent }}>.</span>
         </h1>
         <p className="mt-2 max-w-[60ch] text-sm leading-relaxed" style={{ color: c.muted }}>
-          Things I&apos;ve built. Expand a card for screenshots and the details.
+          Things I&apos;ve built. Click a cover to see the screenshots.
         </p>
       </header>
 
-      <Suspense fallback={<ProjectShowcase />}>
-        <ShowcaseWithParams />
-      </Suspense>
+      <ProjectShowcase />
     </motion.div>
   );
 }

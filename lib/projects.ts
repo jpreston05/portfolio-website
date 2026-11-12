@@ -9,12 +9,17 @@ export type Project = {
   slug: string;
   title: string;
   category: ProjectCategory; // filter grouping on the /projects page
-  tagline: string; // one-liner (collapsed card + featured card)
-  description: string; // paragraph (expanded card)
-  highlights: string[]; // 2-4 substance bullets — what was built, measured outcomes
+  event?: string; // shown after the category, e.g. "WDCC x SESA 2025"
+  tagline: string; // one-liner under the title
+  // 1-3 short facts with a number ("62% win rate vs random"); omit ⇒ no row.
+  metrics?: string[];
+  description: string; // longer write-up (not rendered at the moment)
+  highlights: string[]; // substance bullets (not rendered at the moment)
   stack: string[];
   links: { github?: string; live?: string };
-  images: string[]; // /projects/<slug>/*.png — empty ⇒ placeholder tiles
+  // /projects/<slug>/* — the first is the card cover, all open in the
+  // lightbox; empty ⇒ an initials tile.
+  images: string[];
   featured: boolean; // true ⇒ shows in home FeaturedProjects
 };
 
@@ -62,12 +67,13 @@ export const projects: Project[] = [
       "/projects/trial-ai/intro.webp",
       "/projects/trial-ai/main_room.webp",
     ],
-    featured: true,
+    featured: false,
   },
   {
     slug: "skool-swaps",
     title: "Skool Swaps",
     category: "hackathon",
+    event: "WDCC x SESA 2025",
     tagline: "Made during the WDCC x SESA Hackathon 2025",
     description:
       "A nostalgia themed web app for trading digital replicas of items commonly traded within New Zealand primary schools in the 2010s. The app features a marketplace for users to trade items, a shop to purchase items, and a profile page to showcase a user's collection of items.",
@@ -88,6 +94,7 @@ export const projects: Project[] = [
     slug: "logic-lift",
     title: "Logic Lift",
     category: "hackathon",
+    event: "SESA x DEVS Beginners 2025",
     tagline: "Made during the SESA x DEVS Beginners Hackathon 2025",
     description:
       "A study tool for students to practice concepts taught in 'Software Engineering Theory' (SOFTENG 282) at the University of Auckland. The app features multiple-choice questions, notes on each topic, and a leaderboard to encourage friendly competition among students.",
@@ -116,7 +123,7 @@ export const projects: Project[] = [
     ],
     stack: [],
     links: { },
-    images: ["/projects/red-bull/team_pic.webp", "/projects/red-bull/initial_drawing1.webp", "/projects/red-bull/initial_drawing2.webp", "/projects/red-bull/logo.webp", "/projects/red-bull/frame1.webp", "/projects/red-bull/frame2.webp", "/projects/red-bull/frame3.webp", "/projects/red-bull/drilling.webp", "/projects/red-bull/track.webp", "/projects/red-bull/steering.webp", "/projects/red-bull/trol1.webp", "/projects/red-bull/trol2.webp", "/projects/red-bull/trol3.webp", "/projects/red-bull/side1.webp", "/projects/red-bull/side2.webp", "/projects/red-bull/side3.webp"],
+    images: ["/projects/red-bull/team_pic.webp", "/projects/red-bull/initial_drawing1.webp", "/projects/red-bull/initial_drawing2.webp", "/projects/red-bull/logo.webp", "/projects/red-bull/frame1.webp", "/projects/red-bull/frame2.webp", "/projects/red-bull/frame3.webp", "/projects/red-bull/drilling.webp","/projects/red-bull/steering.webp", "/projects/red-bull/trol1.webp", "/projects/red-bull/trol2.webp", "/projects/red-bull/trol3.webp", "/projects/red-bull/side1.webp", "/projects/red-bull/side2.webp", "/projects/red-bull/side3.webp"],
     featured: false,
   },
   {

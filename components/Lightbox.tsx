@@ -8,8 +8,8 @@ import { FiChevronLeft, FiChevronRight, FiX } from "react-icons/fi";
 import { c } from "@/components/palette";
 import { EASE_SNAPPY } from "@/lib/motion";
 
-/* Fullscreen image viewer for the project Carousel. Presentational: the Carousel
-   owns index/go, so navigating here also moves the inline track. Portalled to
+/* Fullscreen image viewer for a project's screenshots. Presentational: the
+   ProjectCard owns the index (and wraps it). Portalled to
    document.body so framer layout transforms / overflow-hidden ancestors can't
    clip or mis-position the fixed overlay. */
 

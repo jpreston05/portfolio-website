@@ -51,8 +51,12 @@ export default function Home() {
         <ExperienceCard />
         <StatTiles />
         <FeaturedProjects />
-        <AboutMe />
-        <TechStack />
+        {/* Two short cards share a row at xl rather than each stretching
+            full-width around a few lines of text. */}
+        <div className="grid gap-6 lg:gap-8 xl:grid-cols-2">
+          <AboutMe />
+          <TechStack />
+        </div>
       </motion.div>
       {/* collapse range (~50vh) + a dwell so the docked card + content sit
           still for a stretch before the page scrolls on */}
