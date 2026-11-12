@@ -6,13 +6,13 @@ import { EASE_SNAPPY } from "@/lib/motion";
 
 type SectionCardProps = {
   id?: string;
-  title: string;
+  title?: string; // omit for cards that carry their own small header row
   children: React.ReactNode;
   className?: string;
 };
 
-/* A right-column "card" section: one surface, hairline border, fades in on view.
-   Shared shell so every scrolling section matches the hero card aesthetic. */
+/* A right-column "card" section: one borderless tonal surface, fades in on
+   view. Shared shell so every scrolling section matches the hero card. */
 export const SectionCard = ({
   id,
   title,
@@ -30,14 +30,13 @@ export const SectionCard = ({
     viewport={{ once: true, margin: "-80px" }}
     transition={{ duration: 0.5, ease: EASE_SNAPPY }}
   >
-    <header className="mb-6">
-      <h2
-        className="text-2xl font-bold tracking-tight sm:text-3xl"
-        style={{ color: c.text }}
-      >
-        {title}
-      </h2>
-    </header>
+    {title && (
+      <header className="mb-5">
+        <h2 className="text-2xl font-bold tracking-tight" style={{ color: c.text }}>
+          {title}
+        </h2>
+      </header>
+    )}
     {children}
   </motion.section>
   );

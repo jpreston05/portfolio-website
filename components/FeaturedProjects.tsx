@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { FiArrowRight, FiArrowUpRight } from "react-icons/fi";
+import { FiArrowUpRight } from "react-icons/fi";
+import { ArrowLink } from "@/components/ArrowLink";
 import { SectionCard } from "@/components/SectionCard";
 import { c } from "@/components/palette";
 import { featuredProjects } from "@/lib/projects";
@@ -15,7 +16,7 @@ import { EASE_SNAPPY } from "@/lib/motion";
 const MotionLink = motion.create(Link);
 
 export const FeaturedProjects = () => (
-  <SectionCard id="featured" title="Featured Projects">
+  <SectionCard id="featured" title="Featured projects">
     <div className="flex flex-col gap-4">
       {featuredProjects.map((p) => (
         <MotionLink
@@ -55,17 +56,7 @@ export const FeaturedProjects = () => (
     </div>
 
     <div className="mt-5 flex justify-end">
-      {/* Colour lives in classes (not inline style) so the hover actually wins. */}
-      <MotionLink
-        href="/projects"
-        whileHover={{ x: 3, color: "#DB5461" }}
-        whileTap={{ scale: 0.97 }}
-        transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-        className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-[#A6B0A8]"
-      >
-        All projects
-        <FiArrowRight />
-      </MotionLink>
+      <ArrowLink href="/projects">All projects</ArrowLink>
     </div>
   </SectionCard>
 );

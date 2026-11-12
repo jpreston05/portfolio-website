@@ -11,7 +11,7 @@ const groups = [
 ];
 
 export const TechStack = () => (
-  <SectionCard id="tech" title="Tech Stack">
+  <SectionCard id="tech" title="Tech stack">
     <div className="flex flex-col gap-6">
       {groups.map((g) => (
         <div key={g.label}>

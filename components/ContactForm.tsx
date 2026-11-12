@@ -7,7 +7,7 @@ import { FiAlertCircle, FiCheckCircle } from "react-icons/fi";
 import { c } from "@/components/palette";
 import { EASE_SNAPPY } from "@/lib/motion";
 
-/* The contact form — shared by the home #contact section and /contact.
+/* The contact form — rendered on the /contact page.
    Sends via EmailJS (the public key is passed per-send, so no init needed). */
 
 const fieldClass =

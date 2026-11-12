@@ -18,6 +18,9 @@ export type Milestone = {
   blurb: string; // one-liner shown collapsed
   detail?: string; // a sentence or two revealed on expand; omit ⇒ not expandable
   overview?: boolean; // true ⇒ appears in the default "Overview" tab
+  // 2-3 one-line bullets (what you built, one number, the stack). Shown on the
+  // home Experience card for the latest role; omit and `detail` shows instead.
+  highlights?: string[];
 };
 
 export const CATEGORY_LABELS: Record<TimelineCategory, string> = {
@@ -162,3 +165,6 @@ export const milestones: Milestone[] = [
 ];
 
 export const overviewMilestones = milestones.filter((m) => m.overview);
+
+// Most recent career entry (the list is newest-first) — the home Experience card.
+export const latestRole = milestones.find((m) => m.category === "career");
