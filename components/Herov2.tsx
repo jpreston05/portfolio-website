@@ -9,10 +9,11 @@ import {
   useTransform,
   type Variants,
 } from "framer-motion";
-import { FiDownload, FiFileText } from "react-icons/fi";
+import { FiArrowDown, FiDownload, FiFileText } from "react-icons/fi";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { c } from "@/components/palette";
 import {
+  COLLAPSE_VH,
   PORTRAIT_BIG,
   PORTRAIT_SMALL,
   RAIL_W,
@@ -227,6 +228,7 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
   // Big-state-only dressing fades away as the card docks.
   const watermarkOpacity = useTransform(dock, [0.3, 0.7], [1, 0]);
   const cueOpacity = useTransform(dock, [0, 0.08], [1, 0]);
+  const cueVisibility = useTransform(dock, (d) => (d >= 0.08 ? "hidden" : "visible"));
 
   // Card content-box height GROWS from a shorter big card to the full rail
   // height as it docks; the geometry below reads hcAt(d), not a fixed Hc.
@@ -464,32 +466,40 @@ export const Hero = ({ revealed = true }: { revealed?: boolean }) => {
       )}
     </motion.div>
 
-    {/* Scroll cue — invites the scroll that triggers the dye-on-dock signature;
-        fades the instant scrolling starts. Fixed to the viewport bottom-centre. */}
+    {/* Scroll cue — a bobbing squircle button that plays the dye-on-dock
+        collapse when pressed; fades the instant scrolling starts, then leaves
+        the tab order + hit-testing entirely (visibility). Fixed bottom-centre.
+        Three nested layers so the transforms never share an element: fixed
+        centring (class) → bob (CSS keyframe) → hover/tap scale (framer). */}
     {enabled && (
       <motion.div
-        aria-hidden
-        className="pointer-events-none fixed bottom-8 left-1/2 z-20 -translate-x-1/2"
-        style={{ opacity: cueOpacity }}
+        className="fixed bottom-8 left-1/2 z-20 -translate-x-1/2"
+        style={{ opacity: cueOpacity, visibility: cueVisibility }}
       >
         <motion.div
-          className="flex flex-col items-center gap-2"
           initial={{ opacity: 0 }}
           animate={revealed ? { opacity: 1 } : {}}
           transition={{ duration: 0.5, delay: 1 }}
         >
-          <span
-            className="text-[11px] uppercase tracking-widest"
-            style={{ color: c.muted }}
-          >
-            scroll
-          </span>
-          <span className="relative h-6 w-px" style={{ background: c.line }}>
-            <span
-              className="animate-cue absolute -left-[1.5px] top-0 h-1 w-1 rounded-full"
-              style={{ background: c.accent }}
-            />
-          </span>
+          <div className="animate-cue">
+            <motion.button
+              type="button"
+              aria-label="Scroll to content"
+              onClick={() =>
+                window.scrollTo({
+                  top: window.innerHeight * COLLAPSE_VH,
+                  behavior: "smooth",
+                })
+              }
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+              className="flex h-11 w-11 items-center justify-center rounded-[14px] text-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_8px_24px_rgba(0,0,0,0.35)]"
+              style={{ background: c.surface, color: c.text }}
+            >
+              <FiArrowDown aria-hidden />
+            </motion.button>
+          </div>
         </motion.div>
       </motion.div>
     )}
