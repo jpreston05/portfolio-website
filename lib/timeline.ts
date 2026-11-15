@@ -31,11 +31,11 @@ export const CATEGORY_LABELS: Record<TimelineCategory, string> = {
 export const milestones: Milestone[] = [
   // ── Career ────────────────────────────────────────────────────────────────
   {
-    slug: "marpos",
+    slug: "marops",
     category: "career",
     when: "Summer 2026–27",
     title: "Summer Intern",
-    org: "Marpos",
+    org: "Marops",
     blurb: "Just started: my second summer in a software team.",
   },
   {
@@ -178,7 +178,7 @@ export const milestones: Milestone[] = [
 // array order above), so the headline items can lead regardless of category.
 const OVERVIEW = [
   "sesa-vp",
-  "marpos",
+  "marops",
   "aeroqual",
   "anniversary-scholarship",
   "uoa-start",
