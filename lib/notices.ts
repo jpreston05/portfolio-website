@@ -13,7 +13,7 @@ export type Notice = {
 export const notices: Notice[] = [
   {
     when: "Nov 2026",
-    text: "Started my summer internship at Marpos",
+    text: "Started my summer internship at Marops",
   },
   {
     when: "Nov 2026",
