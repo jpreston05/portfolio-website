@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { FiArrowUpRight, FiImage } from "react-icons/fi";
+import { FiArrowRight, FiArrowUpRight, FiImage } from "react-icons/fi";
 import { Label } from "@/components/Label";
 import { Lightbox } from "@/components/Lightbox";
 import { c } from "@/components/palette";
@@ -13,7 +14,11 @@ import { EASE_SNAPPY } from "@/lib/motion";
 /* One project as a static card: cover, category, title, tagline, optional
    metrics, stack, links. Shared by /projects and the home Featured grid.
    The cover is a button that opens the fullscreen Lightbox on ALL of the
-   project's screenshots; image-less projects get a branded initials tile. */
+   project's screenshots; image-less projects get a branded initials tile.
+   A project with a `story` shows its current build in the label ("· v2")
+   and links to its /projects/<slug> page. */
+
+const MotionLink = motion.create(Link);
 
 const ExternalLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <motion.a
@@ -39,8 +44,9 @@ export const ProjectCard = ({ project, tone = "surface", heading: Heading = "h2"
   const reduce = useReducedMotion();
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [index, setIndex] = useState(0);
-  const { slug, title, category, event, tagline, metrics, stack, links, images } = project;
+  const { slug, title, category, event, tagline, metrics, stack, links, images, story } = project;
   const count = images.length;
+  const current = story?.builds[0]?.label;
 
   return (
     <motion.article
@@ -106,6 +112,7 @@ export const ProjectCard = ({ project, tone = "surface", heading: Heading = "h2"
         <Label className="mb-1.5">
           {CATEGORY_LABELS[category]}
           {event && ` · ${event}`}
+          {current && ` · ${current}`}
         </Label>
         <Heading className="text-xl font-bold tracking-tight" style={{ color: c.text }}>
           {title}
@@ -139,15 +146,27 @@ export const ProjectCard = ({ project, tone = "surface", heading: Heading = "h2"
           </div>
         )}
 
-        {(links.github || links.live) && (
+        {(links.github || links.live || story) && (
           // mt-auto pins the link row to the card floor so rows of cards align.
           <div className="mt-auto pt-4">
             <div
-              className="flex flex-wrap gap-5 pt-3"
+              className="flex flex-wrap items-center gap-5 pt-3"
               style={{ borderTop: `1px solid ${c.line}` }}
             >
               {links.github && <ExternalLink href={links.github}>GitHub</ExternalLink>}
               {links.live && <ExternalLink href={links.live}>Live</ExternalLink>}
+              {story && (
+                <MotionLink
+                  href={`/projects/${slug}`}
+                  whileHover={{ x: 3, color: "#DB5461" }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ duration: 0.2, ease: EASE_SNAPPY }}
+                  className="ml-auto inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-[#A6B0A8]"
+                >
+                  How it evolved
+                  <FiArrowRight aria-hidden />
+                </MotionLink>
+              )}
             </div>
           </div>
         )}
