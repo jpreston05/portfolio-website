@@ -87,12 +87,12 @@ export const milestones: Milestone[] = [
   {
     slug: "wdcc",
     category: "university",
-    when: "2025 – now",
+    when: "2025–26",
     title: "Industry Executive, WDCC",
     org: "Web Development & Consulting Club",
-    blurb: "Connecting students with industry through talks and workshops.",
+    blurb: "Connected students with industry through talks and workshops.",
     detail:
-      "I help put on the events that bridge students and industry, and even got up to present at our Web3 workshop, which I designed the deck for and thoroughly enjoyed running.",
+      "I helped put on the events that bridged students and industry, and even got up to present at our Web3 workshop, which I designed the deck for and thoroughly enjoyed running. I stepped down at the end of 2026 to focus on my role as Vice President of SESA.",
   },
   {
     slug: "sesa",
