@@ -323,6 +323,18 @@ export const Hero = ({
     Math.max(0, Math.min(1, (d - a) / (b - a)));
   // smootherstep — eases a 0→1 ramp so the glide has no hard start/stop.
   const ease = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
+  // Big-state balance: the free width beside the text column (BIG_BTN_W) and the
+  // portrait is split evenly into left margin / middle gap / right margin, so
+  // the pair sits centred instead of hugging the edges with a void between.
+  // pwBig already guarantees free ≥ 16.
+  // Text: the inset eases out over the same span as its downward glide (ends
+  // 0.66), so it travels one smooth diagonal back to the card edge.
+  // Portrait: the inset is a FIXED offset on its right-hand start point, never
+  // faded on its own — fading it pushed the portrait right before the across
+  // glide pulled it left (a visible back-and-forth). The across lerp to centre
+  // absorbs it, so the portrait only ever moves one way.
+  const bigInset = Math.max(0, (bigCardW - 2 * PAD - BIG_BTN_W - pwBig) / 3);
+  const textX = useTransform(dock, (d) => bigInset * (1 - ease(phase(d, 0, 0.66))));
   // Portrait shrinks over the first ~0.72 (still overlaps the slide → diagonal),
   // small enough early that the text can drop fully below it before it centres.
   const pwAt = (d: number) => lerp(pwBig, pwSmall, ease(phase(d, 0, 0.72)));
@@ -330,14 +342,11 @@ export const Hero = ({
   // shrink/rise so it travels diagonally, not "up then across".
   const portraitLeftAt = (d: number, Wc: number) => {
     const pw = pwAt(d);
-    return lerp(Wc - pw /* right */, (Wc - pw) / 2 /* centre */, ease(phase(d, 0.25, 1)));
+    return lerp(Wc - pw - bigInset /* right, inset */, (Wc - pw) / 2 /* centre */, ease(phase(d, 0.25, 1)));
   };
 
   // Headline glides between FIXED endpoints (monotonic — no bob).
   const dockedY = pwSmall * 1.25 + 12; // headline top sits just below docked portrait
-  // Centre the whole headline+buttons block (height tracks the poster name size).
-  const bigBlockH = BIG_REST + 54 + BTN_GAP_BIG + 36 * nameEmBig;
-  const bigY = Math.max(PAD, (bigHc - bigBlockH) / 2);
   const dockedW = RAIL_W - 2 * PAD; // docked text/button column width (344)
 
   const cardHeight = useTransform(dock, (d) => hcAt(d) + 2 * PAD);
@@ -352,9 +361,23 @@ export const Hero = ({
     portraitLeftAt(d, w - 2 * PAD)
   );
 
-  // Headline drops below the portrait EARLY (by ~0.62, before the portrait
-  // centres) so a stable-width text block never collides with it.
-  const headlineYAt = (d: number) => lerp(bigY, dockedY, ease(phase(d, 0.25, 0.66)));
+  // Headline height as the type scales: font 20→16·s (whole collapse) and the
+  // name nameEmBig→docked (by 0.66). BIG_REST is the non-name part at font 20;
+  // each name em adds 36px at font 20 (two lines at leading 0.9).
+  const fontAt = (d: number) => lerp(20, 16 * s, d);
+  const nameEmAt = (d: number) => lerp(nameEmBig, NAME_EM_DOCKED, phase(d, 0, 0.66));
+  const headlineHAt = (d: number) => fontAt(d) * (BIG_REST / 20 + 1.8 * nameEmAt(d));
+  // The whole text block (headline + gap + one big button row, 54px at font 20)
+  // stays CENTRED in the growing card, like the portrait, until the drop takes
+  // over. Anchoring it at the top made it rise while the type shrank (a bounce).
+  const centredTopAt = (d: number) => {
+    const blockH = headlineHAt(d) + lerp(BTN_GAP_BIG, BTN_GAP_DOCKED, d) + 2.7 * fontAt(d);
+    return Math.max(PAD, (hcAt(d) - blockH) / 2);
+  };
+  // Then drops below the portrait EARLY (by ~0.66, before the portrait centres)
+  // so a stable-width text block never collides with it.
+  const headlineYAt = (d: number) =>
+    lerp(centredTopAt(d), dockedY, ease(phase(d, 0.25, 0.66)));
   const headlineY = useTransform(dock, headlineYAt);
   // Width scales WITH the font (20→16) so the blurb keeps the exact same 2-line
   // wrap at every size — final composition from the start, never re-wraps.
@@ -364,10 +387,7 @@ export const Hero = ({
   );
 
   // Buttons GLIDE down to the card floor, but never above the headline's bottom
-  // (so they can't collide). HEADLINE_H tracks the real text height as it scales
-  // with the font (poster-big name → shorter docked) — the big value derives
-  // from nameEmBig (eyebrow + 2 name lines + blurb + chip ≈ BIG_REST + 36·em).
-  const headlineHAt = (d: number) => lerp(BIG_REST + 36 * nameEmBig, HEADLINE_DOCKED * s, d);
+  // (so they can't collide), using headlineHAt above.
   const BTN_BLOCK = 90 * s; // ~2 rows of buttons at the docked font size
   const buttonsTopV = useTransform(dock, (d) => {
     const belowHeadline =
@@ -382,9 +402,11 @@ export const Hero = ({
   // (before the dye reaches it) and the docked 2×2 grid fades in once the card
   // is mostly pink. Whichever is invisible is `inert` (no focus, no clicks).
   const bigActionsOpacity = useTransform(dock, [0.15, 0.35], [1, 0]);
-  const dockedActionsOpacity = useTransform(dock, [0.45, 0.65], [0, 1]);
-  const [actionsDocked, setActionsDocked] = useState(() => dock.get() > 0.4);
-  useMotionValueEvent(dock, "change", (d) => setActionsDocked(d > 0.4));
+  // (Not before ~0.6: earlier, the still-shrinking headline pushes the grid
+  // below the card floor and it fades in clipped.)
+  const dockedActionsOpacity = useTransform(dock, [0.62, 0.82], [0, 1]);
+  const [actionsDocked, setActionsDocked] = useState(() => dock.get() > 0.55);
+  useMotionValueEvent(dock, "change", (d) => setActionsDocked(d > 0.55));
   // Whole text block scales as it docks (children are em-relative); the docked
   // size shrinks with `s` on short viewports so the stack fits the card.
   const textFont = useTransform(dock, [0, 1], [20, 16 * s]);
@@ -458,6 +480,7 @@ export const Hero = ({
               top: PAD,
               left: PAD,
               width: headlineW,
+              x: textX,
               y: headlineY,
               fontSize: textFont,
             }}
@@ -480,6 +503,7 @@ export const Hero = ({
               left: PAD,
               width: dockedW,
               fontSize: textFont,
+              x: textX,
               y: buttonsTopV,
             }}
           >
