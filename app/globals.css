@@ -25,51 +25,45 @@
 :root {
   color-scheme: dark;
 
-  /* -- DEPTH -----------------------------------------------------------------
-     Every raised surface gets its depth from these four variables, so the
-     whole effect is tuned (or reverted) here. One light source from above: a
-     bright hairline on the top edge, a soft sheen fading down from it, a dark
-     hairline on the bottom edge, then a tight contact shadow plus a wide soft
-     one. Box-shadow only (no gradients, blur or glow), so it layers over each
-     component's own inline background colour.
-     Deliberately SUBTLE: a stronger version read as generic/"vibecoded", and
-     a "hard slab edges + recessed wells" version was tried and rejected.
-     The original flat values are kept in the comments for reference. */
+  /* -- EDGES ------------------------------------------------------------------
+     Every raised surface gets its edge from these variables, so the whole
+     effect is tuned (or reverted) here. A flat 1px hairline ring, slightly
+     lighter than the surface, with a heavier top edge (2px: the ring's own
+     top row plus a second faint row under it). No drop shadows, no sheen.
+     Drawn as inset box-shadows rather than `border`, so nothing changes size.
+     Replaced the lit-from-above 3D depth, which read as vibecoded; its values
+     are kept in the comments below for comparison. */
 
   /* Cards: section cards, stat tiles, project + timeline cards, scroll cue.
-     flat: inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.25) */
+     3D: inset 0 1px 0 rgba(255,255,255,0.07), inset 0 24px 24px -24px rgba(255,255,255,0.035),
+         inset 0 -1px 0 rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.22), 0 10px 28px rgba(0,0,0,0.27) */
   --depth-card:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    inset 0 24px 24px -24px rgba(255, 255, 255, 0.035),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
-    0 1px 2px rgba(0, 0, 0, 0.22),
-    0 10px 28px rgba(0, 0, 0, 0.27);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 2px 0 rgba(255, 255, 255, 0.04);
 
-  /* The floating nav: same lighting, deeper drop (it sits above everything).
-     flat: inset 0 1px 0 rgba(255,255,255,0.05), 0 12px 32px rgba(0,0,0,0.45) */
+  /* The floating nav: same ring, plus one soft shadow so it still reads as
+     floating over the content scrolling under it.
+     3D: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 18px 18px -18px rgba(255,255,255,0.04),
+         inset 0 -1px 0 rgba(0,0,0,0.2), 0 1px 3px rgba(0,0,0,0.3), 0 14px 34px rgba(0,0,0,0.47) */
   --depth-dock:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 18px 18px -18px rgba(255, 255, 255, 0.04),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-    0 1px 3px rgba(0, 0, 0, 0.3),
-    0 14px 34px rgba(0, 0, 0, 0.47);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 2px 0 rgba(255, 255, 255, 0.04),
+    0 12px 32px rgba(0, 0, 0, 0.4);
 
-  /* The hero / rail card (dark at the top of home, pink when docked).
-     flat: 0 24px 60px rgba(0,0,0,0.35) */
+  /* The hero / rail card: the ring colour is `--hero-ring`, set on the card
+     from `dock` in Herov2 (card ring while dark, fades out as it dyes pink:
+     a white ring on pink reads as dirty).
+     3D: inset 0 1px 0 rgba(255,255,255,0.1), inset 0 40px 40px -40px rgba(255,255,255,0.05),
+         inset 0 -1px 0 rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.22), 0 24px 60px rgba(0,0,0,0.37) */
   --depth-hero:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 40px 40px -40px rgba(255, 255, 255, 0.05),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
-    0 1px 3px rgba(0, 0, 0, 0.22),
-    0 24px 60px rgba(0, 0, 0, 0.37);
+    inset 0 0 0 1px var(--hero-ring, transparent),
+    inset 0 2px 0 var(--hero-ring, transparent);
 
-  /* Pink buttons: a lit top edge and a shaded bottom edge read as "pressable".
-     flat: none */
-  --depth-cta:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.14),
-    0 1px 2px rgba(0, 0, 0, 0.25),
-    0 4px 12px rgba(0, 0, 0, 0.16);
+  /* Pink buttons: no ring, just a 1px darker bottom edge so they still read
+     as pressable.
+     3D: inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.14),
+         0 1px 2px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.16) */
+  --depth-cta: inset 0 -1px 0 rgba(0, 0, 0, 0.18);
 }
 
 .depth-card {
@@ -87,13 +81,13 @@
 }
 
 /* Small raised controls: dark buttons and chips you can press, and the sliding
-   "active" highlight in the nav and filter bars. Same lighting, scaled down. */
+   "active" highlight in the nav and filter bars. Same ring, 1px top only.
+   3D: inset 0 1px 0 rgba(255,255,255,0.06), inset 0 -1px 0 rgba(0,0,0,0.18),
+       0 1px 2px rgba(0,0,0,0.22), 0 3px 8px rgba(0,0,0,0.12) */
 .depth-chip {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
-    0 1px 2px rgba(0, 0, 0, 0.22),
-    0 3px 8px rgba(0, 0, 0, 0.12);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 html {

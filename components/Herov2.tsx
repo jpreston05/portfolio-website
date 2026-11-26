@@ -273,6 +273,9 @@ export const Hero = ({
   // as CSS vars so no color needs prop-drilling into Headline/PortraitArt.
   const cardBg = useTransform(dock, [0.2, 0.8], [c.surface, c.accent]);
   const squareBg = useTransform(dock, [0.2, 0.8], [c.accent, c.bg]);
+  // Hairline ring (see --depth-hero): matches the other cards while dark, gone
+  // by the time the dye is half in.
+  const ringColor = useTransform(dock, [0.2, 0.5], ["rgba(255,255,255,0.07)", "rgba(255,255,255,0)"]);
   const inkColor = useTransform(dock, [0.42, 0.58], [c.text, c.heroInk]);
   const subColor = useTransform(dock, [0.42, 0.58], [c.muted, c.heroMuted]);
   const dotColor = useTransform(dock, [0.42, 0.58], [c.accent, c.heroMuted]);
@@ -403,6 +406,7 @@ export const Hero = ({
               width: cardWidth,
               height: cardHeight,
               "--hero-card": cardBg,
+              "--hero-ring": ringColor,
               "--hero-square": squareBg,
               "--hero-ink": inkColor,
               "--hero-sub": subColor,
