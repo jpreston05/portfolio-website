@@ -17,7 +17,6 @@ import {
   HERO_PAD,
   PORTRAIT_BIG,
   PORTRAIT_SMALL,
-  RAIL_W,
   useHeroMotion,
 } from "@/components/useHeroMotion";
 import { EASE_SNAPPY } from "@/lib/motion";
@@ -33,12 +32,17 @@ const NAME_EM_DOCKED = 4.2; // display-name size (em of the text wrapper) when d
 const NAME_EM_BIG_MAX = 5.2; // poster-size ceiling for the big state
 const BIG_BTN_W = 590; // horizontal room reserved for the big-state CTA row (BigActions ≈ 560px)
 // Headline block heights (px), measured with the 2-line status chip:
-const HEADLINE_DOCKED = 281; // whole docked headline at font 16
 const BIG_REST = 202; // everything except the two name lines, at font 20
 // Gap between the headline block and the action buttons: roomy in the big
 // hero (the stack read as cluttered at 16), tight in the docked rail.
 const BTN_GAP_BIG = 36;
 const BTN_GAP_DOCKED = 16;
+// Docked 2×2 buttons grow into spare rail height (tall viewports only):
+// BTN_GROW of the slack goes to the buttons (the rest stays as breathing room
+// above them), each row capped at MAX_ROW; rows ≥ BOXY_MIN_ROW stack icon/label.
+const BTN_GROW = 0.6;
+const MAX_ROW = 84;
+const BOXY_MIN_ROW = 64;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 // Static status chip under the blurb (edit here to update it).
@@ -51,7 +55,13 @@ type ActionProps = {
   download?: string; // set ⇒ downloads (with this filename) instead of opening a tab
 };
 
-const Action = ({ href, label, icon, download }: ActionProps) => (
+const Action = ({
+  href,
+  label,
+  icon,
+  download,
+  boxy = false,
+}: ActionProps & { boxy?: boolean }) => (
   <motion.a
     href={href}
     download={download}
@@ -59,10 +69,16 @@ const Action = ({ href, label, icon, download }: ActionProps) => (
     rel={download ? undefined : "noreferrer"}
     whileHover={{ y: -2 }}
     whileTap={{ scale: 0.97 }}
-    className="depth-chip group flex items-center justify-center gap-[0.5em] rounded-lg px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
+    className={`depth-chip group flex items-center justify-center rounded-lg px-[0.9em] font-medium transition-colors ${
+      boxy ? "h-full flex-col gap-[0.45em] text-[0.85em]" : "gap-[0.5em] py-[0.7em] text-[0.85em]"
+    }`}
     style={{ color: c.muted, background: c.bg }}
   >
-    <span className="text-[1.1em] transition-colors duration-200 group-hover:text-[#ECECEA]">
+    <span
+      className={`transition-colors duration-200 group-hover:text-[#ECECEA] ${
+        boxy ? "text-[1.45em]" : "text-[1.1em]"
+      }`}
+    >
       {icon}
     </span>
     <span className="transition-colors duration-200 group-hover:text-[#ECECEA]">
@@ -236,20 +252,30 @@ const BigActions = () => (
   </div>
 );
 
-/* Docked action buttons — a fixed 2×2 grid (also the static mobile card). */
-const DockedActions = () => (
-  <div className="grid grid-cols-2 gap-[0.6em]">
-    <Action href={CV.href} label="CV" icon={<FiDownload />} download={CV.file} />
-    <Action
-      href={TRANSCRIPT.href}
-      label="Transcript"
-      icon={<FiFileText />}
-      download={TRANSCRIPT.file}
-    />
-    <Action href={GITHUB} label="GitHub" icon={<FaGithub />} />
-    <Action href={LINKEDIN} label="LinkedIn" icon={<FaLinkedin />} />
-  </div>
-);
+/* Docked action buttons — a fixed 2×2 grid (also the static mobile card).
+   `rowH` (px) = each row's height when the docked card has spare height to
+   give them (tall viewports); tall enough rows go boxy (icon above label).
+   Omitted ⇒ the thin padding-sized buttons (mobile, short laptops). */
+const DockedActions = ({ rowH }: { rowH?: number }) => {
+  const boxy = rowH !== undefined && rowH >= BOXY_MIN_ROW;
+  return (
+    <div
+      className="grid grid-cols-2 gap-[0.6em]"
+      style={rowH ? { gridAutoRows: `${rowH}px` } : undefined}
+    >
+      <Action href={CV.href} label="CV" icon={<FiDownload />} download={CV.file} boxy={boxy} />
+      <Action
+        href={TRANSCRIPT.href}
+        label="Transcript"
+        icon={<FiFileText />}
+        download={TRANSCRIPT.file}
+        boxy={boxy}
+      />
+      <Action href={GITHUB} label="GitHub" icon={<FaGithub />} boxy={boxy} />
+      <Action href={LINKEDIN} label="LinkedIn" icon={<FaLinkedin />} boxy={boxy} />
+    </div>
+  );
+};
 
 /* `home` = the collapsing hero (scroll-driven). Elsewhere the same card sits
    pinned in its docked state as the persistent left rail. */
@@ -262,7 +288,7 @@ export const Hero = ({
   home?: boolean;
   held?: boolean; // on home but pinned docked (arriving from another route)
 }) => {
-  const { enabled, dock, dockedHc, bigHc, cardWidth, cardX, bigCardW } =
+  const { enabled, dock, dockedHc, scales, bigHc, cardWidth, cardX, bigCardW } =
     useHeroMotion(home && !held);
 
   // Dye-on-dock: at the top the card is DARK with the pink held in the portrait
@@ -302,16 +328,13 @@ export const Hero = ({
   const bigBtnW = BIG_BTN_W * sb; // the CTA row is em-sized, so it shrinks too
   const hcAt = (d: number) => lerp(bigHc, dockedHc, d);
 
-  // Short-viewport guard: the docked stack (portrait + headline + buttons, all
-  // of which scale with `s`) must fit dockedHc — on ~768-800px-tall laptops it
-  // doesn't at full size and the buttons clipped the status chip. Scale the
-  // docked portrait + type down just enough to fit; ≥ ~900px viewports get
-  // s = 1 and are pixel-identical. (312.5/HEADLINE_DOCKED/90 are the portrait
-  // block, docked headline and button block heights at s = 1; 12/16 the gaps.)
-  const DOCKED_STACK = PORTRAIT_SMALL * 1.25 + HEADLINE_DOCKED + 90;
-  const DOCKED_GAPS = 12 + 16 + 8; // portrait→headline, headline→buttons, slack
-  const s = Math.min(1, Math.max(0.72, (dockedHc - DOCKED_GAPS) / DOCKED_STACK));
-  const pwSmall = PORTRAIT_SMALL * s;
+  // Short-viewport guard (dockedScales in useHeroMotion): on ≲910px-tall
+  // viewports the docked stack shrinks to fit the rail: type + portrait
+  // together (`s`, which also narrows the rail), then the portrait alone
+  // (`sp`). Taller viewports get 1 and are pixel-identical.
+  const s = scales.type;
+  const sp = scales.portrait;
+  const pwSmall = PORTRAIT_SMALL * sp;
 
   // Poster name: as large as the big card's height allows. Estimated big-state
   // block height ≈ sb·(BIG_REST + 54 + 36·nameEm) + BTN_GAP_BIG (eyebrow + 2 name
@@ -362,7 +385,7 @@ export const Hero = ({
 
   // Headline glides between FIXED endpoints (monotonic — no bob).
   const dockedY = pwSmall * 1.25 + 12; // headline top sits just below docked portrait
-  const dockedW = RAIL_W - 2 * PAD; // docked text/button column width (344)
+  const dockedW = scales.railW - 2 * PAD; // docked text/button column (344 at s = 1)
 
   const cardHeight = useTransform(dock, (d) => hcAt(d) + 2 * PAD);
   const portraitW = useTransform(dock, pwAt);
@@ -403,7 +426,13 @@ export const Hero = ({
 
   // Buttons GLIDE down to the card floor, but never above the headline's bottom
   // (so they can't collide), using headlineHAt above.
-  const BTN_BLOCK = 90 * s; // ~2 rows of buttons at the docked font size
+  // Thin rows are ~40px at s = 1 (90px block incl. the 0.6em grid gap). Any
+  // height the docked stack leaves over (only when s = 1, i.e. ≳910px-tall
+  // viewports) partly goes to the rows, so big monitors get boxy tiles.
+  const gridGap = 0.6 * 16 * s;
+  const thinRow = (90 * s - gridGap) / 2;
+  const rowH = Math.min(MAX_ROW, thinRow + (scales.slack * BTN_GROW) / 2);
+  const BTN_BLOCK = 2 * rowH + gridGap;
   const buttonsTopV = useTransform(dock, (d) => {
     const belowHeadline =
       headlineYAt(d) + headlineHAt(d) + lerp(BTN_GAP_BIG, BTN_GAP_DOCKED, d);
@@ -542,7 +571,7 @@ export const Hero = ({
                 style={{ opacity: dockedActionsOpacity }}
                 inert={!actionsDocked}
               >
-                <DockedActions />
+                <DockedActions rowH={rowH} />
               </motion.div>
             </motion.div>
           </motion.div>
