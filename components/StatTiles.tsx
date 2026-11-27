@@ -43,7 +43,7 @@ export const StatTiles = () => {
         >
           <Label className="mb-2">{t.label}</Label>
           <p
-            className={`flex min-h-9 items-baseline gap-1.5 font-bold leading-none tracking-tight ${
+            className={`flex min-h-9 items-baseline gap-1.5 font-display font-bold leading-none tracking-tight ${
               t.big ? "text-3xl" : "text-lg"
             }`}
             style={{ color: c.text }}

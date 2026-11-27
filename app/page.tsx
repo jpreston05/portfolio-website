@@ -75,7 +75,7 @@ export default function Home() {
         {/* Styled like the subpage titles, but a <p>: on this page the h1 is
             the name on the hero card. */}
         <p
-          className="-mb-1 text-3xl font-bold tracking-tight sm:text-4xl"
+          className="font-display -mb-1 text-3xl font-bold tracking-tight sm:text-4xl"
           style={{ color: c.text }}
         >
           Home<span style={{ color: c.accent }}>.</span>

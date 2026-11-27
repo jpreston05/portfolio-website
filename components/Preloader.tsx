@@ -171,7 +171,7 @@ export const Preloader = ({
           <motion.div
             layout
             transition={layoutT}
-            className={`font-bold leading-[0.9] tracking-tight ${
+            className={`font-display font-bold leading-[0.9] tracking-tight ${
               combined ? "flex items-baseline" : "flex flex-col items-start"
             }`}
             style={{ fontSize: FONT, color: INK }}

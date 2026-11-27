@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Cal_Sans, Hanken_Grotesk } from "next/font/google";
 import { Background } from "@/components/Background";
 import { SiteChrome } from "@/components/SiteChrome";
 import "./globals.css";
 
-const inter = Inter({
+// Body face for everything that isn't display type.
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-body",
+});
+
+// Display face for names, titles and big numbers (one weight; see .font-display).
+const calSans = Cal_Sans({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-cal",
 });
 
 // The OG/Twitter image is the static app/opengraph-image.png (baked once with
@@ -37,7 +45,7 @@ export default function RootLayout({
     // on <html> before React hydrates — an expected, deliberate mismatch.
     <html
       lang="en"
-      className={inter.variable}
+      className={`${hanken.variable} ${calSans.variable}`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

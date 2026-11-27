@@ -20,7 +20,7 @@ export const ExperienceCard = () => {
       <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] xl:gap-10">
         <div>
           <Label className="mb-3">Experience</Label>
-          <h2 className="text-2xl font-bold tracking-tight" style={{ color: c.text }}>
+          <h2 className="font-display text-2xl font-bold tracking-tight" style={{ color: c.text }}>
             {title}
           </h2>
           <p className="mt-1 text-sm" style={{ color: c.muted }}>

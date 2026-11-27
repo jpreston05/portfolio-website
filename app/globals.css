@@ -15,8 +15,9 @@
   --color-hero-ink: #10120f;
   --color-hero-muted: #2a1013;
 
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
+  --font-sans: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
+  --font-display: var(--font-cal), var(--font-body), sans-serif;
   /* Strong ease-out for UI interactions — more punch than the builtin. Exposed
      as the `ease-snappy` utility; the crisp motion language across the site. */
   --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
@@ -105,6 +106,11 @@ body {
   line-height: 1.6;
   background-color: var(--color-bg);
   color: var(--color-ink);
+  /* Hanken Grotesk's x-height is 0.493em vs Inter's 0.546em, so at the same
+     size it read ~10% smaller. Render it at Inter's x-height instead of
+     bumping every size (computed font-size, and so all em/line metrics, is
+     unchanged). .font-display opts out. */
+  font-size-adjust: 0.546;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -228,4 +234,14 @@ html[data-intro-seen] [data-page-reveal] {
 }
 .type-caret {
   animation: caret-blink 0.9s steps(1, end) infinite;
+}
+
+/* Display face (Cal Sans) on names, titles and stat numbers. It ships in ONE
+   weight that already reads bold, so this unlayered rule overrides the
+   font-bold / tracking-tight utilities beside it (no faux-bold, no cramming). */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em; /* Cal Sans is already tightly spaced */
+  font-size-adjust: none; /* sized as authored, not to the body's x-height */
 }

@@ -16,7 +16,7 @@ export default function ProjectsPage() {
     >
       <header className="mb-8">
         <h1
-          className="text-3xl font-bold tracking-tight sm:text-4xl"
+          className="font-display text-3xl font-bold tracking-tight sm:text-4xl"
           style={{ color: c.text }}
         >
           Projects<span style={{ color: c.accent }}>.</span>

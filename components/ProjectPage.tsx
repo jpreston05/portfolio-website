@@ -125,7 +125,7 @@ export const ProjectPage = ({ slug }: { slug: string }) => {
       </MotionLink>
 
       <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: c.text }}>
+        <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: c.text }}>
           {title}
           <span style={{ color: c.accent }}>.</span>
         </h1>

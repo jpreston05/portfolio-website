@@ -139,7 +139,7 @@ const Headline = ({ home }: { home: boolean }) => {
       Hello, I&apos;m
     </motion.p>
     <Name
-      className="font-bold leading-[0.9] tracking-tight"
+      className="font-display font-bold leading-[0.9] tracking-tight"
       style={{
         color: "var(--hero-ink)",
         fontSize: "calc(var(--hero-name, 4.2) * 1em)",

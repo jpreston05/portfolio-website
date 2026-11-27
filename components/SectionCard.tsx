@@ -32,7 +32,7 @@ export const SectionCard = ({
   >
     {title && (
       <header className="mb-5">
-        <h2 className="text-2xl font-bold tracking-tight" style={{ color: c.text }}>
+        <h2 className="font-display text-2xl font-bold tracking-tight" style={{ color: c.text }}>
           {title}
         </h2>
       </header>
