@@ -17,7 +17,6 @@ import {
   HERO_PAD,
   PORTRAIT_BIG,
   PORTRAIT_SMALL,
-  RAIL_W,
   useHeroMotion,
 } from "@/components/useHeroMotion";
 import { EASE_SNAPPY } from "@/lib/motion";
@@ -33,7 +32,6 @@ const NAME_EM_DOCKED = 4.2; // display-name size (em of the text wrapper) when d
 const NAME_EM_BIG_MAX = 5.2; // poster-size ceiling for the big state
 const BIG_BTN_W = 590; // horizontal room reserved for the big-state CTA row (BigActions ≈ 560px)
 // Headline block heights (px), measured with the 2-line status chip:
-const HEADLINE_DOCKED = 281; // whole docked headline at font 16
 const BIG_REST = 202; // everything except the two name lines, at font 20
 // Gap between the headline block and the action buttons: roomy in the big
 // hero (the stack read as cluttered at 16), tight in the docked rail.
@@ -290,7 +288,7 @@ export const Hero = ({
   home?: boolean;
   held?: boolean; // on home but pinned docked (arriving from another route)
 }) => {
-  const { enabled, dock, dockedHc, bigHc, cardWidth, cardX, bigCardW } =
+  const { enabled, dock, dockedHc, scales, bigHc, cardWidth, cardX, bigCardW } =
     useHeroMotion(home && !held);
 
   // Dye-on-dock: at the top the card is DARK with the pink held in the portrait
@@ -330,16 +328,13 @@ export const Hero = ({
   const bigBtnW = BIG_BTN_W * sb; // the CTA row is em-sized, so it shrinks too
   const hcAt = (d: number) => lerp(bigHc, dockedHc, d);
 
-  // Short-viewport guard: the docked stack (portrait + headline + buttons, all
-  // of which scale with `s`) must fit dockedHc — on ~768-800px-tall laptops it
-  // doesn't at full size and the buttons clipped the status chip. Scale the
-  // docked portrait + type down just enough to fit; ≥ ~900px viewports get
-  // s = 1 and are pixel-identical. (312.5/HEADLINE_DOCKED/90 are the portrait
-  // block, docked headline and button block heights at s = 1; 12/16 the gaps.)
-  const DOCKED_STACK = PORTRAIT_SMALL * 1.25 + HEADLINE_DOCKED + 90;
-  const DOCKED_GAPS = 12 + 16 + 8; // portrait→headline, headline→buttons, slack
-  const s = Math.min(1, Math.max(0.72, (dockedHc - DOCKED_GAPS) / DOCKED_STACK));
-  const pwSmall = PORTRAIT_SMALL * s;
+  // Short-viewport guard (dockedScales in useHeroMotion): on ≲910px-tall
+  // viewports the docked stack shrinks to fit the rail: type + portrait
+  // together (`s`, which also narrows the rail), then the portrait alone
+  // (`sp`). Taller viewports get 1 and are pixel-identical.
+  const s = scales.type;
+  const sp = scales.portrait;
+  const pwSmall = PORTRAIT_SMALL * sp;
 
   // Poster name: as large as the big card's height allows. Estimated big-state
   // block height ≈ sb·(BIG_REST + 54 + 36·nameEm) + BTN_GAP_BIG (eyebrow + 2 name
@@ -390,7 +385,7 @@ export const Hero = ({
 
   // Headline glides between FIXED endpoints (monotonic — no bob).
   const dockedY = pwSmall * 1.25 + 12; // headline top sits just below docked portrait
-  const dockedW = RAIL_W - 2 * PAD; // docked text/button column width (344)
+  const dockedW = scales.railW - 2 * PAD; // docked text/button column (344 at s = 1)
 
   const cardHeight = useTransform(dock, (d) => hcAt(d) + 2 * PAD);
   const portraitW = useTransform(dock, pwAt);
@@ -436,8 +431,7 @@ export const Hero = ({
   // viewports) partly goes to the rows, so big monitors get boxy tiles.
   const gridGap = 0.6 * 16 * s;
   const thinRow = (90 * s - gridGap) / 2;
-  const dockedSlack = Math.max(0, dockedHc - DOCKED_GAPS - s * DOCKED_STACK);
-  const rowH = Math.min(MAX_ROW, thinRow + (dockedSlack * BTN_GROW) / 2);
+  const rowH = Math.min(MAX_ROW, thinRow + (scales.slack * BTN_GROW) / 2);
   const BTN_BLOCK = 2 * rowH + gridGap;
   const buttonsTopV = useTransform(dock, (d) => {
     const belowHeadline =

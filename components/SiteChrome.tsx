@@ -6,6 +6,7 @@ import {
   useContext,
   useState,
   useSyncExternalStore,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
@@ -14,6 +15,7 @@ import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Herov2";
 import { Navbar } from "@/components/Navbar";
 import { Preloader } from "@/components/Preloader";
+import { railWidth, useViewport } from "@/components/useHeroMotion";
 
 /* Persistent site chrome. The Navbar renders ONCE here (inside layout.tsx) and
    survives route changes — so the active-pill layoutId FLIPs smoothly between
@@ -46,6 +48,10 @@ export const useIntro = (): IntroState => {
 const emptySubscribe = () => () => {};
 
 export const SiteChrome = ({ children }: { children: ReactNode }) => {
+  // The rail track follows the docked card's width, which narrows on short
+  // viewports along with its type (see dockedScales).
+  const viewport = useViewport();
+  const railW = railWidth(viewport.vh, viewport.enabled);
   const [revealContent, setRevealContent] = useState(false);
   const [navBrandShown, setNavBrandShown] = useState(false);
   const [intro, setIntro] = useState(true);
@@ -112,7 +118,10 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
         animate={{ opacity: revealed ? 1 : 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <main className="mx-auto grid w-full max-w-[1400px] flex-1 gap-6 px-4 pb-6 pt-26 sm:px-6 lg:pt-28 lg:grid-cols-[minmax(360px,400px)_1fr] lg:gap-8 lg:px-8">
+        <main
+          className="mx-auto grid w-full max-w-[1400px] flex-1 gap-6 px-4 pb-6 pt-26 sm:px-6 lg:pt-28 lg:grid-cols-[var(--rail-w)_1fr] lg:gap-8 lg:px-8"
+          style={{ "--rail-w": `${railW}px` } as CSSProperties}
+        >
           {/* LEFT RAIL — collapsing hero on home, pinned docked card elsewhere.
               Below lg it only shows on home (subpages go straight to content). */}
           <div
