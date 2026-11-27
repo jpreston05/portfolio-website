@@ -79,7 +79,7 @@ export const Navbar = ({ brandVisible = true }: { brandVisible?: boolean }) => {
           aria-label="Home, Jack Preston"
           whileHover={{ backgroundColor: "rgba(255,255,255,0.12)" }}
           transition={{ duration: 0.2, ease: EASE_SNAPPY }}
-          className="rounded-[10px] px-2 py-2 text-sm font-bold tracking-tight text-[#ECECEA] sm:px-4 sm:text-base"
+          className="rounded-[10px] px-2 py-2 font-display text-sm font-bold tracking-tight text-[#ECECEA] sm:px-4 sm:text-base"
           style={{ opacity: brandVisible ? 1 : 0 }}
         >
           <span data-brand>

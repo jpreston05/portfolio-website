@@ -42,7 +42,7 @@ export default function ContactPage() {
     >
       <header className="mb-8">
         <h1
-          className="text-3xl font-bold tracking-tight sm:text-4xl"
+          className="font-display text-3xl font-bold tracking-tight sm:text-4xl"
           style={{ color: c.text }}
         >
           Let&apos;s talk<span style={{ color: c.accent }}>.</span>

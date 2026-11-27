@@ -114,7 +114,7 @@ export const ProjectCard = ({ project, tone = "surface", heading: Heading = "h2"
           {event && ` · ${event}`}
           {current && ` · ${current}`}
         </Label>
-        <Heading className="text-xl font-bold tracking-tight" style={{ color: c.text }}>
+        <Heading className="font-display text-xl font-bold tracking-tight" style={{ color: c.text }}>
           {title}
         </Heading>
         <p className="mt-1.5 text-sm leading-relaxed" style={{ color: c.muted }}>
