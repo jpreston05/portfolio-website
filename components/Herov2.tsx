@@ -14,6 +14,7 @@ import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { c } from "@/components/palette";
 import {
   COLLAPSE_VH,
+  HERO_PAD,
   PORTRAIT_BIG,
   PORTRAIT_SMALL,
   RAIL_W,
@@ -26,9 +27,8 @@ import { EASE_SNAPPY } from "@/lib/motion";
    (0 = big 2-col hero, 1 = docked vertical card) — no container-query snapping.
    On mobile / reduced-motion it renders as a plain static vertical card. */
 
-const PAD = 28; // card inset (matches the absolute children's top/left/bottom)
-const NAVBAR = 136; // 8.5rem, matches the rail: lg top-28 (112px) + 24px bottom gap
-const BIG_CARD_RATIO = 0.68; // big card height as a fraction of the docked (full) height
+const PAD = HERO_PAD; // card inset (matches the absolute children's top/left/bottom)
+const BIG_MARGIN = 20; // min space above/below the big-state text block (see BIG_MIN_HC)
 const NAME_EM_DOCKED = 4.2; // display-name size (em of the text wrapper) when docked
 const NAME_EM_BIG_MAX = 5.2; // poster-size ceiling for the big state
 const BIG_BTN_W = 590; // horizontal room reserved for the big-state CTA row (BigActions ≈ 560px)
@@ -262,7 +262,8 @@ export const Hero = ({
   home?: boolean;
   held?: boolean; // on home but pinned docked (arriving from another route)
 }) => {
-  const { enabled, dock, vh, cardWidth, bigCardW } = useHeroMotion(home && !held);
+  const { enabled, dock, dockedHc, bigHc, cardWidth, cardX, bigCardW } =
+    useHeroMotion(home && !held);
 
   // Dye-on-dock: at the top the card is DARK with the pink held in the portrait
   // square + the full stop (the original accent discipline); scrolling dyes the
@@ -286,8 +287,19 @@ export const Hero = ({
 
   // Card content-box height GROWS from a shorter big card to the full rail
   // height as it docks; the geometry below reads hcAt(d), not a fixed Hc.
-  const dockedHc = (vh || 800) - NAVBAR - 2 * PAD; // full rail content height
-  const bigHc = dockedHc * BIG_CARD_RATIO; // shorter big card
+  // dockedHc = full rail content height; bigHc = the big card's (a ratio of the
+  // rail, floored so its stack fits; see useHeroMotion). The font-scaled part of
+  // that stack (headline at the docked name size + CTA row) at the 20px big
+  // font; BTN_GAP_BIG is fixed px. Keep BIG_MIN_HC in sync with it.
+  const BIG_STACK_EM = BIG_REST + 36 * NAME_EM_DOCKED + 54; // px at font 20
+  // Rail too short for even the floor (≲680px-tall viewports): shrink the
+  // big-state type until the stack fits. 1 everywhere else.
+  const sb = Math.min(
+    1,
+    Math.max(0.8, (bigHc - BTN_GAP_BIG - 2 * BIG_MARGIN) / BIG_STACK_EM)
+  );
+  const bigFont = 20 * sb;
+  const bigBtnW = BIG_BTN_W * sb; // the CTA row is em-sized, so it shrinks too
   const hcAt = (d: number) => lerp(bigHc, dockedHc, d);
 
   // Short-viewport guard: the docked stack (portrait + headline + buttons, all
@@ -302,12 +314,15 @@ export const Hero = ({
   const pwSmall = PORTRAIT_SMALL * s;
 
   // Poster name: as large as the big card's height allows. Estimated big-state
-  // block height at font 20 ≈ BIG_REST + 54 + BTN_GAP_BIG + 36·nameEm (eyebrow + 2 name lines
-  // + blurb + status chip, then gap + one button row); keep it inside bigHc
-  // with ~40px margin.
+  // block height ≈ sb·(BIG_REST + 54 + 36·nameEm) + BTN_GAP_BIG (eyebrow + 2 name
+  // lines + blurb + status chip, then gap + one button row); keep it inside
+  // bigHc with BIG_MARGIN above and below.
   const nameEmBig = Math.min(
     NAME_EM_BIG_MAX,
-    Math.max(NAME_EM_DOCKED, (bigHc - BIG_REST - 94 - BTN_GAP_BIG) / 36)
+    Math.max(
+      NAME_EM_DOCKED,
+      ((bigHc - BTN_GAP_BIG - 2 * BIG_MARGIN) / sb - BIG_REST - 54) / 36
+    )
   );
   const nameEm = useTransform(dock, [0, 0.66], [nameEmBig, NAME_EM_DOCKED]);
   // Big portrait sized so (a) the CENTRED square + its hair overhang (~0.167·w
@@ -316,7 +331,7 @@ export const Hero = ({
   const pwBig = Math.min(
     PORTRAIT_BIG,
     (bigHc / 2 - 10) / 0.667,
-    bigCardW - 2 * PAD - BIG_BTN_W - 16
+    bigCardW - 2 * PAD - bigBtnW - 16
   );
 
   const phase = (d: number, a: number, b: number) =>
@@ -333,7 +348,7 @@ export const Hero = ({
   // faded on its own — fading it pushed the portrait right before the across
   // glide pulled it left (a visible back-and-forth). The across lerp to centre
   // absorbs it, so the portrait only ever moves one way.
-  const bigInset = Math.max(0, (bigCardW - 2 * PAD - BIG_BTN_W - pwBig) / 3);
+  const bigInset = Math.max(0, (bigCardW - 2 * PAD - bigBtnW - pwBig) / 3);
   const textX = useTransform(dock, (d) => bigInset * (1 - ease(phase(d, 0, 0.66))));
   // Portrait shrinks over the first ~0.72 (still overlaps the slide → diagonal),
   // small enough early that the text can drop fully below it before it centres.
@@ -364,7 +379,7 @@ export const Hero = ({
   // Headline height as the type scales: font 20→16·s (whole collapse) and the
   // name nameEmBig→docked (by 0.66). BIG_REST is the non-name part at font 20;
   // each name em adds 36px at font 20 (two lines at leading 0.9).
-  const fontAt = (d: number) => lerp(20, 16 * s, d);
+  const fontAt = (d: number) => lerp(bigFont, 16 * s, d);
   const nameEmAt = (d: number) => lerp(nameEmBig, NAME_EM_DOCKED, phase(d, 0, 0.66));
   const headlineHAt = (d: number) => fontAt(d) * (BIG_REST / 20 + 1.8 * nameEmAt(d));
   // The whole text block (headline + gap + one big button row, 54px at font 20)
@@ -409,7 +424,7 @@ export const Hero = ({
   useMotionValueEvent(dock, "change", (d) => setActionsDocked(d > 0.55));
   // Whole text block scales as it docks (children are em-relative); the docked
   // size shrinks with `s` on short viewports so the stack fits the card.
-  const textFont = useTransform(dock, [0, 1], [20, 16 * s]);
+  const textFont = useTransform(dock, [0, 1], [bigFont, 16 * s]);
 
   return (
     <>
@@ -427,6 +442,7 @@ export const Hero = ({
           ? {
               width: cardWidth,
               height: cardHeight,
+              x: cardX,
               "--hero-card": cardBg,
               "--hero-ring": ringColor,
               "--hero-square": squareBg,

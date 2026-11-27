@@ -16,6 +16,18 @@ export const RAIL_W = 400; // docked card width, matches the grid track max
 export const COLLAPSE_VH = 0.5;
 export const PORTRAIT_BIG = 560; // portrait width (px) at the big hero state
 export const PORTRAIT_SMALL = 250; // portrait width (px) when docked
+// Big card geometry. Height is a fraction of the docked rail height, floored at
+// what its own stack needs: BIG_MIN_HC = Herov2's BIG_STACK_EM (407, headline
+// at the docked name size + CTA row at font 20) + BTN_GAP_BIG (36) + 2 ·
+// BIG_MARGIN (40). A fixed ratio alone clipped the CTA row on short laptops.
+// Width fills the container but never exceeds BIG_MAX_ASPECT × the card's
+// height, so a short window gets a proportionally narrower, centred card
+// instead of a wide strip (tall screens are unaffected).
+export const BIG_CARD_RATIO = 0.68;
+export const BIG_MIN_HC = 483;
+export const BIG_MAX_ASPECT = 2.2;
+export const HERO_PAD = 28; // card inset
+const NAVBAR = 136; // 8.5rem: the rail's lg top-28 (112px) + 24px bottom gap
 
 // Horizontal padding outside the max-w container (lg:px-8) — used to size EXTRA.
 const CONTAINER_PAD = 64; // 2 * 2rem
@@ -53,19 +65,39 @@ export function useHeroMotion(collapsing = true) {
     collapsing ? Math.max(0, Math.min(1, y / intro)) : 1
   );
 
-  // The card's overflow beyond its docked width. EXTRA appears in both cardWidth
-  // and contentX so contentLeft - cardRight stays exactly the grid gap. Numeric
-  // (px) so the hero can do position math off cardWidth without calc-string nesting.
-  const extra = Math.max(0, Math.min(iw || 1280, 1400) - RAIL_W - CONTAINER_PAD);
-  const cardWidth = useTransform(dock, [0, 1], [RAIL_W + extra, RAIL_W]);
-  const contentX = useTransform(dock, [0, 1], [extra, 0]);
-  // Numeric big-state card width — the hero sizes its big portrait off this so
-  // the portrait and the one-row button cap never collide.
-  const bigCardW = RAIL_W + extra;
+  // Card content-box heights (px): docked = the full rail, big = see above.
+  const dockedHc = (vh || 800) - NAVBAR - 2 * HERO_PAD;
+  const bigHc = Math.min(dockedHc, Math.max(dockedHc * BIG_CARD_RATIO, BIG_MIN_HC));
+
+  // The big card is centred in the container (cardX) when the aspect cap makes
+  // it narrower than the container. The right column's offset is the card's
+  // right edge beyond its docked width (cardX + cardWidth - RAIL_W): both sides
+  // are linear in dock, so contentLeft - cardRight stays exactly the grid gap.
+  // Numeric (px) so the hero can do position math off cardWidth without
+  // calc-string nesting.
+  const fullW = Math.max(RAIL_W, Math.min(iw || 1280, 1400) - CONTAINER_PAD);
+  const bigCardW = Math.max(
+    RAIL_W,
+    Math.min(fullW, (bigHc + 2 * HERO_PAD) * BIG_MAX_ASPECT)
+  );
+  const shift = (fullW - bigCardW) / 2;
+  const cardWidth = useTransform(dock, [0, 1], [bigCardW, RAIL_W]);
+  const cardX = useTransform(dock, [0, 1], [shift, 0]);
+  const contentX = useTransform(dock, [0, 1], [shift + bigCardW - RAIL_W, 0]);
 
   // Fade in over the collapse range. (Vertical hold is native sticky in page.tsx,
   // not a transform — transforms lag native scroll and visibly jitter.)
   const contentOpacity = useTransform(scrollY, [0, intro], [0, 1], { clamp: true });
 
-  return { enabled, dock, vh, cardWidth, bigCardW, contentX, contentOpacity };
+  return {
+    enabled,
+    dock,
+    dockedHc,
+    bigHc,
+    cardWidth,
+    cardX,
+    bigCardW,
+    contentX,
+    contentOpacity,
+  };
 }
