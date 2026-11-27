@@ -39,6 +39,12 @@ const BIG_REST = 202; // everything except the two name lines, at font 20
 // hero (the stack read as cluttered at 16), tight in the docked rail.
 const BTN_GAP_BIG = 36;
 const BTN_GAP_DOCKED = 16;
+// Docked 2×2 buttons grow into spare rail height (tall viewports only):
+// BTN_GROW of the slack goes to the buttons (the rest stays as breathing room
+// above them), each row capped at MAX_ROW; rows ≥ BOXY_MIN_ROW stack icon/label.
+const BTN_GROW = 0.6;
+const MAX_ROW = 84;
+const BOXY_MIN_ROW = 64;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 // Static status chip under the blurb (edit here to update it).
@@ -51,7 +57,13 @@ type ActionProps = {
   download?: string; // set ⇒ downloads (with this filename) instead of opening a tab
 };
 
-const Action = ({ href, label, icon, download }: ActionProps) => (
+const Action = ({
+  href,
+  label,
+  icon,
+  download,
+  boxy = false,
+}: ActionProps & { boxy?: boolean }) => (
   <motion.a
     href={href}
     download={download}
@@ -59,10 +71,16 @@ const Action = ({ href, label, icon, download }: ActionProps) => (
     rel={download ? undefined : "noreferrer"}
     whileHover={{ y: -2 }}
     whileTap={{ scale: 0.97 }}
-    className="depth-chip group flex items-center justify-center gap-[0.5em] rounded-lg px-[0.9em] py-[0.7em] text-[0.85em] font-medium transition-colors"
+    className={`depth-chip group flex items-center justify-center rounded-lg px-[0.9em] font-medium transition-colors ${
+      boxy ? "h-full flex-col gap-[0.45em] text-[0.85em]" : "gap-[0.5em] py-[0.7em] text-[0.85em]"
+    }`}
     style={{ color: c.muted, background: c.bg }}
   >
-    <span className="text-[1.1em] transition-colors duration-200 group-hover:text-[#ECECEA]">
+    <span
+      className={`transition-colors duration-200 group-hover:text-[#ECECEA] ${
+        boxy ? "text-[1.45em]" : "text-[1.1em]"
+      }`}
+    >
       {icon}
     </span>
     <span className="transition-colors duration-200 group-hover:text-[#ECECEA]">
@@ -236,20 +254,30 @@ const BigActions = () => (
   </div>
 );
 
-/* Docked action buttons — a fixed 2×2 grid (also the static mobile card). */
-const DockedActions = () => (
-  <div className="grid grid-cols-2 gap-[0.6em]">
-    <Action href={CV.href} label="CV" icon={<FiDownload />} download={CV.file} />
-    <Action
-      href={TRANSCRIPT.href}
-      label="Transcript"
-      icon={<FiFileText />}
-      download={TRANSCRIPT.file}
-    />
-    <Action href={GITHUB} label="GitHub" icon={<FaGithub />} />
-    <Action href={LINKEDIN} label="LinkedIn" icon={<FaLinkedin />} />
-  </div>
-);
+/* Docked action buttons — a fixed 2×2 grid (also the static mobile card).
+   `rowH` (px) = each row's height when the docked card has spare height to
+   give them (tall viewports); tall enough rows go boxy (icon above label).
+   Omitted ⇒ the thin padding-sized buttons (mobile, short laptops). */
+const DockedActions = ({ rowH }: { rowH?: number }) => {
+  const boxy = rowH !== undefined && rowH >= BOXY_MIN_ROW;
+  return (
+    <div
+      className="grid grid-cols-2 gap-[0.6em]"
+      style={rowH ? { gridAutoRows: `${rowH}px` } : undefined}
+    >
+      <Action href={CV.href} label="CV" icon={<FiDownload />} download={CV.file} boxy={boxy} />
+      <Action
+        href={TRANSCRIPT.href}
+        label="Transcript"
+        icon={<FiFileText />}
+        download={TRANSCRIPT.file}
+        boxy={boxy}
+      />
+      <Action href={GITHUB} label="GitHub" icon={<FaGithub />} boxy={boxy} />
+      <Action href={LINKEDIN} label="LinkedIn" icon={<FaLinkedin />} boxy={boxy} />
+    </div>
+  );
+};
 
 /* `home` = the collapsing hero (scroll-driven). Elsewhere the same card sits
    pinned in its docked state as the persistent left rail. */
@@ -403,7 +431,14 @@ export const Hero = ({
 
   // Buttons GLIDE down to the card floor, but never above the headline's bottom
   // (so they can't collide), using headlineHAt above.
-  const BTN_BLOCK = 90 * s; // ~2 rows of buttons at the docked font size
+  // Thin rows are ~40px at s = 1 (90px block incl. the 0.6em grid gap). Any
+  // height the docked stack leaves over (only when s = 1, i.e. ≳910px-tall
+  // viewports) partly goes to the rows, so big monitors get boxy tiles.
+  const gridGap = 0.6 * 16 * s;
+  const thinRow = (90 * s - gridGap) / 2;
+  const dockedSlack = Math.max(0, dockedHc - DOCKED_GAPS - s * DOCKED_STACK);
+  const rowH = Math.min(MAX_ROW, thinRow + (dockedSlack * BTN_GROW) / 2);
+  const BTN_BLOCK = 2 * rowH + gridGap;
   const buttonsTopV = useTransform(dock, (d) => {
     const belowHeadline =
       headlineYAt(d) + headlineHAt(d) + lerp(BTN_GAP_BIG, BTN_GAP_DOCKED, d);
@@ -542,7 +577,7 @@ export const Hero = ({
                 style={{ opacity: dockedActionsOpacity }}
                 inert={!actionsDocked}
               >
-                <DockedActions />
+                <DockedActions rowH={rowH} />
               </motion.div>
             </motion.div>
           </motion.div>
