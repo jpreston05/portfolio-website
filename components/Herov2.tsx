@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -601,7 +602,10 @@ export const Hero = ({
         the tab order + hit-testing entirely (visibility). Fixed bottom-centre.
         Three nested layers so the transforms never share an element: fixed
         centring (class) → bob (CSS keyframe) → hover/tap scale (framer). */}
-    {enabled && home && (
+    {/* Portalled to <body>: the rail has layout containment (SiteChrome),
+        which would otherwise make it the containing block for `fixed`.
+        `enabled` is false on the server, so this never renders during SSR. */}
+    {enabled && home && createPortal(
       <motion.div
         className="fixed bottom-8 left-1/2 z-20 -translate-x-1/2"
         style={{ opacity: cueOpacity, visibility: cueVisibility }}
@@ -631,7 +635,8 @@ export const Hero = ({
             </motion.button>
           </div>
         </motion.div>
-      </motion.div>
+      </motion.div>,
+      document.body
     )}
     </>
   );
