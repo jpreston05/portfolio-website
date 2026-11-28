@@ -101,9 +101,11 @@ const Action = ({
 const PortraitArt = ({
   base,
   scale,
+  moving = false,
 }: {
   base?: number;
   scale?: MotionValue<number>;
+  moving?: boolean; // own layer only while the collapse is moving
 }) => {
   const image = (
     <Image
@@ -124,7 +126,13 @@ const PortraitArt = ({
       {base && scale ? (
         <motion.div
           className="absolute left-0 top-0 z-10 aspect-[6/7]"
-          style={{ width: base, scale, originX: 0, originY: 0, willChange: "transform" }}
+          style={{
+            width: base,
+            scale,
+            originX: 0,
+            originY: 0,
+            willChange: moving ? "transform" : "auto",
+          }}
         >
           {image}
         </motion.div>
@@ -637,7 +645,7 @@ export const Hero = ({
               animate={revealed ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, ease: EASE_SNAPPY, delay: 0.5 }}
             >
-              <PortraitArt base={pwBase} scale={portraitScale} />
+              <PortraitArt base={pwBase} scale={portraitScale} moving={moving} />
             </motion.div>
           </motion.div>
 

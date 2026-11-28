@@ -124,19 +124,21 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
         >
           {/* LEFT RAIL — collapsing hero on home, pinned docked card elsewhere.
               Below lg it only shows on home (subpages go straight to content). */}
-          {/* While the morph runs, the rail is size + layout contained: the
-              card resizes and re-sets its type every scroll frame, and without
-              a relayout boundary some engines (Safari) re-run the whole grid
-              (every card in the right column) each frame, which jitters. Its
-              size comes from the grid track + its fixed height, so nothing
-              about the rail's own box depends on the card. */}
-          <div
-            className={`relative z-10 lg:sticky lg:top-28 lg:flex lg:h-[calc(100vh-8.5rem)] lg:items-center ${
-              isHome ? "" : "hidden"
-            }`}
-            style={viewport.enabled ? { contain: "size layout" } : undefined}
-          >
-            <Hero revealed={revealed} home={isHome} held={heroHeld} />
+          {/* On lg the rail is FIXED, not sticky. It never unpins (the footer
+              lives in the right column), so the two look identical, but
+              Safari stuttered the sticky card on every scroll, on every page.
+              The grid cell stays as the track's placeholder; the fixed child
+              has no `left`, so it sits at its static position in that cell,
+              and takes the track width from --rail-w. While the morph runs
+              it is also size + layout contained, so the card's per-frame
+              changes never re-lay-out the page. */}
+          <div className={isHome ? "" : "hidden lg:block"}>
+            <div
+              className="relative z-10 lg:fixed lg:top-28 lg:flex lg:h-[calc(100vh-8.5rem)] lg:w-[var(--rail-w)] lg:items-center"
+              style={viewport.enabled ? { contain: "size layout" } : undefined}
+            >
+              <Hero revealed={revealed} home={isHome} held={heroHeld} />
+            </div>
           </div>
           {/* The footer lives INSIDE the right column, so the rail stays pinned
               all the way to the end of the page (a full-width footer below the
