@@ -8,6 +8,7 @@ import {
   motion,
   useMotionValueEvent,
   useTransform,
+  type MotionValue,
   type Variants,
 } from "framer-motion";
 import { FiArrowDown, FiArrowRight, FiDownload, FiFileText } from "react-icons/fi";
@@ -90,23 +91,49 @@ const Action = ({
 
 /* Portrait art — a carbon SQUARE pinned to the bottom of the box, with the
    cutout sitting on it so the head/hair pokes out above the square on the pink
-   card. object-cover fills the frame (no invisible gap above the hair). */
-const PortraitArt = () => (
-  <>
-    <div
-      className="absolute inset-x-0 bottom-0 aspect-square rounded-xl"
-      style={{ background: "var(--hero-square)" }}
-    />
+   card. object-cover fills the frame (no invisible gap above the hair).
+   Morphing card: the photo is laid out ONCE at `base` px wide and shrunk with
+   a GPU transform (`scale`, from the top-left corner) on its own layer, so the
+   browser composites one bitmap instead of re-resampling the big PNG every
+   scroll frame (that resample jittered on Retina Macs). The frame and the
+   square still size normally (cheap flat rects) and the frame's rounded
+   overflow clips the scaled photo. */
+const PortraitArt = ({
+  base,
+  scale,
+}: {
+  base?: number;
+  scale?: MotionValue<number>;
+}) => {
+  const image = (
     <Image
       src="/portrait.png"
       alt="Portrait of Jack Preston"
       fill
       priority
       sizes="(min-width: 1024px) 560px, 280px"
-      className="z-10 object-cover object-bottom"
+      className="object-cover object-bottom"
     />
-  </>
-);
+  );
+  return (
+    <>
+      <div
+        className="absolute inset-x-0 bottom-0 aspect-square rounded-xl"
+        style={{ background: "var(--hero-square)" }}
+      />
+      {base && scale ? (
+        <motion.div
+          className="absolute left-0 top-0 z-10 aspect-[6/7]"
+          style={{ width: base, scale, originX: 0, originY: 0, willChange: "transform" }}
+        >
+          {image}
+        </motion.div>
+      ) : (
+        <div className="absolute inset-0 z-10">{image}</div>
+      )}
+    </>
+  );
+};
 
 /* Entrance choreography — runs once, gated on the Preloader's reveal
    (`revealed` prop). Items rise in sequence. Only orchestrated in the morphing
@@ -390,6 +417,9 @@ export const Hero = ({
 
   const cardHeight = useTransform(dock, (d) => hcAt(d) + 2 * PAD);
   const portraitW = useTransform(dock, pwAt);
+  // The photo's layout width; portraitScale shrinks it to portraitW visually.
+  const pwBase = Math.max(pwBig, pwSmall);
+  const portraitScale = useTransform(portraitW, (w) => w / pwBase);
   const portraitY = useTransform(dock, (d) => {
     // Centre the RED SQUARE (not the 6/7 frame): the square's centre sits 0.667·w
     // below the frame top (~0.167·w hair overhang + half the square).
@@ -515,7 +545,7 @@ export const Hero = ({
               animate={revealed ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, ease: EASE_SNAPPY, delay: 0.5 }}
             >
-              <PortraitArt />
+              <PortraitArt base={pwBase} scale={portraitScale} />
             </motion.div>
           </motion.div>
 
