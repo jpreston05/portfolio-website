@@ -66,10 +66,14 @@ export default function Home() {
      (no transform jitter) while it slides in from the right (x) + fades; the
      trailing spacer gives the sticky its scroll range, after which the content
      scrolls normally. */
+  /* `lg:motion-safe:opacity-0` matches the server HTML to what the collapse
+     shows at the top (content hidden): without it a refresh painted the bare
+     "Home." title (the cards fade in on their own) until hydration hid it.
+     The inline contentOpacity overrides it once the morph is running. */
   return (
     <div className="flex flex-col">
       <motion.div
-        className="flex flex-col gap-6 lg:sticky lg:top-28 lg:gap-8"
+        className="flex flex-col gap-6 lg:sticky lg:top-28 lg:gap-8 lg:motion-safe:opacity-0"
         style={enabled ? { opacity: contentOpacity, x: contentX } : undefined}
       >
         {/* Styled like the subpage titles, but a <p>: on this page the h1 is

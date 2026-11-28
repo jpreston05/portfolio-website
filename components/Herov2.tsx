@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
@@ -152,13 +152,25 @@ const entranceItem: Variants = {
   },
 };
 
+type HeadlineParts = {
+  eyebrow: RefObject<HTMLDivElement | null>;
+  name: RefObject<HTMLDivElement | null>;
+  rest: RefObject<HTMLDivElement | null>;
+};
+
 /* Headline (no buttons) — em-relative so it scales with the wrapper font-size.
-   The name reads its size from --hero-name (poster-big → docked). */
-const Headline = ({ home }: { home: boolean }) => {
+   The name reads its size from --hero-name. On the morphing card it is laid
+   out ONCE at its docked size and the three parts (eyebrow, name, blurb +
+   chip) are scaled up with transforms toward the big state (see placeText in
+   Hero): resizing the type every scroll frame re-laid-out and repainted the
+   text, which jittered in Safari. Plain divs, so the entrance stagger still
+   sees the motion items as its variant children. */
+const Headline = ({ home, parts }: { home: boolean; parts?: HeadlineParts }) => {
   // The name is the page h1 only on the home page; subpages carry their own.
   const Name = home ? "h1" : "p";
   return (
   <>
+    <div ref={parts?.eyebrow} className="origin-top-left">
     <motion.p
       variants={entranceItem}
       className="mb-[0.4em] text-[0.8em] font-medium"
@@ -166,6 +178,8 @@ const Headline = ({ home }: { home: boolean }) => {
     >
       Hello, I&apos;m
     </motion.p>
+    </div>
+    <div ref={parts?.name} className="origin-top-left">
     <Name
       className="font-display font-bold leading-[0.9] tracking-tight"
       style={{
@@ -180,6 +194,8 @@ const Headline = ({ home }: { home: boolean }) => {
         Preston<span style={{ color: "var(--hero-dot)" }}>.</span>
       </motion.span>
     </Name>
+    </div>
+    <div ref={parts?.rest} className="origin-top-left">
     <motion.p
       variants={entranceItem}
       className="mt-[0.8em] text-[0.95em] leading-relaxed"
@@ -189,7 +205,7 @@ const Headline = ({ home }: { home: boolean }) => {
     </motion.p>
     {/* Status chip — carbon on either card state (dark surface or pink), so
         its colours are fixed rather than dye vars. Always wraps to 2 lines:
-        the block width scales with the font, like the blurb above. */}
+        the whole block is scaled, never re-laid-out, so it can't re-wrap. */}
     <motion.p
       variants={entranceItem}
       className="depth-chip mt-[1.6em] flex items-start gap-[0.6em] rounded-lg px-[0.9em] py-[0.7em] text-[0.8em] font-medium leading-[1.45]"
@@ -202,6 +218,7 @@ const Headline = ({ home }: { home: boolean }) => {
       />
       {STATUS}
     </motion.p>
+    </div>
   </>
   );
 };
@@ -375,7 +392,6 @@ export const Hero = ({
       ((bigHc - BTN_GAP_BIG - 2 * BIG_MARGIN) / sb - BIG_REST - 54) / 36
     )
   );
-  const nameEm = useTransform(dock, [0, 0.66], [nameEmBig, NAME_EM_DOCKED]);
   // Big portrait sized so (a) the CENTRED square + its hair overhang (~0.167·w
   // above, from the 6/7 frame) still clears the top of the big card, and (b) it
   // clears the one-row button cap horizontally (16px gap) — no chip overlap.
@@ -448,12 +464,60 @@ export const Hero = ({
   const headlineYAt = (d: number) =>
     lerp(centredTopAt(d), dockedY, ease(phase(d, 0.25, 0.66)));
   const headlineY = useTransform(dock, headlineYAt);
-  // Width scales WITH the font (20→16) so the blurb keeps the exact same 2-line
-  // wrap at every size — final composition from the start, never re-wraps.
-  // (The name is whitespace-nowrap, so the column width doesn't affect it.)
-  const headlineW = useTransform([dock, cardWidth], ([d, w]: number[]) =>
-    Math.min(w - 2 * PAD, lerp(dockedW * 1.25, dockedW, d))
-  );
+
+  // Text scaling is all transforms (no per-frame layout): the headline and the
+  // buttons are laid out at the docked font (DOCKED_FONT, docked column width)
+  // and scaled up by kfAt(d) toward the big state; the name additionally by
+  // its own em ratio (knAt). Same sizes as before, and the wrap never changes.
+  const DOCKED_FONT = 16 * s;
+  const kfAt = (d: number) => fontAt(d) / DOCKED_FONT;
+  const knAt = (d: number) => (fontAt(d) * nameEmAt(d)) / (DOCKED_FONT * NAME_EM_DOCKED);
+  const eyebrowRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLDivElement>(null);
+  const restRef = useRef<HTMLDivElement>(null);
+  const partH = useRef({ eyebrow: 0, name: 0 }); // natural (docked) heights
+  // Each part scales from its own top-left; the parts below are pushed down by
+  // how much the parts above grew (heights are measured, untransformed).
+  const placeText = (d: number) => {
+    const e = eyebrowRef.current;
+    const n = nameRef.current;
+    const r = restRef.current;
+    if (!e || !n || !r) return;
+    const kf = kfAt(d);
+    const kn = knAt(d);
+    const dy1 = partH.current.eyebrow * (kf - 1);
+    const dy2 = dy1 + partH.current.name * (kn - 1);
+    e.style.transform = `scale(${kf})`;
+    n.style.transform = `translateY(${dy1}px) scale(${kn})`;
+    r.style.transform = `translateY(${dy2}px) scale(${kf})`;
+    // Own layers only while moving, so the resting states are re-rastered
+    // crisp (a promoted layer can stay a scaled bitmap).
+    const wc = d > 0 && d < 1 ? "transform" : "auto";
+    e.style.willChange = wc;
+    n.style.willChange = wc;
+    r.style.willChange = wc;
+  };
+  useMotionValueEvent(dock, "change", placeText);
+  // Measure after every render (geometry only changes on resize) and again
+  // once the web fonts are in, then place for the current scroll.
+  useLayoutEffect(() => {
+    if (!enabled) return;
+    const measure = () => {
+      partH.current = {
+        eyebrow: eyebrowRef.current?.offsetHeight ?? 0,
+        name: nameRef.current?.offsetHeight ?? 0,
+      };
+      placeText(dock.get());
+    };
+    measure();
+    let live = true;
+    document.fonts?.ready.then(() => {
+      if (live) measure();
+    });
+    return () => {
+      live = false;
+    };
+  });
 
   // Buttons GLIDE down to the card floor, but never above the headline's bottom
   // (so they can't collide), using headlineHAt above.
@@ -467,7 +531,8 @@ export const Hero = ({
   const buttonsTopV = useTransform(dock, (d) => {
     const belowHeadline =
       headlineYAt(d) + headlineHAt(d) + lerp(BTN_GAP_BIG, BTN_GAP_DOCKED, d);
-    const floorTop = hcAt(d) - BTN_BLOCK; // floor grows with the card
+    // Floor grows with the card; the block is scaled by kf (see btnScale).
+    const floorTop = hcAt(d) - BTN_BLOCK * kfAt(d);
     // Math.max ENFORCES the never-above-the-headline rule — on short viewports
     // the mid-collapse floor sits higher than the still-tall headline block and
     // the un-clamped lerp used to pull the buttons up through the text.
@@ -482,9 +547,10 @@ export const Hero = ({
   const dockedActionsOpacity = useTransform(dock, [0.62, 0.82], [0, 1]);
   const [actionsDocked, setActionsDocked] = useState(() => dock.get() > 0.55);
   useMotionValueEvent(dock, "change", (d) => setActionsDocked(d > 0.55));
-  // Whole text block scales as it docks (children are em-relative); the docked
-  // size shrinks with `s` on short viewports so the stack fits the card.
-  const textFont = useTransform(dock, [0, 1], [bigFont, 16 * s]);
+  // The button block scales like the headline (laid out at DOCKED_FONT).
+  const btnScale = useTransform(dock, kfAt);
+  const [moving, setMoving] = useState(false);
+  useMotionValueEvent(dock, "change", (d) => setMoving(d > 0 && d < 1));
 
   return (
     <>
@@ -510,7 +576,7 @@ export const Hero = ({
               "--hero-sub": subColor,
               "--hero-dot": dotColor,
               "--hero-focus": focusColor,
-              "--hero-name": nameEm,
+              "--hero-name": NAME_EM_DOCKED,
             }
           : {
               // Static variant (mobile / reduced-motion): the docked look.
@@ -555,10 +621,10 @@ export const Hero = ({
             style={{
               top: PAD,
               left: PAD,
-              width: headlineW,
+              width: dockedW,
               x: textX,
               y: headlineY,
-              fontSize: textFont,
+              fontSize: DOCKED_FONT,
             }}
           >
             <motion.div
@@ -567,7 +633,10 @@ export const Hero = ({
               initial="hidden"
               animate={revealed ? "show" : "hidden"}
             >
-              <Headline home={home} />
+              <Headline
+                home={home}
+                parts={{ eyebrow: eyebrowRef, name: nameRef, rest: restRef }}
+              />
             </motion.div>
           </motion.div>
 
@@ -578,9 +647,13 @@ export const Hero = ({
               top: PAD,
               left: PAD,
               width: dockedW,
-              fontSize: textFont,
+              fontSize: DOCKED_FONT,
               x: textX,
               y: buttonsTopV,
+              scale: btnScale,
+              originX: 0,
+              originY: 0,
+              willChange: moving ? "transform" : "auto",
             }}
           >
             <motion.div
