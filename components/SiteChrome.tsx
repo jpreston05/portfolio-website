@@ -124,10 +124,17 @@ export const SiteChrome = ({ children }: { children: ReactNode }) => {
         >
           {/* LEFT RAIL — collapsing hero on home, pinned docked card elsewhere.
               Below lg it only shows on home (subpages go straight to content). */}
+          {/* While the morph runs, the rail is size + layout contained: the
+              card resizes and re-sets its type every scroll frame, and without
+              a relayout boundary some engines (Safari) re-run the whole grid
+              (every card in the right column) each frame, which jitters. Its
+              size comes from the grid track + its fixed height, so nothing
+              about the rail's own box depends on the card. */}
           <div
             className={`relative z-10 lg:sticky lg:top-28 lg:flex lg:h-[calc(100vh-8.5rem)] lg:items-center ${
               isHome ? "" : "hidden"
             }`}
+            style={viewport.enabled ? { contain: "size layout" } : undefined}
           >
             <Hero revealed={revealed} home={isHome} held={heroHeld} />
           </div>
