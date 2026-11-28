@@ -432,6 +432,20 @@ export const Hero = ({
   const dockedW = scales.railW - 2 * PAD; // docked text/button column (344 at s = 1)
 
   const cardHeight = useTransform(dock, (d) => hcAt(d) + 2 * PAD);
+  // The card is never resized: its element stays at the largest box it ever
+  // fills (bigCardW wide, the full rail tall) and the visible card is a
+  // clip-path that shrinks/grows, plus a background layer (an empty leaf, so
+  // resizing it is trivial). Resizing the real card each scroll frame made
+  // Safari re-lay-out everything inside it, which jittered. The visible box is
+  // vertically centred in the rail (what flex centring used to do) by
+  // translating the contents down by cardTop.
+  const RADIUS = 16; // rounded-2xl
+  const cardTopAt = (d: number) => (dockedHc - hcAt(d)) / 2;
+  const cardTop = useTransform(dock, cardTopAt);
+  const cardClip = useTransform([dock, cardWidth], ([d, w]: number[]) => {
+    const t = cardTopAt(d);
+    return `inset(${t}px ${bigCardW - w}px ${t}px 0px round ${RADIUS}px)`;
+  });
   const portraitW = useTransform(dock, pwAt);
   // The photo's layout width; portraitScale shrinks it to portraitW visually.
   const pwBase = Math.max(pwBig, pwSmall);
@@ -556,18 +570,16 @@ export const Hero = ({
     <>
     <motion.div
       data-on-accent
+      // The box is wider/taller than the visible card: it must not catch clicks
+      // meant for the right column. Only the clipped card takes pointer events.
       className={
-        enabled
-          ? "relative shrink-0 overflow-hidden rounded-2xl"
-          : "w-full max-w-md rounded-2xl p-6"
+        enabled ? "pointer-events-none relative shrink-0" : "w-full max-w-md rounded-2xl p-6"
       }
       style={{
-        background: "var(--hero-card)",
-        boxShadow: "var(--depth-hero)",
         ...(enabled
           ? {
-              width: cardWidth,
-              height: cardHeight,
+              width: bigCardW,
+              height: dockedHc + 2 * PAD,
               x: cardX,
               "--hero-card": cardBg,
               "--hero-ring": ringColor,
@@ -580,6 +592,8 @@ export const Hero = ({
             }
           : {
               // Static variant (mobile / reduced-motion): the docked look.
+              background: "var(--hero-card)",
+              boxShadow: "var(--depth-hero)",
               "--hero-card": c.accent,
               "--hero-square": c.bg,
               "--hero-ink": c.heroInk,
@@ -594,7 +608,19 @@ export const Hero = ({
       transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
     >
       {enabled ? (
-        <>
+        <motion.div className="pointer-events-auto absolute inset-0" style={{ clipPath: cardClip }}>
+        <motion.div className="absolute inset-0" style={{ y: cardTop }}>
+          {/* The visible card surface (dye + hairline ring). */}
+          <motion.div
+            aria-hidden
+            className="absolute left-0 top-0 rounded-2xl"
+            style={{
+              width: cardWidth,
+              height: cardHeight,
+              background: "var(--hero-card)",
+              boxShadow: "var(--depth-hero)",
+            }}
+          />
           <motion.div
             className="absolute aspect-[6/7] overflow-hidden rounded-xl"
             style={{
@@ -679,7 +705,8 @@ export const Hero = ({
               </motion.div>
             </motion.div>
           </motion.div>
-        </>
+        </motion.div>
+        </motion.div>
       ) : (
         // Base font scales with the viewport on small phones so the em-relative
         // name (Preston. is whitespace-nowrap) can't overflow the card below
